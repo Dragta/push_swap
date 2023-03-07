@@ -1,34 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   push_swap.h                                        :+:      :+:    :+:   */
+/*   lists.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/07 15:39:17 by fsusanna         ###   ########.fr       */
+/*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
+/*   Updated: 2023/03/07 15:31:34 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PUSH_SWAP_H
-# define PUSH_SWAP_H
-# include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
-int		ft_atoi(char *str, int *err);
-void	process(int *data, int n);
-void	pack(int *data, int n, t_list *stack);
+#include "../push_swap.h"
 
 typedef struct s_list
 {
-	int				value;
+	int				datum;
 	int				initial;
 	int				target;
-	struct s_list	**top;
+	struct s_list	**base;
 	struct s_list	*prev;
 	struct s_list	*next;
 }			t_list;
-t_list	*ft_lstnew(void *content);
+t_list	*ft_lstnew(int *data, int pos);
+
 void	ft_lstadd_front(t_list **lst, t_list *new);
 int		ft_lstsize(t_list *lst);
 t_list	*ft_lstlast(t_list *lst);
@@ -37,5 +31,25 @@ void	ft_lstdelone(t_list *lst, void (*del)(void *));
 void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
-/*___Bonus part___*/
-#endif
+
+t_list	*ft_lstnew(int *data, int pos)
+{
+	t_list	*ret;
+
+	ret = malloc(sizeof(*ret));
+	if (!ret)
+		return (NULL);
+	ret->datum = data[pos];
+	ret->initial = pos;
+	ret->target = -1;
+	ret->base = malloc(sizeof(*(ret->base)));
+	if (!(ret->base))
+	{
+		free(ret);
+		return (NULL);
+	}
+	*(ret->base) = ret;
+	ret->prev = ret;
+	ret->next = ret;
+	return (ret);
+}
