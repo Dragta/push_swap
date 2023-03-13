@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/07 10:52:34 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/13 23:32:47 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,59 @@ int	ft_atoi(char *str, int *err)
 	return (sign * ret);
 }
 
+void	init(t_list *stk, int n, int val, int *err)
+{
+	int	i;
+	t_list	*new;
+
+	new = stk + n;
+	new->top = stk->top;
+	*(new->top) = stk;
+	new->val = val;
+	new->initial = n;
+	if (!n)
+	{
+		new->prev = stk;
+		new->next = stk;
+	}
+	else
+	{
+		while (val <= stk->prev->val && stk->val > stk->prev->val)
+			stk = stk->prev;
+		while (val > stk->val && stk->val > stk->prev->val)
+			stk = stk->next;
+		if (stk->val == val)
+			*err = -1;
+		*(new->top) = NULL;
+		ft_lstmove_on(new, stk);
+	}
+}
+
+int	main(int narg, char **args)
+{
+	int	err;
+	int	i;
+	t_list	*stack_a;
+	t_list	*top;
+
+	stack_a = malloc((narg - 1) * sizeof(t_list));
+	top = stack_a;
+	i = 0;
+	err = 0;
+	if (!stack_a)
+		err = 0;
+	else
+		stack_a->top = &top;
+	while (!err && ++i < narg)
+		init(stack_a, i - 1, ft_atoi(args[i], &err), &err);
+	if (narg != i)
+		write(1, "Error\n", 6);
+	else
+		process(stack_a);
+	free(stack_a);
+	return (0);
+}
+/*
 int	main(int narg, char **args)
 {
 	int	err;
@@ -46,17 +99,16 @@ int	main(int narg, char **args)
 	int	*data;
 
 	data = malloc(narg * sizeof(int));
-	i = 1;
+	i = 0;
 	if (!data)
 		i = narg + 1;
-	while (narg > i)
+	while (++i < narg)
 	{
 		err = 0;
 		n = ft_atoi(args[i], &err);
 		if (err)
-			break;
+			break ;
 		data[i - 1] = n;
-		i++;
 	}
 	if (narg != i)
 		write(1, "Error\n", 6);
@@ -64,4 +116,4 @@ int	main(int narg, char **args)
 		process(data, narg);
 	free(data);
 	return (0);
-}
+}*/

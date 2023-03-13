@@ -6,45 +6,50 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/07 15:38:53 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/13 18:09:21 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-void	pack(int *data, int n, t_list *stack)
+void	index(t_list *stk)
+{
+	t_list	*tmp;
+
+	tmp = *(stk->top);
+	tmp->target = 0;
+	tmp = tmp->next;
+	while(tmp != *(stk->top))
+	{
+		tmp->target = tmp->prev->target + 1;
+		tmp = tmp->next;
+	}
+}
+
+void	pack(int *data, int n, t_list *stk)
 {
 	int		i;
-	t_list	*tmp;
 	t_list	*new;
 
 	i = 0;
-	tmp = stack;
 	while (++i < n)
 	{
-		if (data[i] < tmp->datum)
-		{
-			while (data[i] < tmp->prev->datum && tmp != *(tmp->base))
-				tmp = tmp->prev;
-		}
-		else
-		{
-			while (data[i] > tmp->next->datum && tmp != *(tmp->base))
-				tmp = tmp->next;
-		}
+		new = NULL;
+		while (data[i] <= stk->prev->datum && stk->datum > stk->prev->datum)
+			stk = stk->prev;
+		while (data[i] > stk->datum && stk->datum > stk->prev->datum)
+			stk = stk->next;
 		new = ft_lstnew(data, i);
-		if (!new)
-			free_all(stack);
-		else
+		if (!new || data[i] == stk->datum)
 		{
-			new->prev = tmp->prev;
-			new->next = tmp;
-			tmp->prev->next = new;
-			tmp->prev = new;
-			if (new->datum < tmp->datum)
-				*(tmp->base) = new;
+			write(1, "Error\n", 6);
+			free_all(stk);
+			break ;
 		}
+		ft_lstmove_on(new, stk);
 	}
+	if (new)
+		index(stk);
 
 /*	crea nuevo eslabón con primer valor
  *	2º es prev y next del primero
@@ -65,6 +70,11 @@ void	process(int *data, int n)
 	t_list	*stack_a;
 
 	stack_a = ft_lstnew(data, 0);
+	if (!stack_a)
+	{
+		write(1, "Error\n", 6);
+		return ;
+	}
 	stack_a->target = 0;
 	pack(data, n, stack_a);
 }
