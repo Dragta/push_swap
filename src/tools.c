@@ -17,10 +17,10 @@ void	process(t_data **stk, int n)
 	int		i;
 
 	i = -1;
-	printf("val |targ|prev|next\n");
+	printf("id  |val |targ|prev|next\n");
 	while (++i < n)
 	{
-		printf("%4i|%4i|%4i|%4i\n", (*stk)[i].val, (*stk)[i].target, (*stk)[i].prev, (*stk)[i].next);
+		printf("%4i|%4i|%4i|%4i|%4i\n", (*stk)[i].id, (*stk)[i].val, (*stk)[i].target, (*stk)[i].prev, (*stk)[i].next);
 	}
 }
 /*
