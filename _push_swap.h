@@ -1,27 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lists.c                                            :+:      :+:    :+:   */
+/*   push_swap.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/13 23:34:58 by fsusanna         ###   ########.fr       */
+/*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
+/*   Updated: 2023/03/13 22:18:38 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../push_swap.h"
+#ifndef PUSH_SWAP_H
+# define PUSH_SWAP_H
+# include <stdio.h>
+# include <stdlib.h>
+# include <unistd.h>
 
-void	ft_move_data(t_data *stk, int mv, int on)
+typedef struct s_data
 {
-	if (stk[mv].id > -1)
-	{
-		stk[stk[mv].next].prev = stk[mv].prev;
-		stk[stk[mv].prev].next = stk[mv].next;
-	}
-	stk[mv].id = stk[on].id;
-	stk[mv].prev = stk[on].prev;
-	stk[mv].next = on;
-	stk[on].prev = mv;
-	stk[stk[mv].prev].next = mv;
-}
+	int	id;
+	int	*head;
+	int	val;
+	int	target;
+	int	prev;
+	int	next;
+}			t_data;
+
+int		main(void);
+/*___Bonus part___*/
+#endif

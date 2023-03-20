@@ -1,42 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.c                                            :+:      :+:    :+:   */
+/*   push_swap.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/13 18:09:21 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/13 23:32:47 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-void	process(t_data **stk, int n)
+int	main(void)
 {
-	int		i;
+	t_data	*stack;
 
-	i = -1;
-	printf("val |targ|prev|next\n");
-	while (++i < n)
-	{
-		printf("%4i|%4i|%4i|%4i\n", (*stk)[i].val, (*stk)[i].target, (*stk)[i].prev, (*stk)[i].next);
-	}
+	stack = malloc(5 * sizeof(t_data));
+
+	printf("size t_data: %li\n", sizeof(t_data));
+	printf("size: %li\n", sizeof(stack));
+	printf("stack: %p\n", stack);
+	printf("stack+1: %p\n", stack+1);
+	free(stack);
+	return (0);
 }
-/*
-void	process(t_data *stk, int n)
-{
-	int		i;
-	int		max;
-	int		min;
-	t_list	*stack_a;
-
-	stack_a = ft_lstnew(data, 0);
-	if (!stack_a)
-	{
-		write(1, "Error\n", 6);
-		return ;
-	}
-	stack_a->target = 0;
-	pack(data, n, stack_a);
-}*/
