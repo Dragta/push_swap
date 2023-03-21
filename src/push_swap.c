@@ -41,7 +41,9 @@ int	ft_atoi(char *str, int *err)
 void	index(t_data **stk)
 {
 	t_data	*tmp;
+	int		i;
 
+	i = 1;
 	tmp = (t_data *)&((*stk)[(*stk)[0].head[0]].id);
 	tmp->target = 0;
 	tmp = (t_data *)&((*stk)[tmp->next].id);
@@ -49,6 +51,15 @@ void	index(t_data **stk)
 	{
 		tmp->target = (*stk)[tmp->prev].target + 1;
 		tmp = (t_data *)&((*stk)[tmp->next].id);
+		i++;
+	}
+	printf("total i= %i\n", i);
+	(*stk)[0].prev = i - 1;
+	(*stk)[i - 1].next = 0;
+	while (--i)
+	{
+		(*stk)[i].prev = i - 1;
+		(*stk)[i - 1].next = i;
 	}
 }
 
@@ -60,7 +71,7 @@ void	ft_move_data(t_data **stk, int mv, int on)
 		(*stk)[(*stk)[mv].prev].next = (*stk)[mv].next;
 	}
 	(*stk)[mv].id = (*stk)[on].id;
-	(*stk)[mv].prev = stk[on]->prev;
+	(*stk)[mv].prev = (*stk)[on].prev;
 	(*stk)[mv].next = on;
 	(*stk)[on].prev = mv;
 	(*stk)[(*stk)[mv].prev].next = mv;
@@ -70,12 +81,6 @@ void	init(t_data **stk, int n, int val, int *err)
 {
 	int	i;
 
-	printf("Val %d: %d\n", n, val);
-	printf("puntero stk: %p\n", stk);
-	printf("puntero *stk: %p\n", *stk);
-	printf("puntero (*stk)+1: %p\n", (*stk) + 1);
-	printf("puntero stk + 1: %p\n", stk + 1);
-	printf("puntero stk[n]: %p\n", stk[n]);
 	(*stk)[n].val = val;
 	if (!n)
 	{
@@ -86,15 +91,13 @@ void	init(t_data **stk, int n, int val, int *err)
 	}
 	else
 	{
-		printf("aquí0\n");
 		(*stk)[n].id = -1;
 		i = 0;
-		printf("aquí1\n");
 		while (val <= (*stk)[(*stk)[i].prev].val && (*stk)[i].val > (*stk)[(*stk)[i].prev].val)
 			i = (*stk)[i].prev;
-		while (val > (*stk)[i].val && (*stk)[i].val > (*stk)[(*stk)[i].prev].val)
+		while (val > (*stk)[i].val && ((*stk)[i].val > (*stk)[(*stk)[i].prev].val ||
+			val < (*stk)[(*stk)[i].prev].val))
 			i = (*stk)[i].next;
-		printf("aquí2\n");
 		if ((*stk)[i].val == val)
 			*err = -1;
 		ft_move_data(stk, n, i);
@@ -109,10 +112,6 @@ int	main(int narg, char **args)
 	int	i;
 	t_data	*stack;
 	int	head[2];
-	char	txt[5] = "1234\n";
-
-	printf("txt: %p\n", txt);
-	printf("&txt: %p\n", &txt);
 
 	stack = malloc((narg - 1) * sizeof(t_data));
 	i = 0;
@@ -121,14 +120,11 @@ int	main(int narg, char **args)
 	head[1] = -1;
 	if (!(stack))
 		err = -1;
-	printf("     head: %p\n", head);
-	printf("  head[0]: %i\n", head[0]);
-	printf("    *head: %i\n", *head);
-	printf(" &head[0]: %p\n", &head[0]);
 	while (!err && ++i < narg)
 	{
 		printf("i = %i\n", i);
 		stack[i - 1].head = &head[0];
+		process(&stack, i - 1);
 		init(&stack, i - 1, ft_atoi(args[i], &err), &err);
 	}
 	if (narg != i)
@@ -136,7 +132,7 @@ int	main(int narg, char **args)
 	else
 	{
 		index(&stack);
-		process(&stack, narg);
+		process(&stack, narg - 1);
 	}
 	free(stack);
 	return (0);
