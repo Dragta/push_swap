@@ -31,6 +31,7 @@ void	index(t_data **stk);
 void    ft_move_data(t_data **stk, int mv, int on);
 void	init(t_data **stk, int n, int val, int *err);
 void	process(t_data **stk, int n);
+t_data	**mem_stack(int n);
 int		main(int narg, char **args);
 /*___Bonus part___*/
 #endif
