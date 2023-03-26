@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/13 23:32:47 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/27 00:57:10 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ void	ft_move_data(t_data **stk, int mv, int on)
 			stk[stk[mv]->prev]->next = stk[mv]->next;
 		}
 		else 
-			stk[mv]->head[stk[mv]->id] == -1;
+			stk[mv]->head[stk[mv]->id] = -1;
 	}
 	stk[mv]->id = stk[on]->id;
 	stk[mv]->prev = stk[on]->prev;
