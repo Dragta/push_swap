@@ -20,9 +20,16 @@ void	process(t_data **stk, int n)
 	printf("id  |val |targ|prev|next\n");
 	while (++i < n)
 	{
-		printf("%4i|%4i|%4i|%4i|%4i\n", (*stk)[i].id, (*stk)[i].val, (*stk)[i].target, (*stk)[i].prev, (*stk)[i].next);
+		printf("%4i|%4i|%4i|%4i|%4i\n", stk[i]->id, stk[i]->val, stk[i]->target, stk[i]->prev, stk[i]->next);
 	}
 }
+
+void	move_ra(t_data **stk)
+{
+	
+}
+
+
 /*
 void	process(t_data *stk, int n)
 {

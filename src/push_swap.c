@@ -43,7 +43,6 @@ void	index(t_data **stk)
 	t_data	*tmp;
 	int		i;
 
-/*	tmp = (t_data *)&((*stk)[(*stk)[0].head[0]].id);*/
 	tmp = stk[stk[0]->head[0]];
 	tmp->target = 0;
 	tmp = stk[tmp->next];
@@ -68,8 +67,13 @@ void	ft_move_data(t_data **stk, int mv, int on)
 {
 	if (stk[mv]->id > -1)
 	{
-		stk[stk[mv]->next]->prev = stk[mv]->prev;
-		stk[stk[mv]->prev]->next = stk[mv]->next;
+		if (stk[mv]->prev != mv)
+		{
+			stk[stk[mv]->next]->prev = stk[mv]->prev;
+			stk[stk[mv]->prev]->next = stk[mv]->next;
+		}
+		else 
+			stk[mv]->head[stk[mv]->id] == -1;
 	}
 	stk[mv]->id = stk[on]->id;
 	stk[mv]->prev = stk[on]->prev;
