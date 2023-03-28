@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/27 00:57:10 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/28 02:35:16 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,72 +43,60 @@ void	index(t_data **stk)
 	t_data	*tmp;
 	int		i;
 
-	tmp = stk[stk[0]->head[0]];
+	tmp = stk[0]->top[0];
 	tmp->target = 0;
-	tmp = stk[tmp->next];
+	tmp = tmp->next;
 	i = 1;
-	while(tmp != stk[stk[0]->head[0]])
+	while(tmp != stk[0]->top[0])
 	{
-		tmp->target = i;
-		tmp = stk[tmp->next];
-		i++;
+		tmp->target = i++;
+		tmp = tmp->next;
 	}
 	printf("total i= %i\n", i);
-	stk[0]->prev = i - 1;
-	stk[i - 1]->next = 0;
+	stk[0]->prev = stk[i - 1];
+	stk[i - 1]->next = stk[0];
 	while (--i)
 	{
-		stk[i]->prev = i - 1;
-		stk[i - 1]->next = i;
+		stk[i]->prev = stk[i - 1];
+		stk[i - 1]->next = stk[i];
 	}
+	stk[0]->top[0] = stk[0];
 }
 
-void	ft_move_data(t_data **stk, int mv, int on)
+void	add_data(t_data *mv, t_data *on)
 {
-	if (stk[mv]->id > -1)
+	mv->id = 0;
+	if (!on)
 	{
-		if (stk[mv]->prev != mv)
-		{
-			stk[stk[mv]->next]->prev = stk[mv]->prev;
-			stk[stk[mv]->prev]->next = stk[mv]->next;
-		}
-		else 
-			stk[mv]->head[stk[mv]->id] = -1;
-	}
-	stk[mv]->id = stk[on]->id;
-	stk[mv]->prev = stk[on]->prev;
-	stk[mv]->next = on;
-	stk[on]->prev = mv;
-	stk[stk[mv]->prev]->next = mv;
-}
-
-void	init(t_data **stk, int n, int val, int *err)
-{
-	int	i;
-
-	stk[n]->val = val;
-	if (!n)
-	{
-		stk[n]->id = 0;
-		stk[n]->head[0] = 0;
-		stk[n]->prev = 0;
-		stk[n]->next = 0;
+		mv->prev = mv;
+		mv->next = mv;
 	}
 	else
 	{
-		stk[n]->id = -1;
-		i = 0;
-		while (val <= stk[stk[i]->prev]->val && stk[i]->val > stk[stk[i]->prev]->val)
-			i = stk[i]->prev;
-		while (val > stk[i]->val && (stk[i]->val > stk[stk[i]->prev]->val ||
-			val < stk[stk[i]->prev]->val))
-			i = stk[i]->next;
-		if (stk[i]->val == val)
-			*err = -1;
-		ft_move_data(stk, n, i);
-		if (stk[stk[n]->head[0]]->val > val)
-			stk[n]->head[0] = n;
+		mv->prev = on->prev;
+		mv->next = on;
+		on->prev = mv;
+		mv->prev->next = mv;
 	}
+	if (!mv->top[0] || mv->val < mv->top[0]->val)
+		mv->top[0] = mv;
+}
+
+void	init(t_data **stk, t_data *n, int val, int *err)
+{
+	t_data	*i;
+
+	n->val = val;
+	n->id = -1;
+	i = stk[0]->top[0];
+	if (n > stk[0])
+	{
+		while (val > i->val && (i->val > i->prev->val || val < i->prev->val))
+			i = i->next;
+		if (i->val == val)
+			*err = -1;
+	}
+	add_data(n, i);
 }
 
 t_data	**mem_stack(int n)
@@ -135,28 +123,29 @@ int	main(int narg, char **args)
 	int	err;
 	int	i;
 	t_data	**stack;
-	int	head[2];
+	t_data	*top[2];
 
 	i = 0;
 	err = 0;
-	head[0] = -1;
-	head[1] = -1;
+	top[0] = NULL;
+	top[1] = NULL;
 	stack = mem_stack(narg - 1);
 	if (!stack)
 		err = -1;
 	while (!err && ++i < narg)
 	{
 		printf("i = %i\n", i);
-		stack[i - 1]->head = &head[0];
-		process(stack, i - 1);
-		init(stack, i - 1, ft_atoi(args[i], &err), &err);
+		stack[i - 1]->top = top;
+		init(stack, stack[i - 1], ft_atoi(args[i], &err), &err);
+		show_all(stack, i - 1);
 	}
 	if (narg != i)
 		write(1, "Error\n", 6);
 	else
 	{
 		index(stack);
-		process(stack, narg - 1);
+		show_all(stack, i - 2);
+		process(stack);
 	}
 	free(*stack);
 	free(stack);

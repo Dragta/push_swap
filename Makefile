@@ -5,7 +5,7 @@ CFLAGS = -Wall -Werror -Wextra -std=c89# -g -fsanitize=address
 INCLUDES = include
 
 DIR_PUSH_SWAP = src/
-FILES_PUSH_SWAP = push_swap tools 
+FILES_PUSH_SWAP = push_swap tools ops1 ops2 ops3 ops4 
 
 FILES_SRC += $(addprefix $(DIR_PUSH_SWAP), $(FILES_PUSH_SWAP))
 
