@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 01:28:07 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/28 15:26:40 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ void	data_atop(t_data *mv, t_data *on)
 	if (mv->prev != mv)
 	{
 		if (mv->prev != on)
-			mv->top[mv->id] = mv->next;
+			set_top(mv->next);
 		mv->prev->next = mv->next;
 		mv->next->prev = mv->prev;
 	}
@@ -37,7 +37,7 @@ void	data_atop(t_data *mv, t_data *on)
 		on->prev = mv;
 		mv->prev->next = mv;
 	}
-	mv->top[mv->id] = mv;
+	set_top(mv);
 }
 
 void	pr_pa(t_data **stk)

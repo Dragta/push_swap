@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 02:19:04 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/28 15:30:14 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 
 typedef struct s_data
 {
+	int				max_val;
+	int				pos;
 	int				id;
 	struct s_data	**top;
 	int				val;
@@ -29,6 +31,7 @@ typedef struct s_data
 int		ft_atoi(char *str, int *err);
 void	index(t_data **stk);
 void    data_atop(t_data *mv, t_data *on);
+void    set_top(t_data *n);
 void	move_sa(t_data **stk);
 void	move_sb(t_data **stk);
 void	pr_sa(t_data **stk);
@@ -51,6 +54,7 @@ void	init(t_data **stk, t_data *n, int val, int *err);
 void	show_all(t_data **stk, int n);
 void	show_a(t_data **stk);
 void	show_b(t_data **stk);
+int		dist(t_data **stk);
 void	process(t_data **stk);
 t_data	**mem_stack(int n);
 int		main(int narg, char **args);

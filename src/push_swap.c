@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 02:35:16 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/03/28 20:20:33 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,6 @@ void	index(t_data **stk)
 		tmp->target = i++;
 		tmp = tmp->next;
 	}
-	printf("total i= %i\n", i);
 	stk[0]->prev = stk[i - 1];
 	stk[i - 1]->next = stk[0];
 	while (--i)
@@ -60,7 +59,7 @@ void	index(t_data **stk)
 		stk[i]->prev = stk[i - 1];
 		stk[i - 1]->next = stk[i];
 	}
-	stk[0]->top[0] = stk[0];
+	set_top(stk[0]);
 }
 
 void	add_data(t_data *mv, t_data *on)
@@ -134,17 +133,15 @@ int	main(int narg, char **args)
 		err = -1;
 	while (!err && ++i < narg)
 	{
-		printf("i = %i\n", i);
 		stack[i - 1]->top = top;
+		stack[i - 1]->max_val = narg - 1;
 		init(stack, stack[i - 1], ft_atoi(args[i], &err), &err);
-		show_all(stack, i - 1);
 	}
 	if (narg != i)
 		write(1, "Error\n", 6);
 	else
 	{
 		index(stack);
-		show_all(stack, i - 2);
 		process(stack);
 	}
 	free(*stack);
