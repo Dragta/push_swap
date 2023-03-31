@@ -12,6 +12,152 @@
 
 #include "../push_swap.h"
 
+int	sense(t_data *tx, t_data *ty, t_data *tz)
+{
+	int	ret;
+	int	x;
+	int	y;
+	int	z;
+	
+	x = tx->target;
+	y = ty->target;
+	z = tz->target;
+	ret = 1;
+	if (x == y || y == z || z == x)
+		ret = 0;
+	else if ((x > y && y > z) || (z > x && x > y) || (y > z && z > x))
+		ret = -1;
+	return (ret);
+}
+
+void	process(t_data **stk)
+{
+	int	ct;
+	t_data	**a;
+	t_data	**b;
+
+	a = &(stk[0]->top[0]);
+	b = &(stk[0]->top[1]);
+	ct = 0;
+	while ((dist(*a) || *b) && ct++ < 10 * stk[0]->max_val)
+	{
+		while (*b && sense(*a, *b, (*a)->next) == 1 &&
+			sense(*a, *b, (*b)->prev) == 1)
+			pr_rb(stk);
+/*		if (*a)
+			pr_pb(stk);*/
+		while (!(*b) || *b == (*b)->next || (*a && sense((*b)->next, *b, *a) == 1))
+		{
+			while (*b && sense(*b, (*b)->prev, *a) == 1)
+				pr_rrb(stk);
+			pr_pb(stk);
+		}
+
+		while (*a && sense(*b, *a, (*b)->next) == -1 &&
+			sense(*b, *a, (*a)->prev) == -1)
+			pr_ra(stk);
+/*		if (*b)
+			pr_pa(stk);*/
+		while (!(*a) || *a == (*a)->next || (*b && sense((*a)->next, *a, *b) == -1))
+		{
+			while (*a && sense(*a, (*a)->prev, *b) == -1)
+				pr_rra(stk);
+			pr_pa(stk);
+		}
+
+	}
+}
+
+int	trend(t_data *t)
+{
+	t_data	*i;
+	int		lim;
+	int		trend;
+
+	if (!t)
+		return (0);
+	i = t->next;
+	lim = t->target;
+	trend = 0;
+	if (lim < i->target)
+		trend = 1;
+	if (lim > i->target)
+		trend = -1;
+	i = i->next;
+	while (i != t)
+	{
+		if (trend > 0)
+		{
+			if (i->prev->target > lim)
+				{
+					if (i->target < i->prev->target && i->target > lim)
+						return (trend);
+				}
+			else
+				{
+					if (i->target < i->prev->target || i->target > lim)
+						return (trend);
+				}
+			trend++;
+		}
+		else
+		{
+			if (i->prev->target < lim)
+				{
+					if (i->target > i->prev->target && i->target < lim)
+						return (trend);
+				}
+			else
+				{
+					if (i->target > i->prev->target || i->target < lim)
+						return (trend);
+				}
+			trend--;
+		}
+		i = i->next;
+	}
+	return (trend);
+}
+
+int	dist(t_data *t)
+{
+	t_data	*i;
+	int		dist;
+	int		tmp;
+
+	dist = 0;
+	i = t;
+	while (i)
+	{
+		tmp = i->pos - i->target;
+		if (tmp < 0)
+			tmp *= -1;
+		if (tmp > (i->max_val - tmp))
+			tmp = i->max_val - tmp;
+/*		printf("%i ", tmp);*/
+		dist += tmp;
+		i = i->next;
+		if (i == t)
+			break ;
+	}
+/*	printf("=> %i.\n", dist);*/
+	return (dist);
+}
+
+void	set_top(t_data *n)
+{
+	t_data	*i;
+
+	n->top[n->id] = n;
+	n->pos = 0;
+	i = n->next;
+	while (i != n)
+	{
+		i->pos = i->prev->pos + 1;
+		i = i->next;
+	}
+}
+
 void	show_all(t_data **stk, int n)
 {
 	int		i;
@@ -70,7 +216,7 @@ void	process(t_data **stk)
 		pr_ra(stk);
 	}
 }*/
-
+/*
 void	process(t_data **stk)
 {
 	int		ct;
@@ -80,65 +226,101 @@ void	process(t_data **stk)
 	a = &(stk[0]->top[0]);
 	b = &(stk[0]->top[1]);
 	ct = 0;
-	while ((dist(stk) || *b) && ct++ < 10 * stk[0]->max_val)
+	while ((dist(*a) || *b) && ct++ < 10 * stk[0]->max_val)
 	{
-		while (!(*a) || (*b && ((*b)->target > (*a)->prev->target) &&
-				((*b)->target - (*a)->target == (*a)->max_val - 1 ||
+		while (!(*a) || (*b && ((*b)->target > (*a)->prev->target || 
+				(*b)->target - (*a)->target == (*a)->max_val - 1 ||
 				 (*b)->target < (*a)->target)))
 			pr_pa(stk);
 		if ((*a)->target > (*a)->next->target &&
-				(*a)->target > (*a)->prev->target)
+				(*a)->target > (*a)->prev->target && (*a)->next != (*a)->prev)
 		{
 			if ((*a)->prev->prev->target < (*a)->target)
 				pr_pb(stk);
 			else
 				pr_sa(stk);
 		}
-		if (*b && (*b)->target > (*b)->next->target &&
+		else if (*b && (*b)->target > (*b)->next->target &&
 				(*b)->target > (*b)->prev->target)
 			pr_sb(stk);
-		if (*b && (*b)->target < (*b)->prev->target)
+		if (*b && (*b)->target > (*b)->prev->target)
 			pr_rrr(stk);
 		else
 			pr_rra(stk);
 	}
-}
-
-int	dist(t_data **stk)
+}*/
+/***********************************************************/
+/*void	process(t_data **stk)
 {
-	t_data	*i;
-	int		dist;
-	int		tmp;
+	int		ct;
+	int		i;
+	t_data	**a;
+	t_data	**b;
 
-	dist = 0;
-	i = stk[0]->top[0];
-	while (i)
+	a = &(stk[0]->top[0]);
+	b = &(stk[0]->top[1]);
+	ct = 0;
+	while ((dist(*a) || *b) && ct++ < 10 * stk[0]->max_val)
 	{
-		tmp = i->pos - i->target;
-		if (tmp < 0)
-			tmp *= -1;
-		if (tmp > (i->max_val - tmp))
-			tmp = i->max_val - tmp;
-/*		printf("%i ", tmp);*/
-		dist += tmp;
-		i = i->next;
-		if (i == i->top[0])
-			break ;
-	}
-/*	printf("=> %i.\n", dist);*/
-	return (dist);
-}
-
-void	set_top(t_data *n)
-{
-	t_data	*i;
-
-	n->top[n->id] = n;
-	n->pos = 0;
-	i = n->next;
-	while (i != n)
-	{
-		i->pos = i->prev->pos + 1;
-		i = i->next;
-	}
-}
+		if (*a)
+		{
+			i = trend(*a) + 1;
+			while (*a && *b && (*b)->prev->target < (*a)->target && (*b)->target < (*b)->prev->target)
+				pr_rrb(stk);
+			pr_pb(stk);
+			while (i > 1)
+			{
+				while (--i > -1)
+				{
+					while (*a && *b && (*b)->prev->target < (*a)->target && (*b)->target < (*b)->prev->target)
+						pr_rrb(stk);
+					pr_pb(stk);
+				}
+				i = trend(*a) + 1;
+			}
+		}
+		while (*a && (*a)->target > (*a)->prev->target)
+			pr_rra(stk);
+		if (*a && (*a)->next == (*a)->prev)
+			pr_rra(stk);
+		if (*b)
+		{
+			i = trend(*b) - 1;
+			while (*a && *b && (*b)->target < (*a)->prev->target && (*a)->target > (*a)->prev->target)
+				pr_rra(stk);
+			while (i < -1)
+			{
+				while (*b && ++i < 1)
+				{
+					while (*a && *b && (*b)->target < (*a)->prev->target && (*a)->target > (*a)->prev->target)
+						pr_rra(stk);
+					pr_pa(stk);
+				}
+				i = trend(*b) - 1;
+			}
+		}
+		while (*b && (*b)->target > (*b)->prev->target)
+			pr_rrb(stk);
+		if (*b && (*b)->next == (*b)->prev)
+			pr_rrb(stk);
+		if (*a && (*a)->target > (*a)->next->target)
+			pr_rra(stk);*/
+	/*	if (*b)
+			pr_pa(stk);*/
+/*		if ((*a)->target > (*a)->next->target && (*a)->prev->target < (*a)->next->target)
+		{
+			if ((*a)->target > (*a)->next->next->target)
+				pr_pb(stk);
+			else
+				pr_sa(stk);
+		}
+		if (*b && (*b)->target < (*b)->next->target && (*b)->target < (*b)->prev->target)
+			pr_rb(stk);
+		if ((*a)->target && *b && (*b)->target < (*b)->prev->target)
+			pr_rrr(stk);
+		if ((*a)->target && *b && (*b)->target > (*b)->prev->target)
+			pr_rra(stk);
+		if (*b && (*b)->target < (*b)->next->target)
+			pr_sb(stk);*/
+/*	}
+}*/
