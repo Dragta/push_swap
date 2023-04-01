@@ -39,7 +39,7 @@ void	process(t_data **stk)
 	a = &(stk[0]->top[0]);
 	b = &(stk[0]->top[1]);
 	ct = 0;
-	while ((dist(*a) || *b) && ct++ < 10 * stk[0]->max_val)
+	while ((trend(*a) < (*a)->max_val || *b) && ct++ < 100 * stk[0]->max_val)
 	{
 		while (*b && sense(*a, *b, (*a)->next) == 1 &&
 			sense(*a, *b, (*b)->prev) == 1)
@@ -66,55 +66,38 @@ void	process(t_data **stk)
 		}
 
 	}
+	if (trend(*a) < (*a)->max_val)
+		return ;
+	while ((*a)->target && (*a)->target < (*a)->max_val / 2)
+		pr_rra(stk);
+	while ((*a)->target >= (*a)->max_val / 2)
+		pr_ra(stk);
 }
 
 int	trend(t_data *t)
 {
 	t_data	*i;
-	int		lim;
+	int		s;
 	int		trend;
 
 	if (!t)
 		return (0);
 	i = t->next;
-	lim = t->target;
-	trend = 0;
-	if (lim < i->target)
-		trend = 1;
-	if (lim > i->target)
-		trend = -1;
+	if (i == t)
+		return (1);
+	trend = 2;
+/*	if(i->target < t->target && t->target - i->target > t->max_val / 2)*/
+	if(i->target < t->target)
+		trend = -2;
+	if (i->next == t)
+		return (trend);
 	i = i->next;
-	while (i != t)
+	s = sense(t, t->next, i);
+	while (i != t && s * trend > 0)
 	{
-		if (trend > 0)
-		{
-			if (i->prev->target > lim)
-				{
-					if (i->target < i->prev->target && i->target > lim)
-						return (trend);
-				}
-			else
-				{
-					if (i->target < i->prev->target || i->target > lim)
-						return (trend);
-				}
-			trend++;
-		}
-		else
-		{
-			if (i->prev->target < lim)
-				{
-					if (i->target > i->prev->target && i->target < lim)
-						return (trend);
-				}
-			else
-				{
-					if (i->target > i->prev->target || i->target < lim)
-						return (trend);
-				}
-			trend--;
-		}
+		trend += s;
 		i = i->next;
+		s = sense(t, t->next, i);
 	}
 	return (trend);
 }
