@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 21:24:04 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/04 00:20:44 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,48 +30,116 @@ int	sense(t_data *tx, t_data *ty, t_data *tz)
 	return (ret);
 }
 
+void	assign_ops(void (**ops)(t_data **))
+{
+	ops[0] = &pr_sa;
+	ops[1] = &pr_sb;
+	ops[2] = &pr_ss;
+	ops[3] = &pr_pa;
+	ops[4] = &pr_pb;
+	ops[5] = &pr_ra;
+	ops[6] = &pr_rb;
+	ops[7] = &pr_rr;
+	ops[8] = &pr_rra;
+	ops[9] = &pr_rrb;
+	ops[10] = &pr_rrr;
+}
+
 void	process(t_data **stk)
 {
-	int	ct;
+	int		ct;
+	int		push;
 	t_data	**a;
 	t_data	**b;
+	void	(*ops[11])(t_data **);
+
+	assign_ops(ops);
 
 	a = &(stk[0]->top[0]);
 	b = &(stk[0]->top[1]);
 	ct = 0;
-	while ((trend(*a) < (*a)->max_val || *b) && ct++ < 100 * stk[0]->max_val)
+	push = 0;
+}
+
+int	longest(t_data *stk)
+{
+	t_data	*i;
+	int		tmp;
+	int		ct;
+	int		s;
+
+	s = -1;
+	ct = 0;
+	while (++s < 2)
 	{
-		while (*b && sense(*a, *b, (*a)->next) == 1 &&
-			sense(*a, *b, (*b)->prev) == 1)
-			pr_rb(stk);
-/*		if (*a)
-			pr_pb(stk);*/
-		while (!(*b) || *b == (*b)->next || (*a && sense((*b)->next, *b, *a) == 1))
+		i = stk[0]->top[s];
+		if (i)
 		{
-			while (*b && sense(*b, (*b)->prev, *a) == 1)
-				pr_rrb(stk);
-			pr_pb(stk);
+			tmp = 1;
+			while (i->next != stk[0]->top[s])
+			{
+				tmp++;
+				i = i->next;
+			}
 		}
-
-		while (*a && sense(*b, *a, (*b)->next) == -1 &&
-			sense(*b, *a, (*a)->prev) == -1)
-			pr_ra(stk);
-/*		if (*b)
-			pr_pa(stk);*/
-		while (!(*a) || *a == (*a)->next || (*b && sense((*a)->next, *a, *b) == -1))
-		{
-			while (*a && sense(*a, (*a)->prev, *b) == -1)
-				pr_rra(stk);
-			pr_pa(stk);
-		}
-
+		if (tmp > ct)
+			ct = tmp;
 	}
-	if (trend(*a) < (*a)->max_val)
-		return ;
-	while ((*a)->target && (*a)->target < (*a)->max_val / 2)
-		pr_rra(stk);
-	while ((*a)->target >= (*a)->max_val / 2)
-		pr_ra(stk);
+	return (ct);
+}
+
+int	gap(int g, int max)
+{
+	if (g < 0)
+		g = -g;
+	if (g > max / 2)
+		g = max - g;
+	return (g);
+}
+
+int	inter_tension(t_data **stk)
+{
+	int		ret;
+	t_data	*ia;
+	t_data	*ib;
+	int		tmp;
+	int		ct;
+
+	ret = 0;
+	ia = stk[0]->top[0];
+	ib = stk[0]->top[1];
+	if (!ia || !ib)
+		return (0);
+	ct = longest(stk);
+	tmp = ct / 2;
+	while (tmp--)
+	{
+		ia = ia->prev;
+		ib = ib->prev;
+	}
+	while (ct--)
+	{
+		ret += gap(ia->target - ib->target, ia->max_val);
+		ia = ia->next;
+		ib = ib->next;
+	}
+	return (ret);
+}
+
+int	intra_tension(t_data *t)
+{
+	int		ret;
+	t_data	*i;
+
+	ret = gap(t->target - t->next->target, t->max_val);
+	i = t->next;
+	while (i != t)
+	{
+		ret +=gap(i->target - i->next->target, i->max_val);
+		i = i->next;
+	}
+
+	return (ret);
 }
 
 int	trend(t_data *t)
@@ -92,12 +160,13 @@ int	trend(t_data *t)
 	if (i->next == t)
 		return (trend);
 	i = i->next;
-	s = sense(t, t->next, i);
+	s = sense(t, i->prev, i);
+	trend = 3 * s;
 	while (i != t && s * trend > 0)
 	{
 		trend += s;
 		i = i->next;
-		s = sense(t, t->next, i);
+		s = sense(t, i->prev, i);
 	}
 	return (trend);
 }
@@ -133,11 +202,22 @@ void	set_top(t_data *n)
 
 	n->top[n->id] = n;
 	n->pos = 0;
-	i = n->next;
+	if (n->id)
+		i = n->prev;
+	else
+		i = n->next;
 	while (i != n)
 	{
-		i->pos = i->prev->pos + 1;
-		i = i->next;
+		if (n->id)
+		{
+			i->pos = i->next->pos + 1;
+			i = i->prev;
+		}
+		else
+		{
+			i->pos = i->prev->pos + 1;
+			i = i->next;
+		}
 	}
 }
 
@@ -186,124 +266,3 @@ void	show_b(t_data **stk)
 		d = d->next;
 	}
 }
-/*
-void	process(t_data **stk)
-{
-	show_a(stk);
-	printf("Dist: %i\n", dist(stk));
-	pr_ra(stk);
-	while (stk[0]->top[0] != stk[0])
-	{
-		show_a(stk);
-		printf("Dist: %i\n", dist(stk));
-		pr_ra(stk);
-	}
-}*/
-/*
-void	process(t_data **stk)
-{
-	int		ct;
-	t_data	**a;
-	t_data	**b;
-
-	a = &(stk[0]->top[0]);
-	b = &(stk[0]->top[1]);
-	ct = 0;
-	while ((dist(*a) || *b) && ct++ < 10 * stk[0]->max_val)
-	{
-		while (!(*a) || (*b && ((*b)->target > (*a)->prev->target || 
-				(*b)->target - (*a)->target == (*a)->max_val - 1 ||
-				 (*b)->target < (*a)->target)))
-			pr_pa(stk);
-		if ((*a)->target > (*a)->next->target &&
-				(*a)->target > (*a)->prev->target && (*a)->next != (*a)->prev)
-		{
-			if ((*a)->prev->prev->target < (*a)->target)
-				pr_pb(stk);
-			else
-				pr_sa(stk);
-		}
-		else if (*b && (*b)->target > (*b)->next->target &&
-				(*b)->target > (*b)->prev->target)
-			pr_sb(stk);
-		if (*b && (*b)->target > (*b)->prev->target)
-			pr_rrr(stk);
-		else
-			pr_rra(stk);
-	}
-}*/
-/***********************************************************/
-/*void	process(t_data **stk)
-{
-	int		ct;
-	int		i;
-	t_data	**a;
-	t_data	**b;
-
-	a = &(stk[0]->top[0]);
-	b = &(stk[0]->top[1]);
-	ct = 0;
-	while ((dist(*a) || *b) && ct++ < 10 * stk[0]->max_val)
-	{
-		if (*a)
-		{
-			i = trend(*a) + 1;
-			while (*a && *b && (*b)->prev->target < (*a)->target && (*b)->target < (*b)->prev->target)
-				pr_rrb(stk);
-			pr_pb(stk);
-			while (i > 1)
-			{
-				while (--i > -1)
-				{
-					while (*a && *b && (*b)->prev->target < (*a)->target && (*b)->target < (*b)->prev->target)
-						pr_rrb(stk);
-					pr_pb(stk);
-				}
-				i = trend(*a) + 1;
-			}
-		}
-		while (*a && (*a)->target > (*a)->prev->target)
-			pr_rra(stk);
-		if (*a && (*a)->next == (*a)->prev)
-			pr_rra(stk);
-		if (*b)
-		{
-			i = trend(*b) - 1;
-			while (*a && *b && (*b)->target < (*a)->prev->target && (*a)->target > (*a)->prev->target)
-				pr_rra(stk);
-			while (i < -1)
-			{
-				while (*b && ++i < 1)
-				{
-					while (*a && *b && (*b)->target < (*a)->prev->target && (*a)->target > (*a)->prev->target)
-						pr_rra(stk);
-					pr_pa(stk);
-				}
-				i = trend(*b) - 1;
-			}
-		}
-		while (*b && (*b)->target > (*b)->prev->target)
-			pr_rrb(stk);
-		if (*b && (*b)->next == (*b)->prev)
-			pr_rrb(stk);
-		if (*a && (*a)->target > (*a)->next->target)
-			pr_rra(stk);*/
-	/*	if (*b)
-			pr_pa(stk);*/
-/*		if ((*a)->target > (*a)->next->target && (*a)->prev->target < (*a)->next->target)
-		{
-			if ((*a)->target > (*a)->next->next->target)
-				pr_pb(stk);
-			else
-				pr_sa(stk);
-		}
-		if (*b && (*b)->target < (*b)->next->target && (*b)->target < (*b)->prev->target)
-			pr_rb(stk);
-		if ((*a)->target && *b && (*b)->target < (*b)->prev->target)
-			pr_rrr(stk);
-		if ((*a)->target && *b && (*b)->target > (*b)->prev->target)
-			pr_rra(stk);
-		if (*b && (*b)->target < (*b)->next->target)
-			pr_sb(stk);*/
-/*	}
-}*/
