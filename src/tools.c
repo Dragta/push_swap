@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/04 00:20:44 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/04 09:47:10 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,9 @@ int	sense(t_data *tx, t_data *ty, t_data *tz)
 	return (ret);
 }
 
+/*uso:
+ *		(*ops[x])(stk)
+ */
 void	assign_ops(void (**ops)(t_data **))
 {
 	ops[0] = &pr_sa;
@@ -48,7 +51,7 @@ void	assign_ops(void (**ops)(t_data **))
 void	process(t_data **stk)
 {
 	int		ct;
-	int		push;
+	int		tns;
 	t_data	**a;
 	t_data	**b;
 	void	(*ops[11])(t_data **);
@@ -58,7 +61,8 @@ void	process(t_data **stk)
 	a = &(stk[0]->top[0]);
 	b = &(stk[0]->top[1]);
 	ct = 0;
-	push = 0;
+	tns = 0;
+
 }
 
 int	longest(t_data *stk)

@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 15:30:14 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/04 09:47:05 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,15 +18,24 @@
 
 typedef struct s_data
 {
-	int				max_val;
 	int				pos;
 	int				id;
-	struct s_data	**top;
 	int				val;
 	int				target;
 	struct s_data	*prev;
 	struct s_data	*next;
 }			t_data;
+
+typedef struct s_compendium
+{
+	int		max_val;
+	t_data	**top;
+	void	(*ops[11])(t_data);
+	char	steps[5000];
+	int		n_st;
+	char	revert[11];
+	t_data	**s;
+}			t_compendium;
 
 int		ft_atoi(char *str, int *err);
 void	index(t_data **stk);
