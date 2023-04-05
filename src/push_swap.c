@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 20:20:33 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/05 16:27:04 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,31 +38,31 @@ int	ft_atoi(char *str, int *err)
 	return (sign * ret);
 }
 
-void	index(t_data **stk)
+void	index(t_compendium *all)
 {
 	t_data	*tmp;
 	int		i;
 
-	tmp = stk[0]->top[0];
+	tmp = all->top[0];
 	tmp->target = 0;
 	tmp = tmp->next;
 	i = 1;
-	while(tmp != stk[0]->top[0])
+	while(tmp != all->top[0])
 	{
 		tmp->target = i++;
 		tmp = tmp->next;
 	}
-	stk[0]->prev = stk[i - 1];
-	stk[i - 1]->next = stk[0];
+	all->s[0]->prev = all->s[i - 1];
+	all->s[i - 1]->next = all->s[0];
 	while (--i)
 	{
-		stk[i]->prev = stk[i - 1];
-		stk[i - 1]->next = stk[i];
+		all->s[i]->prev = all->s[i - 1];
+		all->s[i - 1]->next = all->s[i];
 	}
-	set_top(stk[0]);
+	set_top(all, all->s[0]);
 }
 
-void	add_data(t_data *mv, t_data *on)
+void	add_data(t_compendium *all, t_data *mv, t_data *on)
 {
 	mv->id = 0;
 	if (!on)
@@ -77,25 +77,25 @@ void	add_data(t_data *mv, t_data *on)
 		on->prev = mv;
 		mv->prev->next = mv;
 	}
-	if (!mv->top[0] || mv->val < mv->top[0]->val)
-		mv->top[0] = mv;
+	if (!all->top[0] || mv->val < all->top[0]->val)
+		all->top[0] = mv;
 }
 
-void	init(t_data **stk, t_data *n, int val, int *err)
+void	init(t_compendium *all, t_data *n, int val, int *err)
 {
 	t_data	*i;
 
 	n->val = val;
 	n->id = -1;
-	i = stk[0]->top[0];
-	if (n > stk[0])
+	i = all->top[0];
+	if (n > all->s[0])
 	{
 		while (val > i->val && (i->val > i->prev->val || val < i->prev->val))
 			i = i->next;
 		if (i->val == val)
 			*err = -1;
 	}
-	add_data(n, i);
+	add_data(all, n, i);
 }
 
 t_data	**mem_stack(int n)
@@ -121,8 +121,9 @@ int	main(int narg, char **args)
 {
 	int	err;
 	int	i;
-	t_data	**stack;
-	t_data	*top[2];
+	t_compendium	all;
+	t_data			**stack;
+	t_data			*top[2];
 
 	i = 0;
 	err = 0;
@@ -131,19 +132,15 @@ int	main(int narg, char **args)
 	stack = mem_stack(narg - 1);
 	if (!stack)
 		err = -1;
+	all.max_val = narg - 1;
+	all.top = top;
+	all.s = stack;
 	while (!err && ++i < narg)
-	{
-		stack[i - 1]->top = top;
-		stack[i - 1]->max_val = narg - 1;
-		init(stack, stack[i - 1], ft_atoi(args[i], &err), &err);
-	}
+		init(&all, all.s[i - 1], ft_atoi(args[i], &err), &err);
 	if (narg != i)
 		write(1, "Error\n", 6);
 	else
-	{
-		index(stack);
-		process(stack);
-	}
+		start(&all);
 	free(*stack);
 	free(stack);
 	return (0);

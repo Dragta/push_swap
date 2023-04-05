@@ -1,0 +1,8 @@
+20230405
+En qué punto estoy:
+viendo el backtracking en process(). Si apply_min() devuelve -1, es que todos los caminos han sido explorados o no aportan mejora. Hay que undo() un paso y volver al ciclo while (tensión...).
+
+También hay que reformular las operaciones(), según move_sa().
+Limpiar tools.c (guardando las funciones que en este algoritmo no se usan pero pueden valer para otro).
+Poner en el .h las defniciones de las funciones.
+repartir en diferentes archivos .c las funciones.
