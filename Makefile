@@ -1,7 +1,7 @@
 ### FILES AND DIRECTORIES ###
 NAME = push_swap
 GC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c89# -g -fsanitize=address
+CFLAGS = -Wall -Werror -Wextra -std=c89 # -g3 -fsanitize=address
 INCLUDES = include
 
 DIR_PUSH_SWAP = src/

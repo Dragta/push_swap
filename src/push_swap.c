@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/05 16:27:04 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 01:46:25 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,7 +59,7 @@ void	index(t_compendium *all)
 		all->s[i]->prev = all->s[i - 1];
 		all->s[i - 1]->next = all->s[i];
 	}
-	set_top(all, all->s[0]);
+	count_stacks(all);
 }
 
 void	add_data(t_compendium *all, t_data *mv, t_data *on)
@@ -127,14 +127,14 @@ int	main(int narg, char **args)
 
 	i = 0;
 	err = 0;
-	top[0] = NULL;
-	top[1] = NULL;
 	stack = mem_stack(narg - 1);
 	if (!stack)
 		err = -1;
 	all.max_val = narg - 1;
 	all.top = top;
 	all.s = stack;
+	top[0] = all.s[0];
+	top[1] = NULL;
 	while (!err && ++i < narg)
 		init(&all, all.s[i - 1], ft_atoi(args[i], &err), &err);
 	if (narg != i)

@@ -6,39 +6,42 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 15:27:40 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/10 19:09:12 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-void	move_ra(t_data **stk)
+int	move_ra(t_compendium *all)
 {
-	if (stk[0]->top[0])
-		set_top(stk[0]->top[0]->next);
+	if (!all->top[0])
+		return (-1);
+	all->top[0] = all->top[0]->next;
+	count_stacks(all);
+	return (_RA);
 }
 
-void	move_rb(t_data **stk)
+int	move_rb(t_compendium *all)
 {
-	if (stk[0]->top[1])
-		set_top(stk[0]->top[1]->next);
+	if (!all->top[1])
+		return (-1);
+	all->top[1] = all->top[1]->next;
+	count_stacks(all);
+	return (_RB);
 }
 
-void	pr_ra(t_data **stk)
+int	move_rr(t_compendium *all)
 {
-	move_ra(stk);
-	write(1, "ra\n", 3);
-}
+	int	mra;
+	int	mrb;
 
-void	pr_rb(t_data **stk)
-{
-	move_rb(stk);
-	write(1, "rb\n", 3);
-}
-
-void	pr_rr(t_data **stk)
-{
-	move_ra(stk);
-	move_rb(stk);
-	write(1, "rr\n", 3);
+	mra = move_ra(all);
+	mrb = move_rb(all);
+	if (-1 == mra || -1 == mrb)
+	{
+		if (-1 == mra)
+			return (mrb);
+		return (mra);
+	}
+	return (_RR);
 }

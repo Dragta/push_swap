@@ -6,39 +6,42 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/03/28 19:46:09 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/10 19:08:58 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-void	move_rra(t_data **stk)
+int	move_rra(t_compendium *all)
 {
-	if (stk[0]->top[0])
-		set_top(stk[0]->top[0]->prev);
+	if (!all->top[0])
+		return (-1);
+	all->top[0] = all->top[0]->prev;
+	count_stacks(all);
+	return (_RRA);
 }
 
-void	move_rrb(t_data **stk)
+int	move_rrb(t_compendium *all)
 {
-	if (stk[0]->top[1])
-		set_top(stk[0]->top[1]->prev);
+	if (!all->top[1])
+		return (-1);
+	all->top[1] = all->top[1]->prev;
+	count_stacks(all);
+	return (_RRB);
 }
 
-void	pr_rra(t_data **stk)
+int	move_rrr(t_compendium *all)
 {
-	move_rra(stk);
-	write(1, "rra\n", 4);
-}
+	int	mrra;
+	int	mrrb;
 
-void	pr_rrb(t_data **stk)
-{
-	move_rrb(stk);
-	write(1, "rrb\n", 4);
-}
-
-void	pr_rrr(t_data **stk)
-{
-	move_rra(stk);
-	move_rrb(stk);
-	write(1, "rrr\n", 4);
+	mrra = move_rra(all);
+	mrrb = move_rrb(all);
+	if (-1 == mrra || -1 == mrrb)
+	{
+		if (-1 == mrra)
+			return (mrrb);
+		return (mrra);
+	}
+	return (_RRR);
 }

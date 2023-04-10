@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/05 20:45:50 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 01:04:55 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,7 @@ typedef struct s_compendium
 {
 	int		max_val;
 	t_data	**top;
-	void	(*ops[12])(struct s_compendium *);
+	int	(*ops[12])(struct s_compendium *);
 	char	*revert;
 	char	steps[15000];
 	int		done[15000];
@@ -59,32 +59,35 @@ typedef struct s_compendium
 
 int		ft_atoi(char *str, int *err);
 void	index(t_compendium *all);
-void    data_atop(t_data *mv, t_data *on);
-void    set_top(t_compendium *all, t_data *n);
-void	move_sa(t_compendium *);
-void	move_sb(t_compendium *);
-void	pr_sa(t_compendium *);
-void	pr_sb(t_compendium *);
-void	pr_ss(t_compendium *);
-void	pr_pa(t_compendium *);
-void	pr_pb(t_compendium *);
-void	move_ra(t_compendium *);
-void	move_rb(t_compendium *);
-void	pr_ra(t_compendium *);
-void	pr_rb(t_compendium *);
-void	pr_rr(t_compendium *);
-void	move_rra(t_compendium *);
-void	move_rrb(t_compendium *);
-void	pr_rra(t_compendium *);
-void	pr_rrb(t_compendium *);
-void	pr_rrr(t_compendium *);
-void    add_data(t_compendium *all, t_data *mv, t_data *on);
+int		data_atop(t_compendium *all, t_data *mv, int stack);
+void	count_stacks(t_compendium *all);
+int		move_sa(t_compendium *all);
+int		move_sb(t_compendium *all);
+int		move_ss(t_compendium *all);
+int		move_pa(t_compendium *all);
+int		move_pb(t_compendium *all);
+int		move_ra(t_compendium *all);
+int		move_rb(t_compendium *all);
+int		move_rr(t_compendium *all);
+int		move_rra(t_compendium *all);
+int		move_rrb(t_compendium *all);
+int		move_rrr(t_compendium *all);
+void	add_data(t_compendium *all, t_data *mv, t_data *on);
 void	init(t_compendium *all, t_data *n, int val, int *err);
-void	show_all(t_data **stk, int n);
-void	show_a(t_data **stk);
+void	show_all(t_compendium *all);
+/*void	show_a(t_data **stk);
 void	show_b(t_data **stk);
 int		dist(t_data *t);
-int		trend(t_data *t);
+int		trend(t_data *t);*/
+void	print_1_step(int op);
+void	print_steps(t_compendium *all);
+int		gap(int g, int max);
+int		longest(t_compendium *all);
+int		inter_tension(t_compendium *all);
+int		intra_tension(t_compendium *all);
+int		tot_tension(t_compendium *all);
+int		apply_min(t_compendium *all);
+int		undo(t_compendium *all, int n);
 int		sense(t_data *tx, t_data *ty, t_data *tz);
 void	start(t_compendium *all);
 void	process(t_compendium *all);

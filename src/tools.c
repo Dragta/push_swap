@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/10 02:09:15 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 01:36:01 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,10 +75,13 @@ void	print_steps(t_compendium *all)
 
 int	gap(int g, int max)
 {
+	printf("g1 en gap(): %i\n", g);
 	if (g < 0)
 		g = -g;
-	if (g > max / 2)
-		g = max - g;
+	printf("g2 en gap(): %i\n", g);
+	if (g > (max + 1) / 2)
+		g = max - g + 1;
+	printf("g3 en gap(): %i\n", g);
 	return (g);
 }
 
@@ -152,11 +155,15 @@ int	intra_tension(t_compendium *all)
 		t = all->top[id];
 		if (!t)
 			continue ;
-		ret += gap(t->target - t->next->target, all->max_val) + id;
+		printf("tn, t: %i, %i\n", t->next->target, t->target);
+		ret += gap(t->next->target - t->target - 1, all->max_val) + id;
+		printf("intra_tns: %i\n", ret);
 		i = t->next;
 		while (i != t)
 		{
-			ret += gap(i->target - i->next->target, all->max_val) + id;
+			printf("in, i: %i, %i\n", i->next->target, i->target);
+			ret += gap(i->next->target - i->target - 1, all->max_val) + id;
+			printf("intra_tns: %i\n", ret);
 			i = i->next;
 		}
 	}
@@ -186,8 +193,11 @@ int	apply_min(t_compendium *all)
 		ret = all->tns[0] + 1;
 		while (++op < 12)
 		{
-			if (all->tns[op] > -1 && all->tns[op] < all->tns[do_op])
+			if (all->tns[op] > -1 && all->tns[op] < ret)
+			{
+				ret = all->tns[op];
 				do_op = op;
+			}
 		}
 		if (!do_op)
 			return (-1);
@@ -195,12 +205,24 @@ int	apply_min(t_compendium *all)
 			all->tns[do_op] = -1;
 		ret = all->tns[do_op];
 	}
-	all->steps[all->n_st] = op;
+	ret += '0';
+	write(1, &ret, 1);
+	ret -= '0';
+	if (ret < 0)
+		return (ret);
+	write(1, "(", 1);
+	print_1_step(do_op);
+	write(1, ")\n", 2);
+	all->steps[all->n_st] = do_op;
 	all->done[all->n_st] |= 1 << op;
 	all->done[all->n_st + 1] = 0;
+/*	printf("%i ", all->cut[all->n_st]);*/
 	all->cut[all->n_st + 1] = all->cut[all->n_st];
-	all->cut[all->n_st + 1] &= all->heir_mask[all->steps[all->n_st]];
-	all->cut[all->n_st + 1] |= all->cut_mask[all->steps[all->n_st]];
+/*	printf("%i ", all->heir_mask[(int)all->steps[all->n_st]]);*/
+	all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
+/*	printf("%i ", all->cut_mask[(int)all->steps[all->n_st]]);*/
+	all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];
+/*	printf("%i ", all->cut[all->n_st + 1]);*/
 	all->n_st++;
 	return (ret);
 }
@@ -212,11 +234,13 @@ int	undo(t_compendium *all, int n)
 	all->undo = 1;
 	while (n--)
 	{
-		op = all->revert[(int)all->steps[all->n_st]];
-		(*(all->ops[op]))(all);
+		op = all->revert[(int)all->steps[all->n_st - 1]];
 		all->n_st--;
+		if ((*(all->ops[op]))(all) < 0)
+			return (n + 1);
 	}
 	all->undo = 0;
+	return (0);
 }
 
 void	process(t_compendium *all)
@@ -228,7 +252,9 @@ void	process(t_compendium *all)
 	index(all);
 	a = &(all->top[0]);
 	b = &(all->top[1]);
+	show_all(all);
 	all->tns[0] = tot_tension(all);
+	printf("tens: %i\n", all->tns[0]);
 	while (all->tns[0] && all->n_st < 15000 && all->n_st > -1)
 	{
 		op = 0;
@@ -237,11 +263,16 @@ void	process(t_compendium *all)
 			all->tns[op] = -1;
 			if ((all->done[all->n_st] | all->cut[all->n_st]) & (1 << op))
 				continue ;
-			(*(all->ops[op]))(all);
+			all->steps[all->n_st] = (*(all->ops[op]))(all);
+			if (all->steps[all->n_st] != op)
+				continue ;
+			all->n_st++;
 			all->tns[op] = tot_tension(all);
+			printf("op: %i; tns: %i\n", op, all->tns[op]);
 			undo(all, 1);
 		}
 		all->tns[0] = apply_min(all);
+		printf("tens: %i\n", all->tns[0]);
 		if (all->tns[0] < 0)
 			undo(all, 1);
 
@@ -263,17 +294,17 @@ void	start(t_compendium *all)
 	all->revert = (char *)rev;
 	all->cut_mask = (int *)c_m;
 	all->heir_mask = (int *)h_m;
-	all->ops[1] = &pr_sa;
-	all->ops[2] = &pr_sb;
-	all->ops[3] = &pr_ss;
-	all->ops[4] = &pr_pa;
-	all->ops[5] = &pr_pb;
-	all->ops[6] = &pr_ra;
-	all->ops[7] = &pr_rb;
-	all->ops[8] = &pr_rr;
-	all->ops[9] = &pr_rra;
-	all->ops[10] = &pr_rrb;
-	all->ops[11] = &pr_rrr;
+	all->ops[1] = &move_sa;
+	all->ops[2] = &move_sb;
+	all->ops[3] = &move_ss;
+	all->ops[4] = &move_pa;
+	all->ops[5] = &move_pb;
+	all->ops[6] = &move_ra;
+	all->ops[7] = &move_rb;
+	all->ops[8] = &move_rr;
+	all->ops[9] = &move_rra;
+	all->ops[10] = &move_rrb;
+	all->ops[11] = &move_rrr;
 	all->n_st = 0;
 	all->done[0] = 0;
 	all->cut[0] = 0;
@@ -336,43 +367,50 @@ int	dist(t_data *t)
 	return (dist);
 }
 */
-void	set_top(t_compendium *all, t_data *n)
+void	count_stacks(t_compendium *all)
+{
+	t_data	*i;
+	int		p;
+	int		s;
+
+	s = 0;
+	while (++s < 2)
+	{
+		i = all->top[s];
+		if (!i)
+			continue ;
+		p = 0;
+		i->pos = p++;
+		if (s)
+			i = i->prev;
+		else
+			i = i->next;
+		while (i != all->top[s])
+		{
+			i->pos = p++;
+			if (s)
+				i = i->prev;
+			else
+				i = i->next;
+		}
+	}
+}
+
+void	show_all(t_compendium *all)
 {
 	t_data	*i;
 
-	all->top[n->id] = n;
-	n->pos = 0;
-	if (n->id)
-		i = n->prev;
-	else
-		i = n->next;
-	while (i != n)
+	i = all->top[0];
+	printf("pos |id  |val |targ|prev|next\n");
+	printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", i->pos, i->id, i->val, i->target, (i->prev - all->s[0]), (i->next - all->s[0]));
+	i = i->next;
+	while (i != all->top[0])
 	{
-		if (n->id)
-		{
-			i->pos = i->next->pos + 1;
-			i = i->prev;
-		}
-		else
-		{
-			i->pos = i->prev->pos + 1;
-			i = i->next;
-		}
+		printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", i->pos, i->id, i->val, i->target, (i->prev - all->s[0]), (i->next - all->s[0]));
+		i = i->next;
 	}
 }
 /*
-void	show_all(t_data **stk, int n)
-{
-	int		i;
-
-	i = -1;
-	printf("pos |id  |val |targ|prev|next\n");
-	while (++i <= n)
-	{
-		printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", stk[i]->pos, stk[i]->id, stk[i]->val, stk[i]->target, (stk[i]->prev - stk[0]), (stk[i]->next - stk[0]));
-	}
-}
-
 void	show_a(t_data **stk)
 {
 	t_data	*d;

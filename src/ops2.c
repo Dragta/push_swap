@@ -6,50 +6,52 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/10 02:23:32 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/10 20:03:21 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-void	data_atop(t_compendium *all, t_data *mv, t_data *on)
+int	data_atop(t_compendium *all, t_data *mv, int stack)
 {
-	if (mv->prev != mv)
+	if (all->top[stack] == mv || (mv->id != stack && all->top[mv->id] != mv))
+		return (-1);
+	mv->prev->next = mv->next;
+	mv->next->prev = mv->prev;
+	if (mv->id != stack)
 	{
-		if (mv->prev != on)
-			set_top(all, mv->next);
-		mv->prev->next = mv->next;
-		mv->next->prev = mv->prev;
-	}
-	else
 		all->top[mv->id] = NULL;
-	if (!on)
+		if (mv->next != mv)
+			all->top[mv->id] = mv->next;
+	}
+	mv->id = stack;
+	if (!all->top[stack])
 	{
-		mv->id = 1 - mv->id;
 		mv->prev = mv;
 		mv->next = mv;
 	}
 	else
 	{
-		mv->id = on->id;
-		mv->prev = on->prev;
-		mv->next = on;
-		on->prev = mv;
+		mv->prev = all->top[stack]->prev;
+		mv->next = all->top[stack];
+		all->top[stack]->prev = mv;
 		mv->prev->next = mv;
 	}
-	set_top(mv);
+	all->top[stack] = mv;
+	count_stacks(all);
+	return (0);
 }
 
-void	move_pa(t_compendium *all)
+int	move_pa(t_compendium *all)
 {
-	if (stk[0]->top[1])
-		data_atop(stk[0]->top[1], stk[0]->top[0]);
-	write(1, "pa\n", 3);
+	if (!all->top[1] || data_atop(all, all->top[1], 0))
+		return (-1);
+	return (_PA);
 }
 
-void	move_pb(t_compendium *all)
+int	move_pb(t_compendium *all)
 {
-	if (stk[0]->top[0])
-		data_atop(stk[0]->top[0], stk[0]->top[1]);
-	write(1, "pb\n", 3);
+	if (!all->top[0] || data_atop(all, all->top[0], 1))
+		return (-1);
+	return (_PB);
 }
