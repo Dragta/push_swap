@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/05 20:45:36 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/10 02:09:15 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,18 +175,33 @@ int	tot_tension(t_compendium *all)
 int	apply_min(t_compendium *all)
 {
 	int	op;
+	int	do_op;
 	int	ret;
 
-	op = 0;
-	ret = all->tns[0] + 1;
-	while (++op < 12)
+	ret = -1;
+	while (ret == -1)
 	{
-		if (all->tns[op] > -1 && all->tns[op] < ret)
-			ret = all->tns[op];
+		op = 0;
+		do_op = 0;
+		ret = all->tns[0] + 1;
+		while (++op < 12)
+		{
+			if (all->tns[op] > -1 && all->tns[op] < all->tns[do_op])
+				do_op = op;
+		}
+		if (!do_op)
+			return (-1);
+		if ((*(all->ops[do_op]))(all) != do_op)
+			all->tns[do_op] = -1;
+		ret = all->tns[do_op];
 	}
-	if (all->tns[0] < ret)
-		return (-1);
-	(*(all->ops[op]))(all);
+	all->steps[all->n_st] = op;
+	all->done[all->n_st] |= 1 << op;
+	all->done[all->n_st + 1] = 0;
+	all->cut[all->n_st + 1] = all->cut[all->n_st];
+	all->cut[all->n_st + 1] &= all->heir_mask[all->steps[all->n_st]];
+	all->cut[all->n_st + 1] |= all->cut_mask[all->steps[all->n_st]];
+	all->n_st++;
 	return (ret);
 }
 
@@ -199,6 +214,7 @@ int	undo(t_compendium *all, int n)
 	{
 		op = all->revert[(int)all->steps[all->n_st]];
 		(*(all->ops[op]))(all);
+		all->n_st--;
 	}
 	all->undo = 0;
 }
@@ -213,22 +229,24 @@ void	process(t_compendium *all)
 	a = &(all->top[0]);
 	b = &(all->top[1]);
 	all->tns[0] = tot_tension(all);
-	while (all->tns[0] && all->n_st < 15000)
+	while (all->tns[0] && all->n_st < 15000 && all->n_st > -1)
 	{
-		op = -1;
+		op = 0;
 		while (++op < 12)
 		{
 			all->tns[op] = -1;
-			if (all->done[all->n_st] & (1 << op))
+			if ((all->done[all->n_st] | all->cut[all->n_st]) & (1 << op))
 				continue ;
+			(*(all->ops[op]))(all);
 			all->tns[op] = tot_tension(all);
 			undo(all, 1);
 		}
 		all->tns[0] = apply_min(all);
-		while (all->tns[0] < 0)
-			all->tns[0] = undo(all, 1);
+		if (all->tns[0] < 0)
+			undo(all, 1);
 
 	}
+	printf("tens: %i; nb_steps: %i.\n", all->tns[0], all->n_st);
 	print_steps(all);
 }
 
@@ -258,6 +276,7 @@ void	start(t_compendium *all)
 	all->ops[11] = &pr_rrr;
 	all->n_st = 0;
 	all->done[0] = 0;
+	all->cut[0] = 0;
 	all->undo = 0;
 	process(all);
 /*	assign_rev(all, "0123549:;678");*/

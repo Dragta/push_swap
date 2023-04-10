@@ -6,3 +6,6 @@ También hay que reformular las operaciones(), según move_sa().
 Limpiar tools.c (guardando las funciones que en este algoritmo no se usan pero pueden valer para otro).
 Poner en el .h las defniciones de las funciones.
 repartir en diferentes archivos .c las funciones.
+
+20230410
+viendo data_atop()
