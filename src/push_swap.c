@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/11 01:46:25 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 12:32:17 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ void	index(t_compendium *all)
 		all->s[i]->prev = all->s[i - 1];
 		all->s[i - 1]->next = all->s[i];
 	}
+	all->top[0] = all->s[0];
 	count_stacks(all);
 }
 
@@ -125,6 +126,7 @@ int	main(int narg, char **args)
 	t_data			**stack;
 	t_data			*top[2];
 
+	setvbuf(stdout, NULL, _IONBF, 0);
 	i = 0;
 	err = 0;
 	stack = mem_stack(narg - 1);

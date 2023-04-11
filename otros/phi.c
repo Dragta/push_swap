@@ -3,9 +3,10 @@
 
 int	main(void)
 {
-	int		n, tot = 1597;
+	int		n, tot = 610;
 	double	nd, phi;
 
+	printf("1 << 1 = %i\n\n", 1 << 1);
 	phi = (sqrt(5)-1)/2 * tot;
 	nd = phi;
 	n = -1;

@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/11 01:04:55 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 21:08:51 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,8 @@
 # define _RRA 9
 # define _RRB 10
 # define _RRR 11
+# define ONE_LINE 0
+# define NEW_LINE 1
 # define OPS_A 0b01001010010
 # define OPS_B 0b10010100100
 
@@ -59,6 +61,7 @@ typedef struct s_compendium
 
 int		ft_atoi(char *str, int *err);
 void	index(t_compendium *all);
+void	quick_st(t_compendium *all);
 int		data_atop(t_compendium *all, t_data *mv, int stack);
 void	count_stacks(t_compendium *all);
 int		move_sa(t_compendium *all);
@@ -74,13 +77,14 @@ int		move_rrb(t_compendium *all);
 int		move_rrr(t_compendium *all);
 void	add_data(t_compendium *all, t_data *mv, t_data *on);
 void	init(t_compendium *all, t_data *n, int val, int *err);
+void	show_tgts(t_compendium *all);
 void	show_all(t_compendium *all);
 /*void	show_a(t_data **stk);
 void	show_b(t_data **stk);
 int		dist(t_data *t);
 int		trend(t_data *t);*/
 void	print_1_step(int op);
-void	print_steps(t_compendium *all);
+void	print_steps(t_compendium *all, int nl);
 int		gap(int g, int max);
 int		longest(t_compendium *all);
 int		inter_tension(t_compendium *all);

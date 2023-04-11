@@ -13,3 +13,5 @@ viendo data_atop()
 20230411
 compila pero segfault.
 viendo problema en index(), pone primero el que tiene el menor val.
+
+incluida quick_st() para intentar encontrar por qué se pierde cuando da un paso atrás.

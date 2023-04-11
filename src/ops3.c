@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/10 19:09:12 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 20:17:02 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int	move_ra(t_compendium *all)
 {
-	if (!all->top[0])
+	if (!all->top[0] || all->top[0] == all->top[0]->next)
 		return (-1);
 	all->top[0] = all->top[0]->next;
 	count_stacks(all);
@@ -23,7 +23,7 @@ int	move_ra(t_compendium *all)
 
 int	move_rb(t_compendium *all)
 {
-	if (!all->top[1])
+	if (!all->top[1] || all->top[1] == all->top[1]->next)
 		return (-1);
 	all->top[1] = all->top[1]->next;
 	count_stacks(all);
