@@ -29,6 +29,16 @@ int	sense(t_data *tx, t_data *ty, t_data *tz)
 		ret = -1;
 	return (ret);
 }
+/*
+void	assign_rev(t_compendium *all, char *vals)
+{
+	int	i;
+
+	i = -1;
+	while (++i < 12)
+		all->revert[i] = vals[i] - '0';
+}
+*/
 
 void	print_1_step(int op)
 {
@@ -51,6 +61,7 @@ void	print_1_step(int op)
 	if (op ==  11)
 		write(1, "r", 1);
 }
+
 
 void	print_steps(t_compendium *all, int nl)
 {
@@ -85,10 +96,13 @@ void	quick_st(t_compendium *all)
 
 int	gap(int g, int max)
 {
+/*	printf("g1 en gap(): %i\n", g);*/
 	if (g < 0)
 		g = -g;
+/*	printf("g2 en gap(): %i\n", g);*/
 	if (g > max / 2)
 		g = max - g;
+/*	printf("g3 en gap(): %i\n", g);*/
 	return (g);
 }
 
@@ -267,13 +281,13 @@ int	undo(t_compendium *all, int n)
 void	process(t_compendium *all)
 {
 	int		op;
-/*	t_data	**a;
-	t_data	**b;*/
+	t_data	**a;
+	t_data	**b;
 	int		best;
 
 	index(all);
-/*	a = &(all->top[0]);
-	b = &(all->top[1]);*/
+	a = &(all->top[0]);
+	b = &(all->top[1]);
 	show_all(all);
 	best = 15000;
 	while (all->n_st >= 0)
@@ -346,6 +360,7 @@ void	start(t_compendium *all)
 	all->cut[0] = 0;
 	all->undo = 0;
 	process(all);
+/*	assign_rev(all, "0123549:;678");*/
 }
 
 int	trend(t_data *t)
@@ -376,7 +391,32 @@ int	trend(t_data *t)
 	}
 	return (trend);
 }
+/*
+int	dist(t_data *t)
+{
+	t_data	*i;
+	int		dist;
+	int		tmp;
 
+	dist = 0;
+	i = t;
+	while (i)
+	{
+		tmp = i->pos - i->target;
+		if (tmp < 0)
+			tmp *= -1;
+		if (tmp > (i->max_val - tmp))
+			tmp = i->max_val - tmp;
+*		printf("%i ", tmp);*
+		dist += tmp;
+		i = i->next;
+		if (i == t)
+			break ;
+	}
+*	printf("=> %i.\n", dist);*
+	return (dist);
+}
+*/
 void	count_stacks(t_compendium *all)
 {
 	t_data	*i;
@@ -449,3 +489,37 @@ void	show_all(t_compendium *all)
 		i = i->next;
 	}
 }
+/*
+void	show_a(t_data **stk)
+{
+	t_data	*d;
+
+	d = stk[0]->top[0];
+	if (!d)
+		return ;
+	printf("pos |id  |val |targ|prev|next\n");
+	printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", d->pos, d->id, d->val, d->target, (d->prev - stk[0]), (d->next - stk[0]));
+	d = d->next;
+	while (d != d->top[0])
+	{
+		printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", d->pos, d->id, d->val, d->target, (d->prev - stk[0]), (d->next - stk[0]));
+		d = d->next;
+	}
+}
+
+void	show_b(t_data **stk)
+{
+	t_data	*d;
+
+	d = stk[0]->top[1];
+	if (!d)
+		return ;
+	printf("id  |val |targ|prev|next\n");
+	printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", d->pos, d->id, d->val, d->target, (d->prev - stk[0]), (d->next - stk[0]));
+	d = d->next;
+	while (d != d->top[1])
+	{
+		printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", d->pos, d->id, d->val, d->target, (d->prev - stk[0]), (d->next - stk[0]));
+		d = d->next;
+	}
+}*/
