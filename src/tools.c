@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/11 21:10:17 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/17 01:31:01 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ void	quick_st(t_compendium *all)
 	int	tmp;
 
 	i = 0;
-	while (i <= all->n_st)
+	while (i < all->n_st)
 	{
 		tmp = all->steps[i++] + '0';
 		write(1, &tmp, 1);
@@ -217,14 +217,12 @@ int	apply_min(t_compendium *all)
 		if (!do_op)
 			return (-1);
 		tmp_op = (*(all->ops[do_op]))(all);
-		if (tmp_op != do_op)
-		{
-			if (tmp_op < -1)
+		if (tmp_op > 0)
 				all->done[all->n_st] |= 1 << tmp_op;
+		if (tmp_op != do_op)
 			all->tns[do_op] = -1;
-		}
-		printf("%i ", do_op);
-		ret = all->tns[do_op];
+		printf("%i ", tmp_op);
+		ret = all->tns[tmp_op];
 	}
 /*	ret += '0';
 	write(1, &ret, 1);
@@ -234,7 +232,7 @@ int	apply_min(t_compendium *all)
 /*	write(1, "(", 1);
 	print_1_step(do_op);
 	write(1, ")\n", 2);*/
-	all->steps[all->n_st] = do_op;
+	all->steps[all->n_st] = tmp_op;
 	all->done[all->n_st] |= 1 << do_op;
 	all->done[all->n_st + 1] = 0;
 /*	printf("%i ", all->cut[all->n_st]);*/
@@ -256,9 +254,10 @@ int	undo(t_compendium *all, int n)
 	while (n--)
 	{
 		op = all->revert[(int)all->steps[all->n_st - 1]];
-		all->n_st--;
 		if ((*(all->ops[op]))(all) < 0)
 			return (n + 1);
+		if (--all->n_st == 0)
+			break ;
 	}
 	all->undo = 0;
 	return (0);
@@ -297,6 +296,8 @@ void	process(t_compendium *all)
 					continue ;
 				all->n_st++;
 				all->tns[op] = tot_tension(all);
+				all->tns[(int)all->steps[all->n_st]] = tot_tension(all);
+				write(1, "ok.", 3);
 				undo(all, 1);
 			}
 			all->tns[0] = apply_min(all);
@@ -422,15 +423,15 @@ void	show_tgts(t_compendium *all)
 		i = all->top[s];
 		if (!i)
 			continue ;
-		while (i->next != all->top[s])
-		{
-			tmp = '0' + i->target;
-			write(1, &tmp, 1);
-			write(1, " ", 1);
-			i = i->next;
-		}
 		tmp = '0' + i->target;
 		write(1, &tmp, 1);
+		while (i->next != all->top[s])
+		{
+			i = i->next;
+			tmp = '0' + i->target;
+			write(1, " ", 1);
+			write(1, &tmp, 1);
+		}
 	}
 	write(1, "\n", 1);
 }
