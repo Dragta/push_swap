@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/17 01:31:01 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/17 19:21:45 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,9 +52,8 @@ void	print_1_step(int op)
 		write(1, "r", 1);
 }
 
-void	print_steps(t_compendium *all, int nl)
+void	print_steps(char *ops, int nl)
 {
-	int		st;
 	char	sep;
 
 	if (nl)
@@ -62,11 +61,11 @@ void	print_steps(t_compendium *all, int nl)
 	else
 		sep = ' ';
 
-	st = -1;
-	while (++st < all->n_st)
+	while (*ops)
 	{
-		print_1_step(all->steps[st]);
+		print_1_step(*ops);
 		write(1, &sep, 1);
+		ops++;
 	}
 }
 
@@ -218,10 +217,10 @@ int	apply_min(t_compendium *all)
 			return (-1);
 		tmp_op = (*(all->ops[do_op]))(all);
 		if (tmp_op > 0)
-				all->done[all->n_st] |= 1 << tmp_op;
+			all->done[all->n_st] |= 1 << tmp_op;
 		if (tmp_op != do_op)
-			all->tns[do_op] = -1;
-		printf("%i ", tmp_op);
+			all->done[all->n_st] |= 1 << do_op;
+/*		printf("%i ", tmp_op);*/
 		ret = all->tns[tmp_op];
 	}
 /*	ret += '0';
@@ -233,7 +232,7 @@ int	apply_min(t_compendium *all)
 	print_1_step(do_op);
 	write(1, ")\n", 2);*/
 	all->steps[all->n_st] = tmp_op;
-	all->done[all->n_st] |= 1 << do_op;
+	all->steps[all->n_st + 1] = 0;
 	all->done[all->n_st + 1] = 0;
 /*	printf("%i ", all->cut[all->n_st]);*/
 	all->cut[all->n_st + 1] = all->cut[all->n_st];
@@ -253,14 +252,29 @@ int	undo(t_compendium *all, int n)
 	all->undo = 1;
 	while (n--)
 	{
+		if (!all->n_st)
+			return (-1);
 		op = all->revert[(int)all->steps[all->n_st - 1]];
 		if ((*(all->ops[op]))(all) < 0)
 			return (n + 1);
-		if (--all->n_st == 0)
-			break ;
+		all->n_st--;
 	}
 	all->undo = 0;
 	return (0);
+}
+
+void	try_move(t_compendium *all, int op)
+{
+	all->tns[op] = -1;
+	if ((all->done[all->n_st] | all->cut[all->n_st]) & (1 << op))
+		return ;
+	all->steps[all->n_st] = (*(all->ops[op]))(all);
+	if (all->steps[all->n_st] < 0)
+		return ;
+	if (all->steps[all->n_st] == op)
+		all->tns[op] = tot_tension(all);
+	all->n_st++;
+	undo(all, 1);
 }
 
 void	process(t_compendium *all)
@@ -269,53 +283,44 @@ void	process(t_compendium *all)
 /*	t_data	**a;
 	t_data	**b;*/
 	int		best;
+	char	sol[100];
+	int		sol_tns;
 
 	index(all);
 /*	a = &(all->top[0]);
-	b = &(all->top[1]);*/
-	show_all(all);
-	best = 15000;
-	while (all->n_st >= 0)
+	b = &(all->top[1]);
+	show_all(all);*/
+	sol[0] = 0;
+	sol_tns = -1;
+	best = 21;
+	while (all->n_st > -1)
 	{
 		all->tns[0] = tot_tension(all);
 		while (all->tns[0] > 0 && all->n_st < best && all->n_st > -1)
 		{
 			op = 0;
-			printf("(%i/%i)", all->n_st, best);
-			printf("tens: %i_%i\n", all->tns[0], tot_tension(all));
-			show_tgts(all);
-			quick_st(all);
-			write(1, "\n", 1);
 			while (++op < 12)
-			{
-				all->tns[op] = -1;
-				if ((all->done[all->n_st] | all->cut[all->n_st]) & (1 << op))
-					continue ;
-				all->steps[all->n_st] = (*(all->ops[op]))(all);
-				if (all->steps[all->n_st] < 0)
-					continue ;
-				all->n_st++;
-				all->tns[op] = tot_tension(all);
-				all->tns[(int)all->steps[all->n_st]] = tot_tension(all);
-				write(1, "ok.", 3);
-				undo(all, 1);
-			}
+				try_move(all, op);
 			all->tns[0] = apply_min(all);
-	/*		if (all->tns[0] < 0)
-				undo(all, 1);*/
+			if (all->tns[0] < 0 && undo(all, 1) < 0)
+				break ;
 		}
-		if (!all->tns[0])
+		all->tns[0] = tot_tension(all);
+		if ((sol_tns < 0 || all->tns[0] <= sol_tns) && all->n_st <= best)
 		{
-			printf("tens: %i_%i; nb_steps: %i.\n", all->tns[0], tot_tension(all), all->n_st);
-			print_steps(all, ONE_LINE);
-			write(1, "\n", 1);
-			show_tgts(all);
+			op = -1;
+			while (++op < all->n_st)
+				sol[op] = all->steps[op];
+			sol[op] = 0;
+			sol_tns = all->tns[0];
+			printf("mejor tns: %i\n", sol_tns);
 			best = all->n_st;
-			undo(all, 2);
-		}
-		else
 			undo(all, 1);
+		}
+		if (undo(all, 1) < 0)
+			break ;
 	}
+	print_steps(sol, NEW_LINE);
 }
 
 /*uso:

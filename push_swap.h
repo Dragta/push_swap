@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/11 21:08:51 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/17 19:19:16 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,7 +84,7 @@ void	show_b(t_data **stk);
 int		dist(t_data *t);
 int		trend(t_data *t);*/
 void	print_1_step(int op);
-void	print_steps(t_compendium *all, int nl);
+void	print_steps(char *ops, int nl);
 int		gap(int g, int max);
 int		longest(t_compendium *all);
 int		inter_tension(t_compendium *all);
@@ -94,6 +94,7 @@ int		apply_min(t_compendium *all);
 int		undo(t_compendium *all, int n);
 int		sense(t_data *tx, t_data *ty, t_data *tz);
 void	start(t_compendium *all);
+void	try_move(t_compendium *all, int op);
 void	process(t_compendium *all);
 t_data	**mem_stack(int n);
 int		main(int narg, char **args);

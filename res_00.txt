@@ -1,0 +1,454 @@
+pos |id  |val |targ|prev|next
+   0|   0|   0|   0|   3|   1
+   1|   0|   2|   2|   0|   2
+   2|   0|   1|   1|   1|   3
+   3|   0|   3|   3|   2|   0
+(0/15000)tens: 3_3
+a: 0 2 1 3 // b: 
+
+msk_done[0] 0
+probando 1
+ok.1
+probando 2
+probando 3
+probando 4
+probando 5
+ok.5
+probando 6
+ok.6
+probando 7
+probando 8
+probando 9
+ok.9
+probando 10
+probando 11
+>op: 1 (tns 7)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 7)
+>op: 6 (tns 6)
+6 ->ret
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 6)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+6 (1/15000)tens: 6_6
+a: 2 1 3 0 // b: 
+6
+msk_done[1] 0
+probando 1
+ok.1
+probando 2
+probando 3
+probando 4
+probando 5
+ok.5
+probando 6
+ok.6
+descartado 7 (tns -1)
+probando 8
+descartado 9 (tns -1)
+probando 10
+descartado 11 (tns -1)
+>op: 1 (tns 2)
+2 ->ret
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 3)
+>op: 6 (tns 5)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+1 (2/15000)tens: 2_2
+a: 1 2 3 0 // b: 
+61
+msk_done[2] 0
+descartado 1 (tns -1)
+descartado 2 (tns -1)
+descartado 3 (tns -1)
+probando 4
+probando 5
+ok.5
+probando 6
+ok.6
+descartado 7 (tns -1)
+probando 8
+probando 9
+ok.9
+probando 10
+descartado 11 (tns -1)
+>op: 1 (tns -1)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 5)
+5 ->ret
+>op: 6 (tns 4)
+4 ->ret
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 0)
+0 ->ret
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+9 tens: 0_0; nb_steps: 3.
+ra sa rra 
+a: 0 1 2 3 // b: 
+(1/3)tens: 6_6
+a: 2 1 3 0 // b: 
+6
+msk_done[1] 2
+descartado 1 (tns -1)
+probando 2
+probando 3
+probando 4
+probando 5
+ok.5
+probando 6
+ok.6
+descartado 7 (tns -1)
+probando 8
+descartado 9 (tns -1)
+probando 10
+descartado 11 (tns -1)
+>op: 1 (tns -1)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 3)
+3 ->ret
+>op: 6 (tns 5)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+5 (2/3)tens: 3_3
+a: 1 3 0 // b: 2
+65
+msk_done[2] 0
+probando 1
+ok.1
+probando 2
+probando 3
+descartado 4 (tns -1)
+probando 5
+ok.5
+probando 6
+ok.6
+probando 7
+probando 8
+probando 9
+ok.9
+probando 10
+probando 11
+>op: 1 (tns 7)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 8)
+>op: 6 (tns 4)
+4 ->ret
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 3)
+3 ->ret
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+9 (2/3)tens: 3_3
+a: 1 3 0 // b: 2
+65
+msk_done[2] 512
+probando 1
+ok.1
+probando 2
+probando 3
+descartado 4 (tns -1)
+probando 5
+ok.5
+probando 6
+ok.6
+probando 7
+probando 8
+descartado 9 (tns -1)
+probando 10
+probando 11
+>op: 1 (tns 7)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 8)
+>op: 6 (tns 4)
+4 ->ret
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+6 (2/3)tens: 3_3
+a: 1 3 0 // b: 2
+65
+msk_done[2] 576
+probando 1
+ok.1
+probando 2
+probando 3
+descartado 4 (tns -1)
+probando 5
+ok.5
+descartado 6 (tns -1)
+probando 7
+probando 8
+descartado 9 (tns -1)
+probando 10
+probando 11
+>op: 1 (tns 7)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 8)
+>op: 6 (tns -1)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+(0/3)tens: 3_3
+a: 0 2 1 3 // b: 
+
+msk_done[0] 64
+probando 1
+ok.1
+probando 2
+probando 3
+probando 4
+probando 5
+ok.5
+descartado 6 (tns -1)
+probando 7
+probando 8
+probando 9
+ok.9
+probando 10
+probando 11
+>op: 1 (tns 7)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 7)
+>op: 6 (tns -1)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 6)
+6 ->ret
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+9 (1/3)tens: 6_6
+a: 3 0 2 1 // b: 
+9
+msk_done[1] 0
+probando 1
+ok.1
+probando 2
+probando 3
+probando 4
+probando 5
+ok.5
+descartado 6 (tns -1)
+probando 7
+descartado 8 (tns -1)
+probando 9
+ok.9
+descartado 10 (tns -1)
+probando 11
+>op: 1 (tns 6)
+6 ->ret
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 5)
+5 ->ret
+>op: 6 (tns -1)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 5)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+5 (2/3)tens: 5_5
+a: 0 2 1 // b: 3
+95
+msk_done[2] 0
+probando 1
+ok.1
+probando 2
+probando 3
+descartado 4 (tns -1)
+probando 5
+ok.5
+probando 6
+ok.6
+probando 7
+probando 8
+probando 9
+ok.9
+probando 10
+probando 11
+>op: 1 (tns 4)
+4 ->ret
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 4)
+>op: 6 (tns 7)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 5)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+1 (2/3)tens: 5_5
+a: 0 2 1 // b: 3
+95
+msk_done[2] 2
+descartado 1 (tns -1)
+probando 2
+probando 3
+descartado 4 (tns -1)
+probando 5
+ok.5
+probando 6
+ok.6
+probando 7
+probando 8
+probando 9
+ok.9
+probando 10
+probando 11
+>op: 1 (tns -1)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 4)
+4 ->ret
+>op: 6 (tns 7)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 5)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+5 (2/3)tens: 5_5
+a: 0 2 1 // b: 3
+95
+msk_done[2] 34
+descartado 1 (tns -1)
+probando 2
+probando 3
+descartado 4 (tns -1)
+descartado 5 (tns -1)
+probando 6
+ok.6
+probando 7
+probando 8
+probando 9
+ok.9
+probando 10
+probando 11
+>op: 1 (tns -1)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns -1)
+>op: 6 (tns 7)
+7 ->ret
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns 5)
+5 ->ret
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+9 (2/3)tens: 5_5
+a: 0 2 1 // b: 3
+95
+msk_done[2] 546
+descartado 1 (tns -1)
+probando 2
+probando 3
+descartado 4 (tns -1)
+descartado 5 (tns -1)
+probando 6
+ok.6
+probando 7
+probando 8
+descartado 9 (tns -1)
+probando 10
+probando 11
+>op: 1 (tns -1)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns -1)
+>op: 6 (tns 7)
+7 ->ret
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+6 (2/3)tens: 5_5
+a: 0 2 1 // b: 3
+95
+msk_done[2] 610
+descartado 1 (tns -1)
+probando 2
+probando 3
+descartado 4 (tns -1)
+descartado 5 (tns -1)
+descartado 6 (tns -1)
+probando 7
+probando 8
+descartado 9 (tns -1)
+probando 10
+probando 11
+>op: 1 (tns -1)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns -1)
+>op: 6 (tns -1)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
+(0/3)tens: 3_3
+a: 0 2 1 3 // b: 
+
+msk_done[0] 576
+probando 1
+ok.1
+probando 2
+probando 3
+probando 4
+probando 5
+ok.5
+descartado 6 (tns -1)
+probando 7
+probando 8
+descartado 9 (tns -1)
+probando 10
+probando 11
+>op: 1 (tns 7)
+>op: 2 (tns -1)
+>op: 3 (tns -1)
+>op: 4 (tns -1)
+>op: 5 (tns 7)
+>op: 6 (tns -1)
+>op: 7 (tns -1)
+>op: 8 (tns -1)
+>op: 9 (tns -1)
+>op: 10 (tns -1)
+>op: 11 (tns -1)
