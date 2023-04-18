@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/17 19:21:45 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/18 23:02:21 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,9 +190,37 @@ int	tot_tension(t_compendium *all)
 	return (ret);
 }
 
+int	min_step(t_compendium *all, int *op)
+{
+	int	ret;
+	int	low;
+
+/*	ret = all->tns[0] + all->max_val;*/
+	ret = 15000;
+	low = 0;
+	while (++low < 12)
+	{
+		if (all->tns[low] > -1 && all->tns[low] < ret)
+		{
+			ret = all->tns[low];
+			*op = low;
+		}
+	}
+	return (ret);
+}
+
+void	init_next_st(t_compendium *all)
+{
+	all->steps[all->n_st + 1] = 0;
+	all->done[all->n_st + 1] = 0;
+	all->cut[all->n_st + 1] = all->cut[all->n_st];
+	all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
+	all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];
+	all->n_st++;
+}
+
 int	apply_min(t_compendium *all)
 {
-	int	op;
 	int	do_op;
 	int	tmp_op;
 	int	ret;
@@ -200,48 +228,27 @@ int	apply_min(t_compendium *all)
 	ret = -1;
 	while (ret == -1)
 	{
-		op = 0;
 		do_op = 0;
-		ret = all->tns[0] + all->max_val;
-		while (++op < 12)
-		{
-/*			printf(">op: %i (tns %i)\n", op, all->tns[op]);*/
-			if (all->tns[op] > -1 && all->tns[op] < ret)
-			{
-				ret = all->tns[op];
-/*				printf("%i ->ret\n", ret);*/
-				do_op = op;
-			}
-		}
+		ret = min_step(all, &do_op);
 		if (!do_op)
 			return (-1);
 		tmp_op = (*(all->ops[do_op]))(all);
-		if (tmp_op > 0)
-			all->done[all->n_st] |= 1 << tmp_op;
-		if (tmp_op != do_op)
-			all->done[all->n_st] |= 1 << do_op;
-/*		printf("%i ", tmp_op);*/
 		ret = all->tns[tmp_op];
+		if (tmp_op > 0)
+		{
+			all->done[all->n_st] |= 1 << tmp_op;
+			all->tns[tmp_op] = -1;
+		}
+		if (tmp_op != do_op)
+		{
+			all->done[all->n_st] |= 1 << do_op;
+			all->tns[do_op] = -1;
+		}
 	}
-/*	ret += '0';
-	write(1, &ret, 1);
-	ret -= '0';*/
-	if (ret < 0)
-		return (ret);
-/*	write(1, "(", 1);
-	print_1_step(do_op);
-	write(1, ")\n", 2);*/
+/*	if (ret < 0)
+		return (ret);*/
 	all->steps[all->n_st] = tmp_op;
-	all->steps[all->n_st + 1] = 0;
-	all->done[all->n_st + 1] = 0;
-/*	printf("%i ", all->cut[all->n_st]);*/
-	all->cut[all->n_st + 1] = all->cut[all->n_st];
-/*	printf("%i ", all->heir_mask[(int)all->steps[all->n_st]]);*/
-	all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
-/*	printf("%i ", all->cut_mask[(int)all->steps[all->n_st]]);*/
-	all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];
-/*	printf("%i ", all->cut[all->n_st + 1]);*/
-	all->n_st++;
+	init_next_st(all);
 	return (ret);
 }
 
@@ -249,78 +256,92 @@ int	undo(t_compendium *all, int n)
 {
 	int	op;
 
-	all->undo = 1;
-	while (n--)
+	n++;
+	while (--n)
 	{
 		if (!all->n_st)
-			return (-1);
+		{
+			n = -1;
+			break ;
+		}
 		op = all->revert[(int)all->steps[all->n_st - 1]];
 		if ((*(all->ops[op]))(all) < 0)
-			return (n + 1);
+			break ;
 		all->n_st--;
 	}
-	all->undo = 0;
-	return (0);
+	all->tns[0] = tot_tension(all);
+	return (n);
 }
 
-void	try_move(t_compendium *all, int op)
+void	eval_moves(t_compendium *all)
 {
-	all->tns[op] = -1;
-	if ((all->done[all->n_st] | all->cut[all->n_st]) & (1 << op))
-		return ;
-	all->steps[all->n_st] = (*(all->ops[op]))(all);
-	if (all->steps[all->n_st] < 0)
-		return ;
-	if (all->steps[all->n_st] == op)
-		all->tns[op] = tot_tension(all);
-	all->n_st++;
-	undo(all, 1);
+	int	op;
+
+	op = 0;
+	while (++op < 12)
+	{
+		all->tns[op] = -1;
+		if ((all->done[all->n_st] | all->cut[all->n_st]) & (1 << op))
+			continue ;
+		all->steps[all->n_st] = (*(all->ops[op]))(all);
+		if (all->steps[all->n_st] < 0)
+			continue ;
+		if (all->steps[all->n_st] == op)
+			all->tns[op] = tot_tension(all);
+		all->n_st++;
+		undo(all, 1);
+	}
 }
+
+void	save_sol(t_compendium *all, int bt_n)
+{
+	int	i;
+
+	all->sol_tns = all->tns[0];
+	printf("mejor tns: %i\n", all->sol_tns);
+/*	best = all->n_st;*/
+	i = all->n_st;
+	all->sol_part[i - bt_n] = 0;
+	while (i-- >= bt_n)
+		all->sol_part[i - bt_n] = all->steps[i];
+}
+
 
 void	process(t_compendium *all)
 {
-	int		op;
+	int		i;
 /*	t_data	**a;
 	t_data	**b;*/
 	int		best;
-	char	sol[100];
-	int		sol_tns;
+	int		bt_n;
 
 	index(all);
 /*	a = &(all->top[0]);
 	b = &(all->top[1]);
 	show_all(all);*/
-	sol[0] = 0;
-	sol_tns = -1;
-	best = 21;
-	while (all->n_st > -1)
+	all->sol_part[0] = 0;
+	all->sol_tns = -1;
+	best = 30;
+	all->tns[0] = tot_tension(all);
+	while (all->tns[0] > 0)
 	{
-		all->tns[0] = tot_tension(all);
-		while (all->tns[0] > 0 && all->n_st < best && all->n_st > -1)
+		bt_n = all->n_st;
+		while (all->n_st - bt_n < BACKTRACK_DEPTH && all->n_st >= bt_n)
 		{
-			op = 0;
-			while (++op < 12)
-				try_move(all, op);
+			eval_moves(all);
 			all->tns[0] = apply_min(all);
-			if (all->tns[0] < 0 && undo(all, 1) < 0)
+			if (all->tns[0] < 0 && all->n_st > bt_n)
+				undo(all, 1);
+			if (all->tns[0] < 0 && all->n_st == bt_n)
 				break ;
+			if (all->tns[0] > -1 && all->tns[0] < all->sol_tns)
+				save_sol(all, bt_n);
 		}
-		all->tns[0] = tot_tension(all);
-		if ((sol_tns < 0 || all->tns[0] <= sol_tns) && all->n_st <= best)
-		{
-			op = -1;
-			while (++op < all->n_st)
-				sol[op] = all->steps[op];
-			sol[op] = 0;
-			sol_tns = all->tns[0];
-			printf("mejor tns: %i\n", sol_tns);
-			best = all->n_st;
-			undo(all, 1);
-		}
-		if (undo(all, 1) < 0)
-			break ;
+		i = -1;
+		while (all->sol_part[++i])
+			(*(all->ops[(int)all->sol_part[i]]))(all);
 	}
-	print_steps(sol, NEW_LINE);
+	print_steps(all->sol_part, NEW_LINE);
 }
 
 /*uso:
@@ -350,7 +371,6 @@ void	start(t_compendium *all)
 	all->n_st = 0;
 	all->done[0] = 0;
 	all->cut[0] = 0;
-	all->undo = 0;
 	process(all);
 }
 
