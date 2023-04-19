@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/18 23:02:39 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/19 18:15:16 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,9 @@
 # define _RRR 11
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 15
+# define BACKTRACK_DEPTH 6
+# define NOT_1 0b111111001110
+# define NOT_2 0b011011000000
 # define OPS_A 0b01001010010
 # define OPS_B 0b10010100100
 
@@ -55,6 +57,7 @@ typedef struct s_compendium
 	int		*cut_mask;
 	int		*heir_mask;
 	int		n_st;
+	int		max[2];
 	int		tns[12];
 	char	sol_part[30];
 	int		sol_tns;
