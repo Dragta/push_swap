@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/27 18:58:47 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/27 19:17:47 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -314,11 +314,12 @@ int	exclude_reps(t_compendium *all, int op)
 	id = 1;
 	if (OPS_A && (1 << op))
 		id = 0;
-	i = all->max[0] / 2;
-	while (i && all->steps[all->n_st] == _RA)
+	i = all->max[id] / 2;
+	while (i && all->steps[all->n_st] == op)
 		i--;
-	if (i)
-		ret = 1 << _RA;
+	if (!i)
+		ret = 1 << op;
+	return (ret);
 }
 
 int	exclude(t_compendium *all)
@@ -336,7 +337,10 @@ int	exclude(t_compendium *all)
 		ret |= NOT_2B;
 	ret |= all->done[all->n_st];
 	ret |= all->cut[all->n_st];
-/*	exclude_reps*************************/
+	ret |= exclude_reps(all, _RA);
+	ret |= exclude_reps(all, _RB);
+	ret |= exclude_reps(all, _RRA);
+	ret |= exclude_reps(all, _RRB);
 	return (ret);
 }
 
