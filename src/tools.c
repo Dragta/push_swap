@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/27 03:26:59 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/27 18:58:47 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,6 +175,17 @@ int	inter_tension(t_compendium *all)
 	return (ret);
 }
 
+int	point_tns(t_compendium *all, t_data *i)
+{
+	int		ret;
+
+	ret = gap(i->next->target - i->target + (2 * i->id - 1), all->max_val) + i->id;
+	ret *= gap(i->pos, all->max_val) + 1;
+	if (!i->id || ret > 5 || all->max[i->id] > all->max_val / 2)
+		ret *= 3;
+	return (ret);
+}
+
 int	intra_tension(t_compendium *all)
 {
 	int		ret;
@@ -194,16 +205,16 @@ int	intra_tension(t_compendium *all)
 /*		printf("tn, t: %i, %i\n", t->next->target, t->target);*/
 /*		i = t->next->next;
 		while (id && all->max[id] > 2 && sense(t, t->next, t->next->next) == sense(t, t->next, i))*/
-		i = t->next;
 		pos_tns += gap(t->target - t->pos, all->max_val);
-		ret += gap(t->next->target - t->target + (2 * id - 1), all->max_val);/* + id;*/
+		ret += point_tns(all, t);
+		i = t->next;
 /*		ret += gap(t->pos, all->max[id]) * gap(t->pos, all->max[id]) * gap(t->next->target - t->target + (2 * id - 1), all->max[id]); + id;*/
 /*		printf("intra_tns: %i\n", ret);*/
 		while (i != t)
 		{
 /*			printf("target, pos, max: %i, %i, %i\n", i->target, i->pos, all->max_val);*/
 			pos_tns += gap(i->target - i->pos, all->max_val);
-			ret += gap(i->next->target - i->target + (2 * id- 1), all->max_val) + id;
+			ret += point_tns(all, i);
 /*			printf("intra_tns: %i\n", ret);*/
 			i = i->next;
 		}
@@ -211,7 +222,8 @@ int	intra_tension(t_compendium *all)
 /*	ret *= all->max[0] - all->max[1];
 	if (ret < 0)
 		ret *= -1;*/
-	ret += pos_tns / all->max_val;
+	if (!ret)
+		ret += pos_tns / all->max_val;
 	return (ret);
 }
 
@@ -292,6 +304,42 @@ int	apply_min(t_compendium *all)
 	return (ret);
 }
 
+int	exclude_reps(t_compendium *all, int op)
+{
+	int	id;
+	int	i;
+	int	ret;
+
+	ret = 0;
+	id = 1;
+	if (OPS_A && (1 << op))
+		id = 0;
+	i = all->max[0] / 2;
+	while (i && all->steps[all->n_st] == _RA)
+		i--;
+	if (i)
+		ret = 1 << _RA;
+}
+
+int	exclude(t_compendium *all)
+{
+	int	ret;
+
+	ret = 0;
+	if (all->max[0] < 2)
+		ret |= NOT_1A;
+	if (all->max[1] < 2)
+		ret |= NOT_1B;
+	if (all->max[0] < 3)
+		ret |= NOT_2A;
+	if (all->max[1] < 3)
+		ret |= NOT_2B;
+	ret |= all->done[all->n_st];
+	ret |= all->cut[all->n_st];
+/*	exclude_reps*************************/
+	return (ret);
+}
+
 int	undo(t_compendium *all, int n)
 {
 	int	op;
@@ -310,28 +358,9 @@ int	undo(t_compendium *all, int n)
 		all->n_st--;
 	}
 	all->tns[0] = tot_tension(all);
+	if (exclude(all) == ALL_OPS)
+		all->tns[0] = -1;
 	return (n);
-}
-
-int	exclude(t_compendium *all, int op)
-{
-	int	tmp;
-	int	ret;
-
-	ret = NOT_1A & (1 << op);
-	ret &= all->top[0] && all->top[0] == all->top[0]->next;
-	tmp = NOT_1B & (1 << op);
-	tmp &= all->top[1] && all->top[1] == all->top[1]->next;
-	ret |= tmp;
-	tmp = NOT_2A & (1 << op);
-	tmp &= all->top[0] && all->top[0] == all->top[0]->next->next;
-	ret |= tmp;
-	tmp = NOT_2B & (1 << op);
-	tmp &= all->top[1] && all->top[1] == all->top[1]->next->next;
-	ret |= tmp;
-	tmp = (all->done[all->n_st] | all->cut[all->n_st]) & (1 << op);
-	ret |= tmp;
-	return (ret);
 }
 
 
@@ -340,12 +369,12 @@ void	eval_moves(t_compendium *all)
 	int	op;
 
 /*	quick_st(all);
-	printf("w(%i)", all->tns[0]);*/
+	printf("w(%i/%i)", all->tns[0], all->sol_tns);*/
 	op = 12;
 	while (--op)
 	{
 		all->tns[op] = -1;
-		if (exclude(all, op))
+		if (exclude(all) & (1 << op))
 			continue ;
 		all->steps[all->n_st] = (*(all->ops[op]))(all);
 		if (all->steps[all->n_st] <= 0)
@@ -365,7 +394,7 @@ void	save_sol(t_compendium *all, int bt_n)
 
 	all->sol_tns = all->tns[0];
 /*	if (!all->sol_tns)
-			quick_st(all);
+		quick_st(all);
 	printf(" mejor tns: %i\n", all->sol_tns);*/
 	i = all->n_st + 1;
 	while (--i >= bt_n)
@@ -378,7 +407,7 @@ void	process(t_compendium *all)
 	int		i;
 /*	t_data	**a;
 	t_data	**b;*/
-	char	op;
+	int		op;
 	int		bt_n;
 	int		sol_depth;
 
@@ -393,8 +422,7 @@ void	process(t_compendium *all)
 	while (all->tns[0] && all->n_st < LIMITE)
 	{
 		bt_n = all->n_st;
-/*		while (all->n_st - bt_n < sol_depth && all->n_st >= bt_n)*/
-		while (all->tns[0] > 0)
+		while (bt_n < all->n_st || all->tns[0] > 0)
 		{
 			eval_moves(all);
 			all->tns[0] = apply_min(all);
@@ -404,15 +432,8 @@ void	process(t_compendium *all)
 					sol_depth = all->n_st - bt_n - 1;
 				save_sol(all, bt_n);
 			}
-			if ((all->tns[0] < 0 && all->n_st > bt_n))
-/*			{
-				printf("*BRANCH*BACK ");
-				quick_st(all);
-				printf("\n");*/
-				undo(all, 1);
-			if (all->n_st - bt_n >= sol_depth)
-/*			{
-				printf("BACK %i\n", all->steps[all->n_st - 1]);*/
+			if ((all->n_st - bt_n >= sol_depth || all->tns[0] < 0) &&
+					all->n_st > bt_n)
 				undo(all, 1);
 		}
 		if (bt_n != all->n_st)
@@ -422,22 +443,16 @@ void	process(t_compendium *all)
 			break ;
 		}
 		i = -1;
-		if (!all->sol_part[0])
-			break ;
-/*		printf("FORWARD ");*/
+		if (!all->sol_part[0] && all->n_st)
+			undo(all, 1);
 		while (all->sol_part[++i])
 		{
 			op = all->sol_part[i];
-/*			op += '0';
-			write(1, &op, 1);
-			op -= '0';*/
-			(*(all->ops[(int)op]))(all);
+			(*(all->ops[op]))(all);
 			all->steps[all->n_st] = op;
 			init_next_st(all);
 		}
 		all->sol_part[0] = 0;
-/*		printf("~");*/
-/*		printf("done: %i cut: %i\n", all->done[all->n_st], all->cut[all->n_st]);*/
 		all->tns[0] = tot_tension(all);
 	}
 	print_steps(all->steps, NEW_LINE);
@@ -529,8 +544,8 @@ void	count_stacks(t_compendium *all)
 			else
 				i = i->next;
 		}
-/*		all->max[s] = p;*/
-		all->max[s] = all->max_val;
+		all->max[s] = p;
+/*		all->max[s] = all->max_val;*/
 	}
 }
 

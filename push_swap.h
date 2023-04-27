@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/27 03:39:03 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/27 16:07:15 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@
 # define _RRB 10
 # define _RRR 11
 # define LIMITE 500
-# define TOLERANCE 4
+# define TOLERANCE 20
 # define ONE_LINE 0
 # define NEW_LINE 1
 # define BACKTRACK_DEPTH 5
@@ -36,8 +36,9 @@
 # define NOT_1B 0b110110001100
 # define NOT_2A 0b001001000000
 # define NOT_2B 0b010010000000
-# define OPS_A 0b01001010010
-# define OPS_B 0b10010100100
+# define OPS_A 0b001001010010
+# define OPS_B 0b010010100100
+# define ALL_OPS 0b111111111110
 
 typedef struct s_data
 {
