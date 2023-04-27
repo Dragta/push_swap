@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/19 18:15:16 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/27 03:39:03 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,15 @@
 # define _RRA 9
 # define _RRB 10
 # define _RRR 11
+# define LIMITE 500
+# define TOLERANCE 4
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 6
-# define NOT_1 0b111111001110
-# define NOT_2 0b011011000000
+# define BACKTRACK_DEPTH 5
+# define NOT_1A 0b101101001010
+# define NOT_1B 0b110110001100
+# define NOT_2A 0b001001000000
+# define NOT_2B 0b010010000000
 # define OPS_A 0b01001010010
 # define OPS_B 0b10010100100
 

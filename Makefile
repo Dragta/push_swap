@@ -1,7 +1,7 @@
 ### FILES AND DIRECTORIES ###
 NAME = push_swap
 GC = gcc
-CFLAGS = -Wall -Werror -Wextra -std=c89 # -g3 -fsanitize=address
+CFLAGS = -Wall -Werror -Wextra -std=c89 -g3 -fsanitize=address
 INCLUDES = include
 
 DIR_PUSH_SWAP = src/
@@ -20,7 +20,7 @@ FILES_OBJ = $(addprefix $(DIR_OBJ), $(addsuffix .o, $(FILES_PUSH_SWAP)))
 all: $(NAME)
 
 $(NAME): $(FILES_OBJ)
-	$(GC) $(FILES_OBJ) -o $(NAME) # -fsanitize=address
+	$(GC) $(FILES_OBJ) -o $(NAME) -fsanitize=address
 #	@ar rsc $(NAME) $(FILES_OBJ)
 	@echo "SUCCESSFULLY COMPILED $(NAME)"
 
