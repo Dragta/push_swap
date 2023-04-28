@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/27 16:07:15 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/28 14:53:33 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,9 @@
 # define ONE_LINE 0
 # define NEW_LINE 1
 # define BACKTRACK_DEPTH 5
+# define NOT_REP 0b011011000000
+# define NOT_0A 0b000000100000
+# define NOT_0B 0b000000010000
 # define NOT_1A 0b101101001010
 # define NOT_1B 0b110110001100
 # define NOT_2A 0b001001000000

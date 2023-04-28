@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/27 19:17:47 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/28 15:16:37 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -304,29 +304,42 @@ int	apply_min(t_compendium *all)
 	return (ret);
 }
 
-int	exclude_reps(t_compendium *all, int op)
+void	exclude_reps(t_compendium *all)
 {
 	int	id;
+	int	msk;
+	int	op;
 	int	i;
-	int	ret;
 
-	ret = 0;
-	id = 1;
-	if (OPS_A && (1 << op))
-		id = 0;
-	i = all->max[id] / 2;
-	while (i && all->steps[all->n_st] == op)
-		i--;
-	if (!i)
-		ret = 1 << op;
-	return (ret);
+	op = 0;
+	msk = NOT_REP;
+	while (msk)
+	{
+		op++;
+		msk = msk >> 1;
+		if (!(msk & 1))
+			continue ;
+		id = 1;
+		if (OPS_A & (1 << op))
+			id = 0;
+		i = all->max[id] / 2;
+		while (i && i <= all->n_st && all->steps[all->n_st - i] == op)
+			i--;
+		if (!i)
+			all->cut[all->n_st] |= 1 << op;
+	}
 }
 
 int	exclude(t_compendium *all)
 {
 	int	ret;
 
+	exclude_reps(all);
 	ret = 0;
+	if (!all->max[0])
+		ret |= NOT_0A;
+	if (!all->max[1])
+		ret |= NOT_0B;
 	if (all->max[0] < 2)
 		ret |= NOT_1A;
 	if (all->max[1] < 2)
@@ -337,10 +350,6 @@ int	exclude(t_compendium *all)
 		ret |= NOT_2B;
 	ret |= all->done[all->n_st];
 	ret |= all->cut[all->n_st];
-	ret |= exclude_reps(all, _RA);
-	ret |= exclude_reps(all, _RB);
-	ret |= exclude_reps(all, _RRA);
-	ret |= exclude_reps(all, _RRB);
 	return (ret);
 }
 
@@ -359,6 +368,7 @@ int	undo(t_compendium *all, int n)
 		op = all->revert[(int)all->steps[all->n_st - 1]];
 		if ((*(all->ops[op]))(all) <= 0)
 			break ;
+		all->steps[all->n_st - 1] = 0;
 		all->n_st--;
 	}
 	all->tns[0] = tot_tension(all);
@@ -373,19 +383,27 @@ void	eval_moves(t_compendium *all)
 	int	op;
 
 /*	quick_st(all);
-	printf("w(%i/%i)", all->tns[0], all->sol_tns);*/
+	printf("w(%i/%i), done[%i]=%i", all->tns[0], all->sol_tns, all->n_st, all->done[all->n_st]);*/
 	op = 12;
 	while (--op)
 	{
 		all->tns[op] = -1;
 		if (exclude(all) & (1 << op))
+		{
+			all->done[all->n_st] |= 1 << op;
 			continue ;
+		}
 		all->steps[all->n_st] = (*(all->ops[op]))(all);
 		if (all->steps[all->n_st] <= 0)
 			continue ;
 		if (all->steps[all->n_st] == op)
 			all->tns[op] = tot_tension(all);
 /*		printf(" %i(%i)", op, all->tns[op]);*/
+		if (all->tns[op] > all->tns[0] + TOLERANCE)
+		{
+			all->tns[op] = -1;
+			all->done[all->n_st] |= 1 << op;
+		}
 		all->n_st++;
 		undo(all, 1);
 	}
@@ -420,13 +438,13 @@ void	process(t_compendium *all)
 	b = &(all->top[1]);
 	show_all(all);*/
 	all->sol_part[0] = 0;
-	all->sol_tns = 2000;
+	all->sol_tns = 100 * all->max_val;
 	all->tns[0] = tot_tension(all);
 	sol_depth = BACKTRACK_DEPTH;
-	while (all->tns[0] && all->n_st < LIMITE)
+	while (all->tns[0] && all->n_st < LIMITE && (all->n_st || all->done[0] < ALL_OPS))
 	{
 		bt_n = all->n_st;
-		while (bt_n < all->n_st || all->tns[0] > 0)
+		while ((all->n_st || all->done[0] < ALL_OPS) && (bt_n < all->n_st || all->tns[0] > 0))
 		{
 			eval_moves(all);
 			all->tns[0] = apply_min(all);
@@ -488,7 +506,7 @@ void	start(t_compendium *all)
 	all->ops[11] = &move_rrr;
 	all->n_st = 0;
 	all->steps[0] = 0;
-	all->done[0] = 0;
+	all->done[0] = 1 << _PA;/********JARKODEADO******/
 	all->cut[0] = 0;
 	process(all);
 }
