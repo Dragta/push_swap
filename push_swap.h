@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/28 14:53:33 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/04 00:28:59 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,11 +27,11 @@
 # define _RRA 9
 # define _RRB 10
 # define _RRR 11
-# define LIMITE 500
-# define TOLERANCE 20
+# define LIMIT 300
+# define TOLERANCE 30
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 5
+# define BACKTRACK_DEPTH 7
 # define NOT_REP 0b011011000000
 # define NOT_0A 0b000000100000
 # define NOT_0B 0b000000010000
@@ -67,7 +67,8 @@ typedef struct s_compendium
 	int		n_st;
 	int		max[2];
 	int		tns[12];
-	char	sol_part[30];
+	int		tolerance;
+	char	sol_part[300];
 	int		sol_tns;
 	t_data	**s;
 }			t_compendium;
