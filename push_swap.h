@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 00:28:59 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/04 18:52:26 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ typedef struct s_compendium
 	int		tolerance;
 	char	sol_part[300];
 	int		sol_tns;
-	t_data	**s;
+	t_data	*s;
 }			t_compendium;
 
 int		ft_atoi(char *str, int *err);
@@ -89,8 +89,8 @@ int		move_rr(t_compendium *all);
 int		move_rra(t_compendium *all);
 int		move_rrb(t_compendium *all);
 int		move_rrr(t_compendium *all);
-void	add_data(t_compendium *all, t_data *mv, t_data *on);
-void	init(t_compendium *all, t_data *n, int val, int *err);
+void	add_data(t_compendium *all, int position, t_data *on);
+void	init(t_compendium *all, int position, int val, int *err);
 void	show_tgts(t_compendium *all);
 void	show_all(t_compendium *all);
 /*void	show_a(t_data **stk);

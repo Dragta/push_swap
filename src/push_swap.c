@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/27 03:07:57 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/04 18:52:01 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,19 +52,22 @@ void	index(t_compendium *all)
 		tmp->target = i++;
 		tmp = tmp->next;
 	}
-	all->s[0]->prev = all->s[i - 1];
-	all->s[i - 1]->next = all->s[0];
+	all->s[0].prev = &(all->s[i - 1]);
+	all->s[i - 1].next = &(all->s[0]);
 	while (--i)
 	{
-		all->s[i]->prev = all->s[i - 1];
-		all->s[i - 1]->next = all->s[i];
+		all->s[i].prev = &(all->s[i - 1]);
+		all->s[i - 1].next = &(all->s[i]);
 	}
-	all->top[0] = all->s[0];
+	all->top[0] = &(all->s[0]);
 	count_stacks(all);
 }
 
-void	add_data(t_compendium *all, t_data *mv, t_data *on)
+void	add_data(t_compendium *all, int position , t_data *on)
 {
+	t_data	*mv;
+
+	mv = all->s + position;
 	mv->id = 0;
 	if (!on)
 	{
@@ -78,44 +81,28 @@ void	add_data(t_compendium *all, t_data *mv, t_data *on)
 		on->prev = mv;
 		mv->prev->next = mv;
 	}
-	if (!all->top[0] || mv->val < all->top[0]->val)
+	if (mv->val < all->top[0]->val)
 		all->top[0] = mv;
 }
 
-void	init(t_compendium *all, t_data *n, int val, int *err)
+void	init(t_compendium *all, int position, int val, int *err)
 {
 	t_data	*i;
 
-	n->val = val;
-	n->id = -1;
-	i = all->top[0];
-	if (n > all->s[0])
+	if (*err)
+		return ;
+	all->s[position].val = val;
+	all->s[position].id = -1;
+	i = NULL;
+	if (position)
 	{
+		i = all->top[0];
 		while (val > i->val && (i->val > i->prev->val || val < i->prev->val))
 			i = i->next;
 		if (i->val == val)
 			*err = -1;
 	}
-	add_data(all, n, i);
-}
-
-t_data	**mem_stack(int n)
-{
-	t_data	**ret;
-
-	ret = malloc(n * sizeof(t_data *));
-	if (ret)
-	{
-		*ret = malloc(n * sizeof(t_data));
-		if (!(*ret))
-		{
-			free (ret);
-			return (NULL);
-		}
-		while (--n)
-			*(ret + n) = *ret + n;
-	}
-	return (ret);
+	add_data(all, position, i);
 }
 
 int	main(int narg, char **args)
@@ -123,27 +110,26 @@ int	main(int narg, char **args)
 	int	err;
 	int	i;
 	t_compendium	all;
-	t_data			**stack;
+	t_data			*stack;
 	t_data			*top[2];
 
 	setvbuf(stdout, NULL, _IONBF, 0);
-	i = 0;
 	err = 0;
-	stack = mem_stack(narg - 1);
+	stack = malloc((narg - 1) * sizeof(t_data));
 	if (!stack)
 		err = -1;
 	all.max_val = narg - 1;
 	all.top = top;
 	all.s = stack;
-	top[0] = all.s[0];
+	top[0] = all.s;
 	top[1] = NULL;
+	i = 0;
 	while (!err && ++i < narg)
-		init(&all, all.s[i - 1], ft_atoi(args[i], &err), &err);
+		init(&all, i - 1, ft_atoi(args[i], &err), &err);
 	if (narg != i)
 		write(1, "Error\n", 6);
-	else
+	if (narg == i && narg > 1)
 		start(&all);
-	free(*stack);
 	free(stack);
 	return (0);
 }
