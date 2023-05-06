@@ -297,9 +297,13 @@ void	process(t_compendium *all)
 				move(all, _PB);
 			}
 			else
+			{
 				move(all, _RA);
+				if (all->max[0] < all->max_val / 30)
+					break ;
+			}
 		}
-		toler -= 3;
+		toler /= 5;
 		while ((*b) && (*b)->next != all->top[1] && all->n_st - n < 12 * all->max_val)
 		{
 			if (better_push(all, 0, toler))
@@ -309,9 +313,13 @@ void	process(t_compendium *all)
 				move(all, _PA);
 			}
 			else
+			{
 				move(all, _RB);
+				if (all->max[1] < all->max_val / 30)
+					break ;
+			}
 		}
-		toler -= 3;
+		toler /= 5;
 	}
 
 
