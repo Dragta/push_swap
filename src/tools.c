@@ -125,6 +125,7 @@ void	init_next_st(t_compendium *all)
 	all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
 	all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];*/
 	all->n_st++;
+	count_stacks(all);
 }
 /*
 int	apply_min(t_compendium *all)
@@ -161,44 +162,6 @@ int	apply_min(t_compendium *all)
 	return (ret);
 }
 */
-int	better_push(t_compendium *all, int stack, int tolerance)
-{
-	int	i;
-	int	i_max;
-	t_data	*b;
-	int	sum;
-	int	ret;
-
-	ret = 1;
-	b = all->top[stack];
-	if (!b)
-		return (ret);
-	sum = gap(b->target - all->top[1 - stack]->target, all->max_val);
-	b = b->prev;
-	i_max = 10;
-	if (all->max[1] < 20)
-		i_max = all->max[1] / 2 - 1;
-	i = 0;
-	while (i++ < i_max)
-	{
-		sum += gap(b->target - all->top[1 - stack]->target, all->max_val);
-		b = b->prev;
-	}
-	b = all->top[stack]->next;
-	i = 0;
-	while (i++ <= i_max)
-	{
-		sum += gap(b->target - all->top[1 - stack]->target, all->max_val);
-		b = b->next;
-	}
-	if (i_max)
-		sum /= i_max;
-/*	printf("%i\n", sum);*/
-	if (sum > tolerance)
-		ret = 0;
-	return (ret);
-}
-
 void	exclude_reps(t_compendium *all)
 {
 	int	id;
@@ -296,6 +259,20 @@ void	move(t_compendium *all, int op)
 	init_next_st(all);
 }
 
+int	better_push(t_compendium *all, int stack, int tolerance)
+{
+	t_data	*b;
+	int	sum;
+	int	ret;
+
+	ret = 1;
+	b = all->top[1 - stack];
+	sum = gap(b->target - all->max[stack], all->max_val);
+	if (sum > all->max_val * tolerance / 100)
+		ret = 0;
+	return (ret);
+}
+
 void	process(t_compendium *all)
 {
 	t_data	**a;
@@ -307,11 +284,11 @@ void	process(t_compendium *all)
 	a = &(all->top[0]);
 	b = &(all->top[1]);
 /*	show_all(all);*/
-	toler = 300;
-	while (all->n_st < 8000)
+	toler = 20;
+	while (all->n_st < 16 * all->max_val && toler > 0)
 	{
 		n = all->n_st;
-		while ((*a) && (*a)->next != all->top[0] && all->n_st - n < 1000)
+		while ((*a) && (*a)->next != all->top[0] && all->n_st - n < 6 * all->max_val)
 		{
 			if (better_push(all, 1, toler))
 			{
@@ -322,9 +299,8 @@ void	process(t_compendium *all)
 			else
 				move(all, _RA);
 		}
-		toler *= 17;
-		toler /= 17;
-		while ((*b) && (*b)->next != all->top[1] && all->n_st - n < 2000)
+		toler -= 3;
+		while ((*b) && (*b)->next != all->top[1] && all->n_st - n < 12 * all->max_val)
 		{
 			if (better_push(all, 0, toler))
 			{
@@ -335,8 +311,7 @@ void	process(t_compendium *all)
 			else
 				move(all, _RB);
 		}
-		toler *= 17;
-		toler /= 17;
+		toler -= 3;
 	}
 
 
@@ -355,7 +330,7 @@ void	process(t_compendium *all)
 		printf("\n%i (%i)\n", all->n_st, tot_tension(all));
 	}*/
 	print_steps(all->steps, NEW_LINE);
-	printf("%i\n", toler);
+/*	printf("%i\n", toler);*/
 }
 
 /*uso:
