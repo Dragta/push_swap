@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 20:35:25 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/08 19:44:06 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,6 +85,7 @@ int	gap(int g, int max)
 {
 	if (g < 0)
 		g = -g;
+	(void) max;
 	if (g > max / 2)
 		g = max - g;
 	return (g);
@@ -259,67 +260,125 @@ void	move(t_compendium *all, int op)
 	init_next_st(all);
 }
 
-int	better_push(t_compendium *all, int stack, int tolerance)
+int	better_push(t_compendium *all, t_data *i, int tolerance, int method)
 {
-	t_data	*b;
+	int	stack;
 	int	sum;
-	int	ret;
 
-	ret = 1;
-	b = all->top[1 - stack];
-	sum = gap(b->target - all->max[stack], all->max_val);
+	stack = 1 - i->id;
+	if (!all->max[stack])
+		return (1);
+	if (method == 4)
+	{
+		if (i->target + 1 == all->top[stack]->target || (i->target - all->top[stack]->target == all->max_val - 1))
+			return (1);
+		return (0);
+	}
+	if (method == 3)
+	{
+		if (gap(i->target - all->max[stack], all->max_val) < 8 + tolerance)
+			return (1);
+		return (0);
+	}
+	if (method < 3)
+		sum = gap(i->target - all->max[stack], all->max_val);
+	else
+		sum = gap(i->target - all->top[stack]->target, all->max_val);
 	if (sum > all->max_val * tolerance / 100)
-		ret = 0;
-	return (ret);
+		return (0);
+	return (1);
 }
+
+int	eval_sense(t_compendium *all, int stack, int tolerance, int method)
+{
+	t_data	*i;
+	int		ct;
+	int		ret;
+
+	if (!all->max[1 - stack])
+		return (0);
+	i = all->top[stack];
+	ct = 0;
+	while (!better_push(all, i, tolerance, method))
+	{
+		ct++;
+		i = i->next;
+		if (i == all->top[stack])
+			return (-1);
+	}
+	ret = ct;
+	i = all->top[stack];
+	ct = 0;
+	while (!better_push(all, i, tolerance, method))
+	{
+		ct++;
+		i = i->prev;
+		if (i == all->top[stack])
+			return (-1);
+	}
+	if (ct > ret)
+		return (0);
+	return (3);/*(3)*/
+}
+
 
 void	process(t_compendium *all)
 {
-	t_data	**a;
-	t_data	**b;
-	int		n;
+	t_data	**top_[2];
+	int		stk;
+	int		sense;
+	int		pass;
 	int		toler;
 
 	index(all);
-	a = &(all->top[0]);
-	b = &(all->top[1]);
+	top_[0] = &(all->top[0]);
+	top_[1] = &(all->top[1]);
 /*	show_all(all);*/
-	toler = 20;
-	while (all->n_st < 16 * all->max_val && toler > 0)
+	stk = 0;
+	pass = 0;
+	toler = 11;
+	while (toler > 0 && ++pass < 5)
 	{
-		n = all->n_st;
-		while ((*a) && (*a)->next != all->top[0] && all->n_st - n < 6 * all->max_val)
+		if (pass == 3)
+			toler = 0;
+		sense = eval_sense(all, stk, toler, pass);
+		while (all->max[stk] > 0 && all->n_st < 12000) /* && (pass < 3 || all->max[1 - stk] < all->max_val / 2))*/
 		{
-			if (better_push(all, 1, toler))
+/*			printf("pass %i, stk %i, steps %i, max0 %i, max1 %i\n", pass, stk, all->n_st, all->max[0], all->max[1]);*/
+			if (better_push(all, *top_[stk], toler, pass))
 			{
-				if ((*b) && (*b)->target > (*a)->target)
-					move(all, _RB);
-				move(all, _PB);
+				if ((*top_[1 - stk]) &&
+						(((*top_[1])->target > (*top_[0])->target && (*top_[1])->target - (*top_[0])->target < all->max_val / 2) ||
+						 ((*top_[1])->target < (*top_[0])->target && (*top_[1])->target - (*top_[0])->target < -all->max_val / 2)))
+					move(all, _RB - stk);
+				move(all, _PB - stk);
+				if (!all->max[stk] || (eval_sense(all, stk, toler, pass) < 0 && pass < 3))
+					break ;
+				while (eval_sense(all, stk, toler, pass) < 0 && pass > 2)
+					toler++;
+				sense = eval_sense(all, stk, toler, pass);
 			}
 			else
-			{
-				move(all, _RA);
-				if (all->max[0] < all->max_val / 30)
-					break ;
-			}
+				move(all, _RA + stk + sense);
+/*			{
+				if (pass < 3)
+					move(all, _RA + stk + sense);
+				else
+				{
+					move(all, _RR + sense);
+					toler++;
+				}
+			}*/
 		}
-		toler /= 5;
-		while ((*b) && (*b)->next != all->top[1] && all->n_st - n < 12 * all->max_val)
+		if (toler < 5 && toler > 2)
+			toler--;
+		else
 		{
-			if (better_push(all, 0, toler))
-			{
-				if ((*a) && (*a)->target < (*b)->target)
-					move(all, _RA);
-				move(all, _PA);
-			}
-			else
-			{
-				move(all, _RB);
-				if (all->max[1] < all->max_val / 30)
-					break ;
-			}
+			toler *= 1;
+			toler /= 5;
+			toler++;
 		}
-		toler /= 5;
+		stk = 1 - stk;
 	}
 
 
@@ -338,7 +397,7 @@ void	process(t_compendium *all)
 		printf("\n%i (%i)\n", all->n_st, tot_tension(all));
 	}*/
 	print_steps(all->steps, NEW_LINE);
-/*	printf("%i\n", toler);*/
+	printf("%i\n", pass);
 }
 
 /*uso:
