@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 18:52:26 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/15 18:46:26 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,7 +99,7 @@ int		dist(t_data *t);
 int		trend(t_data *t);*/
 void	print_1_step(int op);
 void	print_steps(char *ops, int nl);
-int		gap(int g, int max);
+int		gap(t_compendium *all, t_data *i);
 int		longest(t_compendium *all);
 int		inter_tension(t_compendium *all);
 int		intra_tension(t_compendium *all);

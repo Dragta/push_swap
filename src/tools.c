@@ -6,32 +6,11 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/08 19:44:06 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/16 00:51:08 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
-
-int	direction(t_data *tx, t_data *ty, t_data *tz)
-{
-	int	ret;
-	int	x;
-	int	y;
-	int	z;
-	
-	if (!tx)
-		x = ty->target - 1;
-	else
-		x = tx->target;
-	y = ty->target;
-	z = tz->target;
-	ret = 1;
-	if (x == y || y == z || z == x)
-		ret = 0;
-	else if ((x > y && y > z) || (z > x && x > y) || (y > z && z > x))
-		ret = -1;
-	return (ret);
-}
 
 void	print_1_step(int op)
 {
@@ -84,41 +63,43 @@ void	quick_st(t_compendium *all)
 	}
 }
 
-int	gap(int g, int max)
+int	abs(int g)
 {
 	if (g < 0)
 		g = -g;
-	(void) max;
-	if (g > max / 2)
-		g = max - g;
 	return (g);
 }
 
-int	longest(t_compendium *all)
+int	gap(t_compendium *all, t_data *i)
 {
-	t_data	*i;
-	int		tmp;
-	int		ct;
-	int		s;
+	int	g;
+	int	max;
 
-	s = -1;
-	ct = 0;
-	while (++s < 2)
-	{
-		i = all->top[s];
-		if (i)
-		{
-			tmp = 1;
-			while (i->next != all->top[s])
-			{
-				tmp++;
-				i = i->next;
-			}
-		}
-		if (tmp > ct)
-			ct = tmp;
-	}
-	return (ct);
+	if (!i)
+		return (0);
+	g = i->target - i->prev->target;
+	max = all->max_val;
+	while (g < - max / 2)
+		g += max;
+	while (g >= max / 2)
+		g -= max;
+	return (g);
+}
+
+int	inter_gap(t_compendium *all, t_data *i)
+{
+	int	g;
+	int	max;
+
+	if (!i || !all->top[1 - i->id])
+		return (0);
+	g = all->top[1 - i->id]->target - i->target;
+	max = all->max_val;
+	while (g < - max / 2)
+		g += max;
+	while (g >= max / 2)
+		g -= max;
+	return (g);
 }
 
 void	init_next_st(t_compendium *all)
@@ -131,274 +112,71 @@ void	init_next_st(t_compendium *all)
 	all->n_st++;
 	count_stacks(all);
 }
-/*
-int	apply_min(t_compendium *all)
-{
-	int	do_op;
-	int	tmp_op;
-	int	ret;
-
-	ret = -1;
-	while (ret == -1)
-	{
-		do_op = 0;
-		ret = min_step(all, &do_op);
-		if (!do_op)
-			return (-1);
-		tmp_op = (*(all->ops[do_op]))(all);
-		ret = all->tns[tmp_op];
-*		if (all->tolerance > 999)
-			printf(" %i>%i(%i)\n", all->n_st, do_op, ret);*
-		if (tmp_op > 0)
-		{
-			all->done[all->n_st] |= 1 << tmp_op;
-			all->tns[tmp_op] = -1;
-		}
-		if (tmp_op != do_op)
-		{
-			printf("*****\ndo_op: %i; tmp_op: %i\n*****", do_op, tmp_op);
-			all->done[all->n_st] |= 1 << do_op;
-			all->tns[do_op] = -1;
-		}
-	}
-	all->steps[all->n_st] = tmp_op;
-	init_next_st(all);
-	return (ret);
-}
-*/
-void	exclude_reps(t_compendium *all)
-{
-	int	id;
-	int	msk;
-	int	op;
-	int	i;
-
-	op = 0;
-	msk = NOT_REP;
-	while (msk)
-	{
-		op++;
-		msk = msk >> 1;
-		if (!(msk & 1))
-			continue ;
-		id = 1;
-		if (OPS_A & (1 << op))
-			id = 0;
-		i = all->max[id] / 2;
-		while (i && i <= all->n_st && all->steps[all->n_st - i] == op)
-			i--;
-		if (!i)
-			all->cut[all->n_st] |= 1 << op;
-	}
-}
-
-int	exclude(t_compendium *all)
-{
-	int	ret;
-
-	exclude_reps(all);
-	ret = 0;
-	if (!all->max[0])
-		ret |= NOT_0A;
-	if (!all->max[1])
-		ret |= NOT_0B;
-	if (all->max[0] < 2)
-		ret |= NOT_1A;
-	if (all->max[1] < 2)
-		ret |= NOT_1B;
-	if (all->max[0] < 3)
-		ret |= NOT_2A;
-	if (all->max[1] < 3)
-		ret |= NOT_2B;
-	ret |= all->done[all->n_st];
-	ret |= all->cut[all->n_st];
-	return (ret);
-}
-/*
-int	undo(t_compendium *all, int n)
-{
-	int	op;
-
-	n++;
-	while (--n)
-	{
-		if (!all->n_st)
-		{
-			n = -1;
-			break ;
-		}
-		op = all->revert[(int)all->steps[all->n_st - 1]];
-		if ((*(all->ops[op]))(all) <= 0)
-		{
-			printf("No undo %i with %i possible. Stack A: %i; Stack B: %i\n", all->steps[all->n_st - 1], op, all->max[0], all->max[1]);
-			break ;
-		}
-		all->steps[all->n_st - 1] = 0;
-		all->n_st--;
-	}
-	all->tns[0] = tot_tension(all);
-	if (exclude(all) == ALL_OPS)
-		all->tns[0] = -1;
-	return (n);
-}
-*/
-void	save_sol(t_compendium *all, int bt_n)
-{
-	int	i;
-
-	all->sol_tns = all->tns[0];
-/*	if (!all->sol_tns)
-		quick_st(all);
-	printf(" mejor tns: %i\n", all->sol_tns);*/
-	i = all->n_st;
-	all->sol_part[i - bt_n] = 0;
-	while (--i >= bt_n)
-		all->sol_part[i - bt_n] = all->steps[i];
-}
 
 void	move(t_compendium *all, int op)
 {
 	(*(all->ops[op]))(all);
 	all->steps[all->n_st] = op;
 	init_next_st(all);
+	print_1_step(op);
+	printf("\n");
 /*	printf("%i op %i, a: %i b: %i\n", all->n_st - 1, op, all->max[0], all->max[1]);*/
 }
-
-int	better_push(t_compendium *all, t_data *i, int tolerance, int method)
-{
-	int	stack;
-	int	sum;
-
-	stack = 1 - i->id;
-	if (!all->max[stack])
-		return (i->target);
-	if (method == 4)
-	{
-		if (i->target + 1 == all->top[stack]->target || (i->target - all->top[stack]->target == all->max_val - 1))
-			return (1);
-		return (0);
-	}
-	if (method == 3)
-	{
-/*		if (gap(i->target - all->max[stack], all->max_val) < 8 + tolerance)
-		if (direction(NULL, i->prev, i) > 0)*/
-		if (i->target > i->prev->target || i->prev->target - i->target > all->max_val / 2)
-			return (0);
-		return (1);
-	}
-	if (method < 3)
-		sum = gap(i->target - all->max[stack], all->max_val);
-	else
-		sum = gap(i->target - all->top[stack]->target, all->max_val);
-	if (sum > all->max_val * tolerance / 100)
-		return (0);
-	return (1);
-}
-
-int	eval_sense(t_compendium *all, int stack, int tolerance, int method)
-{
-	t_data	*i;
-	int		ct;
-	int		ret;
-
-	if (!all->max[1 - stack])
-		return (0);
-	i = all->top[stack];
-	ct = 0;
-	while (!better_push(all, i, tolerance, method))
-	{
-		ct++;
-		i = i->next;
-		if (i == all->top[stack])
-			return (-1);
-	}
-	ret = ct;
-	i = all->top[stack];
-	ct = 0;
-	while (!better_push(all, i, tolerance, method))
-	{
-		ct++;
-		i = i->prev;
-		if (i == all->top[stack])
-			return (-1);
-	}
-	if (ct > ret)
-		return (0);
-	return (3);/*(3)*/
-}
-
 
 void	process(t_compendium *all)
 {
 	t_data	**top_[2];
 	int		stk;
-	int		sense;
 	int		pass;
 	int		toler;
+	int		init_target;
+	int		init_st;
 
 	index(all);
 	top_[0] = &(all->top[0]);
 	top_[1] = &(all->top[1]);
 /*	show_all(all);*/
 	stk = 0;
-	pass = 0;
-	toler = 11;
-	while (toler > 0 && ++pass < 5)
+	pass = 1;
+	toler = 20;
+	while (pass < 4 && toler)
 	{
-		if (pass == 3)
-			toler = 0;
-		sense = eval_sense(all, stk, toler, pass);
-		while (all->max[stk] > 0 && all->n_st < 12000) /* && (pass < 3 || all->max[1 - stk] < all->max_val / 2))*/
+/*		printf("pass %i\n", pass);*/
+		init_target = (*top_[stk])->prev->target;
+		init_st = all->n_st;
+		if (init_st > 3000)
+			break ;
+		while (*top_[stk])
 		{
-/*			printf("pass %i, stk %i, steps %i, max0 %i, max1 %i\n", pass, stk, all->n_st, all->max[0], all->max[1]);*/
-			while (pass == 4 && direction(NULL, *top_[0], (*top_[0])->next) > 0)
-				move(all, _RA);
-			if (better_push(all, *top_[stk], toler, pass))
+			while (gap(all, *top_[stk]) * (1 - 2 * stk) <= toler &&
+					gap(all, *top_[stk]) * (1 - 2 * stk) > 0 &&
+					(init_target != (*top_[stk])->target))
 			{
-				if ((*top_[1 - stk]) &&
-						(((*top_[1])->target > (*top_[0])->target && (*top_[1])->target - (*top_[0])->target < all->max_val / 2) ||
-						 ((*top_[1])->target < (*top_[0])->target && (*top_[1])->target - (*top_[0])->target < -all->max_val / 2)))
-					move(all, _RB - stk);
-				move(all, _PB - stk);
-				if (!all->max[stk] || (pass < 4 && eval_sense(all, stk, toler, pass) < 0))
+				if (inter_gap(all, *top_[stk]) * (1 - 2 * stk) < 0)
+					move(all, _PB - stk);
+				move(all, _RA + stk);
+				if (gap(all, (*top_[stk])->next) * (1 - 2 * stk) < 0)
+					move(all, _SA + stk);
+				if (pass == 3 && !(*top_[0])->target)
 					break ;
-				while (pass > 2 && eval_sense(all, stk, toler, pass) < 0)
-					toler++;
-				sense = eval_sense(all, stk, toler, pass);
 			}
-			else
-				move(all, _RA + stk + sense);
-/*			{
-				if (pass < 3)
-					move(all, _RA + stk + sense);
-				else
-				{
-					move(all, _RR + sense);
-					toler++;
-				}
-			}*/
+			if (pass == 3 && !(*top_[0])->target)
+				break ;
+			if ((*top_[stk])->prev->target == init_target && all->n_st > init_st)
+				break ;
+			if ((*top_[stk])->prev->target == init_target)
+				move(all, _PB - stk);
+			while (inter_gap(all, *top_[stk]) * (1 - 2 * stk) > 0)
+				move(all, _RB - stk);
+			while (inter_gap(all, *top_[stk]) * (1 - 2 * stk) < 0)
+				move(all, _PB - stk);
 		}
-		toler /= 2;
+/*		toler /= 2;
+		toler++;*/
 		stk = 1 - stk;
+		pass++;
 	}
-
-
-	
-/*	save_sol(all, 0);
-	undo(all, all->n_st);
-	i = -1;
-	while (all->sol_part[++i])
-	{
-		op = all->sol_part[i];
-		(*(all->ops[(int)op]))(all);
-		all->done[all->n_st] |= 1 << op;
-		all->steps[all->n_st] = op;
-		init_next_st(all);
-		print_1_step(op);
-		printf("\n%i (%i)\n", all->n_st, tot_tension(all));
-	}*/
-	print_steps(all->steps, NEW_LINE);
-/*	printf("%i\n", pass);*/
+/*	print_steps(all->steps, NEW_LINE);*/
 }
 
 /*uso:
@@ -432,35 +210,6 @@ void	start(t_compendium *all)
 	all->cut[0] = 0;
 	all->tolerance = TOLERANCE;
 	process(all);
-}
-
-int	trend(t_data *t)
-{
-	t_data	*i;
-	int		s;
-	int		trend;
-
-	if (!t)
-		return (0);
-	i = t->next;
-	if (i == t)
-		return (1);
-	trend = 2;
-/*	if(i->target < t->target && t->target - i->target > t->max_val / 2)*/
-	if(i->target < t->target)
-		trend = -2;
-	if (i->next == t)
-		return (trend);
-	i = i->next;
-	s = direction(t, i->prev, i);
-	trend = 3 * s;
-	while (i != t && s * trend > 0)
-	{
-		trend += s;
-		i = i->next;
-		s = direction(t, i->prev, i);
-	}
-	return (trend);
 }
 
 void	count_stacks(t_compendium *all)
