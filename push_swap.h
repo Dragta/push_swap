@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/15 18:46:26 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/16 13:20:26 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,6 +66,7 @@ typedef struct s_compendium
 	int		*heir_mask;
 	int		n_st;
 	int		max[2];
+	int		base[2];
 	int		tns[12];
 	int		tolerance;
 	char	sol_part[300];

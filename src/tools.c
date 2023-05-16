@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/16 00:51:08 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/16 18:43:21 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,7 +77,7 @@ int	gap(t_compendium *all, t_data *i)
 
 	if (!i)
 		return (0);
-	g = i->target - i->prev->target;
+	g = (i->target - i->prev->target) * (1 - 2 * i->id) - 1;
 	max = all->max_val;
 	while (g < - max / 2)
 		g += max;
@@ -91,10 +91,10 @@ int	inter_gap(t_compendium *all, t_data *i)
 	int	g;
 	int	max;
 
-	if (!i || !all->top[1 - i->id])
-		return (0);
-	g = all->top[1 - i->id]->target - i->target;
 	max = all->max_val;
+	if (!i || !all->top[1 - i->id])
+		return (max);
+	g = (all->base[1 - i->id] + all->max[1 - i->id] - i->target) * (1 - 2 * i->id)  - 1;
 	while (g < - max / 2)
 		g += max;
 	while (g >= max / 2)
@@ -127,6 +127,9 @@ void	process(t_compendium *all)
 {
 	t_data	**top_[2];
 	int		stk;
+	int		sense;
+	int		ct;
+	int		ct_r;
 	int		pass;
 	int		toler;
 	int		init_target;
@@ -136,44 +139,54 @@ void	process(t_compendium *all)
 	top_[0] = &(all->top[0]);
 	top_[1] = &(all->top[1]);
 /*	show_all(all);*/
+	all->base[0] = 0;
+	all->base[1] = 0;
 	stk = 0;
 	pass = 1;
-	toler = 20;
-	while (pass < 4 && toler)
+	toler = 12;
+	sense = 3;
+	while (pass < 6 && toler)
 	{
-/*		printf("pass %i\n", pass);*/
+		printf("pass %i\n", pass);
 		init_target = (*top_[stk])->prev->target;
 		init_st = all->n_st;
 		if (init_st > 3000)
 			break ;
-		while (*top_[stk])
+		if (!all->max[1 - stk])
+			move(all, _PB - stk);
+		ct = 0;
+		while ((*top_[stk]) && ct <= 5 * all->max[stk])/* && init_target != (*top_[stk])->target)*/
 		{
-			while (gap(all, *top_[stk]) * (1 - 2 * stk) <= toler &&
-					gap(all, *top_[stk]) * (1 - 2 * stk) > 0 &&
-					(init_target != (*top_[stk])->target))
+			all->base[stk] = (*top_[stk])->target - all->max[stk];
+			while ((2 * stk - 1) * inter_gap(all, *top_[stk]) < toler &&
+					(2 * stk - 1) * inter_gap(all, *top_[stk]) > - toler / 2)
 			{
-				if (inter_gap(all, *top_[stk]) * (1 - 2 * stk) < 0)
-					move(all, _PB - stk);
-				move(all, _RA + stk);
-				if (gap(all, (*top_[stk])->next) * (1 - 2 * stk) < 0)
-					move(all, _SA + stk);
-				if (pass == 3 && !(*top_[0])->target)
-					break ;
+				ct = 0;
+				ct_r = 0;
+				init_target = (*top_[stk])->prev->target;
+				if (!all->max[1 - stk])
+					all->base[1 - stk] = (*top_[stk])->target;
+/*				else if (inter_gap(all, (*top_[stk])) < 0)
+					move(all, _RRB - stk);*/
+				move(all, _PB - stk);
 			}
-			if (pass == 3 && !(*top_[0])->target)
-				break ;
-			if ((*top_[stk])->prev->target == init_target && all->n_st > init_st)
-				break ;
-			if ((*top_[stk])->prev->target == init_target)
-				move(all, _PB - stk);
-			while (inter_gap(all, *top_[stk]) * (1 - 2 * stk) > 0)
-				move(all, _RB - stk);
-			while (inter_gap(all, *top_[stk]) * (1 - 2 * stk) < 0)
-				move(all, _PB - stk);
+			if(*top_[stk])
+			{
+				if (!ct || ct_r)
+					ct_r++;
+				ct++;
+				move(all, _RA + stk + 3 * (1 - stk));
+			}
+			if (pass > 2 && ct_r > 4)
+			{
+				ct_r = 0;
+				sense = 3 - sense;
+			}
 		}
-/*		toler /= 2;
-		toler++;*/
+		toler /= 2;
+		toler++;
 		stk = 1 - stk;
+		printf("end pass %i\n", pass);
 		pass++;
 	}
 /*	print_steps(all->steps, NEW_LINE);*/
