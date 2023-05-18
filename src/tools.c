@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/16 18:43:21 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/18 19:36:52 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,15 @@ int	abs(int g)
 	return (g);
 }
 
+int	mod(int g, int max)
+{
+	while (g < - max / 2)
+		g += max;
+	while (g >= max / 2)
+		g -= max;
+	return (g);
+}
+
 int	gap(t_compendium *all, t_data *i)
 {
 	int	g;
@@ -79,14 +88,10 @@ int	gap(t_compendium *all, t_data *i)
 		return (0);
 	g = (i->target - i->prev->target) * (1 - 2 * i->id) - 1;
 	max = all->max_val;
-	while (g < - max / 2)
-		g += max;
-	while (g >= max / 2)
-		g -= max;
-	return (g);
+	return (mod(g, max));
 }
 
-int	inter_gap(t_compendium *all, t_data *i)
+int	inter_gap_up(t_compendium *all, t_data *i)
 {
 	int	g;
 	int	max;
@@ -94,12 +99,21 @@ int	inter_gap(t_compendium *all, t_data *i)
 	max = all->max_val;
 	if (!i || !all->top[1 - i->id])
 		return (max);
-	g = all->max[1 - i->id] * (1 - 2 * i->id) + all->base[1 - i->id] - i->target;
-	while (g < - max / 2)
-		g += max;
-	while (g >= max / 2)
-		g -= max;
-	return (g);
+	g = all->base[1 - i->id] - i->target;
+	g += all->max[1 - i->id] * (1 - 2 * i->id);
+	return (mod(g, max));
+}
+
+int	inter_gap_down(t_compendium *all, t_data *i)
+{
+	int	g;
+	int	max;
+
+	max = all->max_val;
+	if (!i || !all->top[1 - i->id])
+		return (max);
+	g = all->base[1 - i->id] - i->target;
+	return (mod(g, max));
 }
 
 void	init_next_st(t_compendium *all)
@@ -122,14 +136,58 @@ void	move(t_compendium *all, int op)
 	printf("\n");
 /*	printf("%i op %i, a: %i b: %i\n", all->n_st - 1, op, all->max[0], all->max[1]);*/
 }
+/*			way = next(all, *top_[stk], toler);*/
+
+int	push_it(t_compendium *all, t_data *i, int toler)
+{
+	if ((2 * i->id - 1) * inter_gap_up(all, i) < toler &&
+			(2 * i->id - 1) * inter_gap_up(all, i) > - toler / 2)
+		return (1);
+	if ((2 * i->id - 1) * inter_gap_down(all, i) < toler &&
+			(2 * i->id - 1) * inter_gap_down(all, i) > - toler / 2)
+		return (-1);
+	return (0);
+}
+
+
+int	closest(t_compendium *all, t_data *i, int toler)
+{
+	int	ct;
+	int	ct_up;
+	int	ct_down;
+	t_data	*tmp;
+
+	tmp = i->prev;
+	ct_down = 0;
+	ct = -1;
+	while (++ct < all->max[i->id] / 3)
+	{
+		if (push_it(all, tmp, toler))
+			ct_down++;
+		tmp = tmp->prev;
+	}
+	tmp = i->next;
+	ct_up = 0;
+	ct = -1;
+	while (++ct < 2 * all->max[i->id] / 3)
+	{
+		if (push_it(all, tmp, toler))
+			ct_up++;
+		tmp = tmp->next;
+	}
+	if (ct_up + ct_down == 0)
+		return (-1);
+	if (ct_up < ct_down)
+		return (3);
+	return (0);
+}
 
 void	process(t_compendium *all)
 {
 	t_data	**top_[2];
 	int		stk;
-	int		sense;
-	int		ct;
-	int		ct_r;
+	int		way;
+	int		down;
 	int		pass;
 	int		toler;
 /*	int		init_target;*/
@@ -143,50 +201,52 @@ void	process(t_compendium *all)
 	all->base[1] = 0;
 	stk = 0;
 	pass = 1;
-	toler = 12;
-	sense = 3;
-	while (pass < 6 && toler)
+	toler = 60;
+	while (pass < 3 && toler)
 	{
 /*		printf("pass %i\n", pass);
 		init_target = (*top_[stk])->prev->target;*/
 		init_st = all->n_st;
-		if (init_st > 3000)
+		if (init_st > 9000)
 			break ;
 		if (!all->max[1 - stk])
 		{
 			all->base[1 - stk] = (*top_[stk])->target;
 			move(all, _PB - stk);
 		}
-		ct = 0;
-		while ((*top_[stk]) && ct <= 5 * all->max[stk])/* && init_target != (*top_[stk])->target)*/
+		while ((*top_[stk]))/* && ct <= 5 * all->max[stk]) && init_target != (*top_[stk])->target)*/
 		{
 			all->base[stk] = (*top_[stk])->target - all->max[stk];
-			while ((2 * stk - 1) * inter_gap(all, *top_[stk]) < toler &&
-					(2 * stk - 1) * inter_gap(all, *top_[stk]) > - toler / 2)
+			while (push_it(all, *top_[stk], toler))
 			{
-				ct = 0;
-				ct_r = 0;
-/*				init_target = (*top_[stk])->prev->target;*/
-				if (!all->max[1 - stk])
+				down = 0;
+				if (push_it(all, *top_[stk], toler) < 0)
+					down = 1;
+				if (all->max[1 - stk])
 					all->base[1 - stk] = (*top_[stk])->target;
-/*				else if (inter_gap(all, (*top_[stk])) < 0)
-					move(all, _RRB - stk);*/
 				move(all, _PB - stk);
+				if (down)
+				{
+					move(all, _RB - stk);
+					all->base[1 - stk] += 2 * stk - 1;
+					all->base[1 - stk] = mod(all->base[1 - stk], all->max_val); 
+				}
+				if (gap(all, (*top_[1 - stk])->next) < 0)
+					move(all, _SB - stk);
 			}
-			if(*top_[stk])
+			way = closest(all, *top_[stk], toler);
+			while (way < 0 && all->max[stk] > 5)
 			{
-				if (!ct || ct_r)
-					ct_r++;
-				ct++;
-				move(all, _RA + stk);
+				toler = toler * 10 / 9 + 1;
+				way = closest(all, *top_[stk], toler);
 			}
-			if (pass > 2 && ct_r > 4)
-			{
-				ct_r = 0;
-				sense = 3 - sense;
-			}
+			if (way < 0)
+				break ;
+			while (!push_it(all, *top_[stk], toler))
+				move(all, _RA + stk + way);
 		}
-		toler /= 2;
+		toler *= 8;
+		toler /= 10;
 		toler++;
 		stk = 1 - stk;
 /*		printf("end pass %i\n", pass);*/
