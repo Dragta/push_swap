@@ -94,7 +94,7 @@ int	inter_gap(t_compendium *all, t_data *i)
 	max = all->max_val;
 	if (!i || !all->top[1 - i->id])
 		return (max);
-	g = (all->base[1 - i->id] + all->max[1 - i->id] - i->target) * (1 - 2 * i->id)  - 1;
+	g = all->max[1 - i->id] * (1 - 2 * i->id) + all->base[1 - i->id] - i->target;
 	while (g < - max / 2)
 		g += max;
 	while (g >= max / 2)
@@ -132,7 +132,7 @@ void	process(t_compendium *all)
 	int		ct_r;
 	int		pass;
 	int		toler;
-	int		init_target;
+/*	int		init_target;*/
 	int		init_st;
 
 	index(all);
@@ -147,13 +147,16 @@ void	process(t_compendium *all)
 	sense = 3;
 	while (pass < 6 && toler)
 	{
-		printf("pass %i\n", pass);
-		init_target = (*top_[stk])->prev->target;
+/*		printf("pass %i\n", pass);
+		init_target = (*top_[stk])->prev->target;*/
 		init_st = all->n_st;
 		if (init_st > 3000)
 			break ;
 		if (!all->max[1 - stk])
+		{
+			all->base[1 - stk] = (*top_[stk])->target;
 			move(all, _PB - stk);
+		}
 		ct = 0;
 		while ((*top_[stk]) && ct <= 5 * all->max[stk])/* && init_target != (*top_[stk])->target)*/
 		{
@@ -163,7 +166,7 @@ void	process(t_compendium *all)
 			{
 				ct = 0;
 				ct_r = 0;
-				init_target = (*top_[stk])->prev->target;
+/*				init_target = (*top_[stk])->prev->target;*/
 				if (!all->max[1 - stk])
 					all->base[1 - stk] = (*top_[stk])->target;
 /*				else if (inter_gap(all, (*top_[stk])) < 0)
@@ -175,7 +178,7 @@ void	process(t_compendium *all)
 				if (!ct || ct_r)
 					ct_r++;
 				ct++;
-				move(all, _RA + stk + 3 * (1 - stk));
+				move(all, _RA + stk);
 			}
 			if (pass > 2 && ct_r > 4)
 			{
@@ -186,7 +189,7 @@ void	process(t_compendium *all)
 		toler /= 2;
 		toler++;
 		stk = 1 - stk;
-		printf("end pass %i\n", pass);
+/*		printf("end pass %i\n", pass);*/
 		pass++;
 	}
 /*	print_steps(all->steps, NEW_LINE);*/
