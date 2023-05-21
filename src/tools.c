@@ -91,6 +91,30 @@ int	gap(t_compendium *all, t_data *i)
 	return (mod(g, max));
 }
 
+int	where_to_push(t_compendium *all, t_data *i, int toler)
+{
+	int	g_up;
+	int	g_down;
+	int	max;
+
+	max = all->max_val;
+	if (!i || !all->top[1 - i->id])
+		return (3);
+	g_up = (all->top[1 - i->id]->target - i->target) * (2 * i->id - 1);
+	g_up = mod(g_up, max);
+	g_down = - (all->top[1 - i->id]->prev->target - i->target) * (2 * i->id - 1);
+	g_down = mod(g_down, max);
+	if (g_up > toler && g_down > toler)
+		return (0);
+	if (g_up > 0 && g_up <= toler && g_up <= g_down)
+		return (1);
+	if (g_down > 0 && g_down <= toler)
+		return (-1);
+	if (g_up < 0 && g_up >= g_down)
+		return (2);
+	return (-2);
+}
+
 int	inter_gap_up(t_compendium *all, t_data *i)
 {
 	int	g;
@@ -149,7 +173,6 @@ int	push_it(t_compendium *all, t_data *i, int toler)
 	return (0);
 }
 
-
 int	closest(t_compendium *all, t_data *i, int toler)
 {
 	int	ct;
@@ -187,7 +210,6 @@ void	process(t_compendium *all)
 	t_data	**top_[2];
 	int		stk;
 	int		way;
-	int		down;
 	int		pass;
 	int		toler;
 /*	int		init_target;*/
@@ -217,22 +239,19 @@ void	process(t_compendium *all)
 		while ((*top_[stk]))/* && ct <= 5 * all->max[stk]) && init_target != (*top_[stk])->target)*/
 		{
 			all->base[stk] = (*top_[stk])->target - all->max[stk];
-			while (push_it(all, *top_[stk], toler))
+			way = where_to_push(all, *top_[stk], toler);
+			while (way)
 			{
-				down = 0;
-				if (push_it(all, *top_[stk], toler) < 0)
-					down = 1;
-				if (all->max[1 - stk])
-					all->base[1 - stk] = (*top_[stk])->target;
 				move(all, _PB - stk);
-				if (down)
-				{
-					move(all, _RB - stk);
-					all->base[1 - stk] += 2 * stk - 1;
-					all->base[1 - stk] = mod(all->base[1 - stk], all->max_val); 
-				}
-				if (gap(all, (*top_[1 - stk])->next) < 0)
+				if (-2 == way)
+					move(all, _RRB - stk);
+				if (-2 == way || 2 == way)
 					move(all, _SB - stk);
+				if (-2 == way || -1 == way)
+					move(all, _RB - stk);
+				if (-2 == way)
+					move(all, _RB - stk);
+				way = where_to_push(all, *top_[stk], toler);
 			}
 			way = closest(all, *top_[stk], toler);
 			while (way < 0 && all->max[stk] > 5)
