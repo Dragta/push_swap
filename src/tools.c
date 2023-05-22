@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/18 19:36:52 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/22 15:46:06 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -91,28 +91,48 @@ int	gap(t_compendium *all, t_data *i)
 	return (mod(g, max));
 }
 
+int	mean(t_compendium *all, int stk)
+{
+	int	up;
+	int	down;
+	int	max;
+
+	max = all->max[stk];
+	up = all->top[stk]->target + (1 - 2 * stk) * max / 2;
+	down = all->top[stk]->prev->target - (1 - 2 * stk) * max / 2;
+	return (mod((up + down) / 2, all->max_val) + all->max_val / 2);
+}
+
 int	where_to_push(t_compendium *all, t_data *i, int toler)
 {
 	int	g_up;
 	int	g_down;
 	int	max;
+	int	mid;
 
 	max = all->max_val;
-	if (!i || !all->top[1 - i->id])
-		return (3);
-	g_up = (all->top[1 - i->id]->target - i->target) * (2 * i->id - 1);
-	g_up = mod(g_up, max);
-	g_down = - (all->top[1 - i->id]->prev->target - i->target) * (2 * i->id - 1);
-	g_down = mod(g_down, max);
-	if (g_up > toler && g_down > toler)
+	if (!i)
 		return (0);
-	if (g_up > 0 && g_up <= toler && g_up <= g_down)
+	if (!all->top[1 - i->id])
 		return (1);
-	if (g_down > 0 && g_down <= toler)
-		return (-1);
-	if (g_up < 0 && g_up >= g_down)
+	mid = mean(all, 1 - i->id);
+
+	g_up = (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
+	g_up = mod(g_up, max);
+	g_down = - (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
+	g_down = mod(g_down, max);
+	if ((g_up > toler || g_up < -toler / 2) && (g_down > toler || g_down < -toler / 2))
+		return (0);
+	if (g_up >= 0 && g_up <= toler && !(g_down >= 0 && g_down < g_up))
+		return (1);
+	if (g_up < 0 && g_up >= -toler / 2 && !(g_down < 0 && g_down > g_up))
 		return (2);
-	return (-2);
+	if (g_down >= 0 && g_down <= toler && !(g_up >= 0 && g_up <= g_down))
+		return (-1);
+	if (g_down < 0 && g_down >= - toler / 2 && !(g_up < 0 && g_up >= g_down))
+		return (-2);
+	printf("i: %i top: %i bot: %i g+: %i g-: %i\n", i->target, all->top[1 - i->id]->target, all->top[1 - i->id]->prev->target, g_up, g_down);
+	return (0);
 }
 
 int	inter_gap_up(t_compendium *all, t_data *i)
@@ -185,7 +205,7 @@ int	closest(t_compendium *all, t_data *i, int toler)
 	ct = -1;
 	while (++ct < all->max[i->id] / 3)
 	{
-		if (push_it(all, tmp, toler))
+		if (where_to_push(all, tmp, toler))
 			ct_down++;
 		tmp = tmp->prev;
 	}
@@ -194,11 +214,11 @@ int	closest(t_compendium *all, t_data *i, int toler)
 	ct = -1;
 	while (++ct < 2 * all->max[i->id] / 3)
 	{
-		if (push_it(all, tmp, toler))
+		if (where_to_push(all, tmp, toler))
 			ct_up++;
 		tmp = tmp->next;
 	}
-	if (ct_up + ct_down == 0)
+	if (!ct_up && !ct_down)
 		return (-1);
 	if (ct_up < ct_down)
 		return (3);
@@ -223,13 +243,13 @@ void	process(t_compendium *all)
 	all->base[1] = 0;
 	stk = 0;
 	pass = 1;
-	toler = 60;
+	toler = 8;
 	while (pass < 3 && toler)
 	{
 /*		printf("pass %i\n", pass);
 		init_target = (*top_[stk])->prev->target;*/
 		init_st = all->n_st;
-		if (init_st > 9000)
+		if (init_st > 99000)
 			break ;
 		if (!all->max[1 - stk])
 		{
@@ -261,10 +281,10 @@ void	process(t_compendium *all)
 			}
 			if (way < 0)
 				break ;
-			while (!push_it(all, *top_[stk], toler))
+			while (!where_to_push(all, *top_[stk], toler))
 				move(all, _RA + stk + way);
 		}
-		toler *= 8;
+		toler *= 5;
 		toler /= 10;
 		toler++;
 		stk = 1 - stk;

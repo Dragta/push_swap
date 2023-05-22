@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 18:52:01 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/22 15:29:32 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -128,6 +128,11 @@ int	main(int narg, char **args)
 		init(&all, i - 1, ft_atoi(args[i], &err), &err);
 	if (narg != i)
 		write(1, "Error\n", 6);
+/*	if (narg == 3)
+	{
+		all.max[0] = 500;
+		printf("mean: %i\n", mean(&all, 0));
+	}*/
 	if (narg == i && narg > 1)
 		start(&all);
 	free(stack);
