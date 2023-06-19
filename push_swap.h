@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/22 15:14:18 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/06/19 20:48:46 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,7 +108,7 @@ int		intra_tension(t_compendium *all);
 int		tot_tension(t_compendium *all);
 int		apply_min(t_compendium *all);
 int		undo(t_compendium *all, int n);
-int		sense(t_data *tx, t_data *ty, t_data *tz);
+int		sense(int a, int b, int max);
 void	start(t_compendium *all);
 void	try_moves(t_compendium *all);
 void	process(t_compendium *all);

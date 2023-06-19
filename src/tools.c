@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/22 15:46:06 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/06/19 21:55:54 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,13 @@ int	mod(int g, int max)
 	return (g);
 }
 
+int	sense(int a, int b, int max)
+{
+	if ((b > a && b - a < max / 2) || (b < a && a - b > max / 2))
+		return (1);
+	return (-1);
+}
+
 int	gap(t_compendium *all, t_data *i)
 {
 	int	g;
@@ -93,14 +100,16 @@ int	gap(t_compendium *all, t_data *i)
 
 int	mean(t_compendium *all, int stk)
 {
-	int	up;
-	int	down;
 	int	max;
+	int	m;
 
-	max = all->max[stk];
-	up = all->top[stk]->target + (1 - 2 * stk) * max / 2;
-	down = all->top[stk]->prev->target - (1 - 2 * stk) * max / 2;
-	return (mod((up + down) / 2, all->max_val) + all->max_val / 2);
+	m = (all->top[stk]->target + all->top[stk]->prev->target) / 2;
+	max = all->max_val;
+	if (!stk && sense(all->top[stk]->target, m, max) == -1)
+		m += max / 2;
+	if (stk && sense(all->top[stk]->target, m, max) == 1)
+		m -= max / 2;
+	return (m);
 }
 
 int	where_to_push(t_compendium *all, t_data *i, int toler)
@@ -117,7 +126,24 @@ int	where_to_push(t_compendium *all, t_data *i, int toler)
 		return (1);
 	mid = mean(all, 1 - i->id);
 
-	g_up = (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
+
+	g_up = mid + (1 - 2 * i->id) * all->max[1 - i->id] / 2;
+	g_up = g_up % max;
+	g_down = mid - (1 - 2 * i->id) * all->max[1 - i->id] / 2;
+	g_down = g_down % max;
+	if (abs(mod(g_up - i->target, max)) < toler &&
+			sense(i->target, all->top[1 - i->id]->target, max) == (2 * i->id - 1))
+		return (1);
+	if (abs(mod(g_up - i->target, max)) < toler &&
+			sense(i->target, all->top[1 - i->id]->target, max) != (2 * i->id - 1))
+		return (2);
+	if (abs(mod(g_down - i->target, max)) < toler &&
+			sense(i->target, all->top[1 - i->id]->prev->target, max) == (2 * i->id - 1))
+		return (-2);
+	if (abs(mod(g_up - i->target, max)) < toler &&
+			sense(i->target, all->top[1 - i->id]->prev->target, max) != (2 * i->id - 1))
+		return (-1);
+/*	g_up = (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
 	g_up = mod(g_up, max);
 	g_down = - (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
 	g_down = mod(g_down, max);
@@ -131,7 +157,7 @@ int	where_to_push(t_compendium *all, t_data *i, int toler)
 		return (-1);
 	if (g_down < 0 && g_down >= - toler / 2 && !(g_up < 0 && g_up >= g_down))
 		return (-2);
-	printf("i: %i top: %i bot: %i g+: %i g-: %i\n", i->target, all->top[1 - i->id]->target, all->top[1 - i->id]->prev->target, g_up, g_down);
+	printf("i: %i top: %i bot: %i g+: %i g-: %i\n", i->target, all->top[1 - i->id]->target, all->top[1 - i->id]->prev->target, g_up, g_down);*/
 	return (0);
 }
 
@@ -258,7 +284,8 @@ void	process(t_compendium *all)
 		}
 		while ((*top_[stk]))/* && ct <= 5 * all->max[stk]) && init_target != (*top_[stk])->target)*/
 		{
-			all->base[stk] = (*top_[stk])->target - all->max[stk];
+			all->base[stk] = mean(all, stk);
+			all->base[1 - stk] = mean(all, 1 - stk);
 			way = where_to_push(all, *top_[stk], toler);
 			while (way)
 			{
@@ -271,6 +298,8 @@ void	process(t_compendium *all)
 					move(all, _RB - stk);
 				if (-2 == way)
 					move(all, _RB - stk);
+				all->base[stk] = mean(all, stk);
+				all->base[1 - stk] = mean(all, 1 - stk);
 				way = where_to_push(all, *top_[stk], toler);
 			}
 			way = closest(all, *top_[stk], toler);
