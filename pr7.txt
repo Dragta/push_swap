@@ -1,0 +1,1433 @@
+./push_swap  69 88 6 30 20 58 33 21 34 10 76 28 38 46 71 73 27 41 79 5 91 93 3 16 75 31 84 60 25 52 96 37 92 61 78 51 59 83 100 35 8 15 68 14 82 65 87 85 39 7 81 1 40 54 80 62 90 48 19 9 70 45 72 17 43 95 18 23 4 56 99 57 98 44 97 86 11 67 32 47 2 22 24 94 29 26 50 66 36 12 42 89 53 63 55 77 64 13 74 > pr7.txt
+
+pb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sa
+pb
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+sb
+sa
+EH! stk 0
+ra
+pb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+sb
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+rb
+sa
+pb
+sb
+sa
+pb
+rb
+sa
+pb
+sa
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+pb
+rb
+pb
+sb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+rrb
+sb
+rb
+rb
+pb
+rrb
+sb
+rb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+sa
+pb
+rrb
+sb
+rb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+rrb
+sb
+rb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+rrb
+sb
+rb
+rb
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+rrb
+sb
+rb
+rb
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+rb
+pb
+sa
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+rrb
+sb
+rb
+rb
+pb
+sa
+pb
+sb
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+rrb
+sb
+rb
+rb
+pb
+rrb
+sb
+rb
+rb
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+pb
+rb
+sa
+pb
+sb
+sa
+pb
+rrb
+sb
+rb
+rb
+sa
+pb
+sb
+pb
+sa
+pb
+sb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+rb
+pb
+rrb
+sb
+rb
+rb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+rb
+sa
+pb
+sb
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sa
+EH! stk 0
+ra
+sa
+pb
+sb
+sa
+EH! stk 0
+ra
+pb
+rrb
+sb
+rb
+rb
+sa
+pb
+rb
+pb
+rrb
+sb
+rb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+sa
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sa
+pb
+sb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sb
+sa
+EH! stk 0
+ra
+pb
+rrb
+sb
+rb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sb
+pb
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sa
+EH! stk 0
+ra
+EH! stk 0
+ra
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sb
+sa
+EH! stk 0
+ra
+sa
+pb
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sb
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+rb
+EH! stk 0
+ra
+pb
+sb
+pb
+rb
+sa
+pb
+sb
+sa
+pb
+rrb
+sb
+rb
+rb
+sa
+EH! stk 0
+ra
+sa
+pb
+sb
+sa
+pb
+sb
+pb
+rrb
+sb
+rb
+rb
+EH! stk 0
+ra
+sa
+pb
+pb
+EH! stk 0
+ra
+pb
+rb
+EH! stk 0
+ra
+EH! stk 0
+ra
+pb
+sa
+pb
+sb
+pb
+pb
+sa
+pb
+sb
+pb
+sa
+pb
+sb
+sa
+pb
+sb
+sa
+pb
+sb
+sa
+pb
+sa
+pb
+pb
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+pb
+sb
+pb
+sb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+ra
+rrb
+pb
+pb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+rb
+pb
+sb
+pa
+sa
+sb
+EH! stk 1
+rb
+sb
+pa
+sa
+sb
+pa
+ra
+sb
+pa
+sa
+sb
+pa
+ra
+sb
+pa
+sa
+sb
+pa
+sb
+pa
+sa
+sb
+pa
+pa
+pa
+pa
+pa
+pa
+sb
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+pa
+sb
+pa
+pa
+sb
+pa
+pa
+sb
+pa
+pa
+pa
+pa
+pa
+pa
+sb
+pa
+sa
+sb
+pa
+sa
+sb
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+sa
+pa
+pa
+sb
+pa
+pa
+pa
+pa
+sb
+pa
+sa
+pa
+pa
+pa
+pa
+pa
+pa
+pa
+sb
+pa
+sa
+pa
+sb
+pa
+pa
+pa
+pa
+sb
+pa
+pa
+pa
+pa
+pa
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+pa
+pa
+sb
+pa
+pa
+sb
+pa
+EH! stk 1
+rrb
+pa
+pa
+sb
+pa
+sa
+sb
+pa
+sb
+pa
+sb
+pa
+sa
+pa
+pa
+pa
+pa
+sb
+pa
+pa
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+sb
+pa
+sb
+pa
+pa
+EH! stk 1
+rrb
+pa
+EH! stk 1
+rb
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+sa
+pa
+EH! stk 1
+rrb
+EH! stk 1
+rrb
+pa
+pa
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+EH! stk 1
+rrb
+EH! stk 1
+rrb
+pa
+sb
+pa
+pa
+EH! stk 1
+rb
+EH! stk 1
+rb
+pa
+EH! stk 1
+rrb
+EH! stk 1
+rrb
+pa
+sb
+pa
+pa
+pa
+pa
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+rb
+rra
+pa
+pa
+pa
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+pa
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+pa
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+ra
+pa
+sa
+pb
+sa
+pb
+sa
+pb
+sb
+sa
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+sa
+pb
+sa
+pb
+sb
+sa
+pb
+sa
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+sa
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+pb
+pb
+pb
+pb
+sa
+EH! stk 0
+rra
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sa
+pb
+sb
+sa
+pb
+sa
+EH! stk 0
+rra
+EH! stk 0
+rra
+pb
+sa
+pb
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+EH! stk 0
+ra
+sa
+EH! stk 0
+ra
+sa
+pb
+sa
+pb
+sa
+EH! stk 0
+rra
+EH! stk 0
+rra
+pb
+pb
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sb
+sa
+pb
+sa
+pb
+sb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+sa
+pb
+rrb
+sb
+rb
+rb
