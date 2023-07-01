@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/06/20 21:27:07 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/05/22 15:46:06 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,20 +70,13 @@ int	abs(int g)
 	return (g);
 }
 
-int	mod(int g, int max)
+int	balanced_mod(int g, int max)
 {
 	while (g < - max / 2)
 		g += max;
 	while (g >= max / 2)
 		g -= max;
 	return (g);
-}
-
-int	sense(int a, int b, int max)
-{
-	if ((b > a && b - a < max / 2) || (b < a && a - b > max / 2))
-		return (1);
-	return (-1);
 }
 
 int	gap(t_compendium *all, t_data *i)
@@ -95,28 +88,19 @@ int	gap(t_compendium *all, t_data *i)
 		return (0);
 	g = (i->target - i->prev->target) * (1 - 2 * i->id) - 1;
 	max = all->max_val;
-	return (mod(g, max));
+	return (balanced_mod(g, max));
 }
 
 int	mean(t_compendium *all, int stk)
 {
+	int	up;
+	int	down;
 	int	max;
-	int	m;
 
-	max = all->max_val;
-	m = (all->top[stk]->target + all->top[stk]->prev->target) / 2;
-	if (m == all->top[stk]->target)
-	{
-		if (all->max[stk] < max / 2)
-			return (m);
-		else
-			return ((m + max / 2) % max);
-	}
-	if (!stk && sense(all->top[stk]->target, m, max) == -1)
-		m += max / 2;
-	if (stk && sense(all->top[stk]->target, m, max) == 1)
-		m -= max / 2;
-	return (m);
+	max = all->max[stk];
+	up = all->top[stk]->target + (1 - 2 * stk) * max / 2;
+	down = all->top[stk]->prev->target - (1 - 2 * stk) * max / 2;
+	return (balanced_mod((up + down) / 2, all->max_val) + all->max_val / 2);
 }
 
 int	where_to_push(t_compendium *all, t_data *i, int toler)
@@ -124,39 +108,35 @@ int	where_to_push(t_compendium *all, t_data *i, int toler)
 	int	g_up;
 	int	g_down;
 	int	max;
-	int	mid;
-	int	sgn;
 
+	max = all->max_val;
 	if (!i)
 		return (0);
-	sgn = 1 - 2 * i->id;
-	max = all->max_val;
 	if (!all->top[1 - i->id])
 		return (1);
-	mid = mean(all, 1 - i->id);
-	g_up = mid + sgn * all->max[1 - i->id] / 2;
-	g_up = g_up % max;
-	g_down = mid - sgn * all->max[1 - i->id] / 2;
-	g_down = (g_down + max) % max;
-/*	printf("i: %i top: %i bot: %i elems: %i g+: %i g-: %i\n", i->target, all->top[1 - i->id]->target, all->top[1 - i->id]->prev->target, all->max[1 - i->id], g_up, g_down);
-	printf("toler: %i; dist up, down: %i, %i\n", toler, abs(mod(g_up - i->target, max)), abs(mod(g_down - i->target, max)));*/
-	if (abs(mod(g_up - i->target, max)) < toler &&
-			sense(i->target, all->top[1 - i->id]->target, max) == -sgn)
-		return (1);
-	if (abs(mod(g_up - i->target, max)) < toler &&
-			sense(i->target, all->top[1 - i->id]->target, max) == sgn)
-		return (2);
-	if (abs(mod(g_down - i->target, max)) < toler &&
-			sense(i->target, all->top[1 - i->id]->prev->target, max) == -sgn)
-		return (-2);
-	if (abs(mod(g_down - i->target, max)) < toler &&
-			sense(i->target, all->top[1 - i->id]->prev->target, max) == sgn)
-		return (-1);
-/*	g_up = (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
+/*	mid = mean(all, 1 - i->id);
+
+	g_up = (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
 	g_up = mod(g_up, max);
 	g_down = - (mid - i->target) * (2 * i->id - 1) - all->max[1 - i->id] / 2;
-	g_down = mod(g_down, max);
-	if ((g_up > toler || g_up < -toler / 2) && (g_down > toler || g_down < -toler / 2))
+	g_down = mod(g_down, max);*/
+	g_up = (all->base[1 - i->id] - i->target) * (2 * i->id - 1) - all->max[1 - i->id];
+	g_up = balanced_mod(g_up, max);
+	g_down = - (all->base[1 - i->id] - i->target) * (2 * i->id - 1) - 1;
+	g_down = balanced_mod(g_down, max);
+/*	if (g_up > toler && g_down > toler)
+		return (0);
+	if (g_up >= 0 && g_up <= toler && (g_down >= g_up || g_down < 0))
+		return (1);
+	if (g_up < 0 && g_down < 0 && g_up >= g_down)
+		return (2);
+	if (g_down >= 0 && g_down <= toler)
+		return (-1);
+	if (g_up < 0 && g_down < 0)
+		return (-2);
+	return (0);*/
+	if (g_up > toler && g_down > toler)
+/*	if ((g_up > toler || g_up < -toler / 2) && (g_down > toler || g_down < -toler / 2))*/
 		return (0);
 	if (g_up >= 0 && g_up <= toler && !(g_down >= 0 && g_down < g_up))
 		return (1);
@@ -166,7 +146,7 @@ int	where_to_push(t_compendium *all, t_data *i, int toler)
 		return (-1);
 	if (g_down < 0 && g_down >= - toler / 2 && !(g_up < 0 && g_up >= g_down))
 		return (-2);
-	printf("i: %i top: %i bot: %i g+: %i g-: %i\n", i->target, all->top[1 - i->id]->target, all->top[1 - i->id]->prev->target, g_up, g_down);*/
+/*	printf("i: %i top: %i bot: %i g+: %i g-: %i\n", i->target, all->top[1 - i->id]->target, all->top[1 - i->id]->prev->target, g_up, g_down);*/
 	return (0);
 }
 
@@ -180,7 +160,7 @@ int	inter_gap_up(t_compendium *all, t_data *i)
 		return (max);
 	g = all->base[1 - i->id] - i->target;
 	g += all->max[1 - i->id] * (1 - 2 * i->id);
-	return (mod(g, max));
+	return (balanced_mod(g, max));
 }
 
 int	inter_gap_down(t_compendium *all, t_data *i)
@@ -192,7 +172,7 @@ int	inter_gap_down(t_compendium *all, t_data *i)
 	if (!i || !all->top[1 - i->id])
 		return (max);
 	g = all->base[1 - i->id] - i->target;
-	return (mod(g, max));
+	return (balanced_mod(g, max));
 }
 
 void	init_next_st(t_compendium *all)
@@ -262,27 +242,6 @@ int	closest(t_compendium *all, t_data *i, int toler)
 	return (0);
 }
 
-int	ordered(t_compendium *all)
-{
-	int	stk;
-	t_data	*i;
-
-	if (all->top[1] && all->top[0])
-		return (0);
-	stk = 0;
-	if (all->top[1])
-		stk = 1;
-	i = all->top[stk];
-	if (gap(all, i))
-		return (0);
-	i = i->next;
-	while (i != all->top[stk] && !gap(all, i))
-		i = i->next;
-	if (!gap(all, i))
-		return (1);
-	return (0);
-}
-
 void	process(t_compendium *all)
 {
 	t_data	**top_[2];
@@ -301,82 +260,57 @@ void	process(t_compendium *all)
 	all->base[1] = 0;
 	stk = 0;
 	pass = 1;
-	toler = 7 * all->max_val / 100 + 3;
-	while (pass < 5 && toler)
+	toler = 8;
+	while (pass < 2 && toler)
 	{
 /*		printf("pass %i\n", pass);
 		init_target = (*top_[stk])->prev->target;*/
-		if (ordered(all))
-		{
-			while ((*top_[stk])->target > all->max_val / 2)
-				move(all, _RA + stk);
-			while ((*top_[stk])->target > 0)
-				move(all, _RRA + stk);
-			break;
-		}
 		init_st = all->n_st;
 		if (init_st > 99000)
 			break ;
 		if (!all->max[1 - stk])
-			move(all, _PB - stk);
-		while (all->n_st < 13000 && all->max[stk] > 1)/* && ct <= 5 * all->max[stk]) && init_target != (*top_[stk])->target)*/
 		{
-			if (all->max[stk] > 2 && sense((*top_[stk])->target, (*top_[stk])->next->target, all->max_val) != 1 - 2 * stk)
-				move(all, _SA + stk);
-			way = closest(all, *top_[stk], toler);
-			if (way < 0)
-			{
-				while (all->n_st < 13000 && abs((*top_[stk])->target - (*top_[1 - stk])->target) > toler)
-					move(all, _RRB - stk);
-			}
-			way = closest(all, *top_[stk], toler);
-			while (!where_to_push(all, *top_[stk], toler))
-			{
-/*				printf("EH! stk %i\n", stk);*/
-				move(all, _RA + stk + way);
-			}
+			all->base[1 - stk] = (*top_[stk])->target;
+			move(all, _PB - stk);
+		}
+/*		while ((*top_[stk])) && ct <= 5 * all->max[stk]) && init_target != (*top_[stk])->target)*/
+		while (all->max[stk] * 10 > all->max[1 - stk])
+		{
 			way = where_to_push(all, *top_[stk], toler);
+			all->base[stk] = (*top_[stk])->target - all->max[stk];
 			while (way)
 			{
-				move(all, _PB - stk);
 				if (-2 == way)
 					move(all, _RRB - stk);
-				if (-2 == way || 2 == way)
+				move(all, _PB - stk);
+				if (2 == way)
 					move(all, _SB - stk);
 				if (-2 == way || -1 == way)
 					move(all, _RB - stk);
 				if (-2 == way)
 					move(all, _RB - stk);
-				if (all->max[stk] > 2 && sense((*top_[stk])->target, (*top_[stk])->next->target, all->max_val) != 1 - 2 * stk)
-					move(all, _SA + stk);
+				if (-1 == way)
+					all->base[1 - stk] = (*top_[1 - stk])->prev->target;
 				way = where_to_push(all, *top_[stk], toler);
 			}
-		/*	while (way < 0 && all->max[stk] > 3)
+			way = closest(all, *top_[stk], toler);
+/*			while (way < 0)
 			{
 				toler = toler * 10 / 9 + 1;
 				way = closest(all, *top_[stk], toler);
 			}*/
+			if (way < 0)
+				break ;
+			while (!where_to_push(all, *top_[stk], toler))
+				move(all, _RA + stk + way);
 		}
-/*		while (all->max[stk] > 1 && all->n_st < 13000 && abs((*top_[stk])->target - (*top_[1 - stk])->target) > toler)
-		{
-			move(all, _RA + stk);
-			move(all, _RRB - stk);
-		}
-		while (all->max[stk] > 1 && all->n_st < 13000)
-		{
-			if (abs((*top_[stk])->target - (*top_[1 - stk])->target) < toler)
-				move(all, _PB - stk);
-			else
-				move(all, _RB - stk);
-		}*/
-		toler /= 2;
+		toler *= 5;
+		toler /= 10;
 		toler++;
 		stk = 1 - stk;
 /*		printf("end pass %i\n", pass);*/
 		pass++;
 	}
-	while (all->max[1])
-		move(all, _PA);
 /*	print_steps(all->steps, NEW_LINE);*/
 }
 
@@ -441,7 +375,6 @@ void	count_stacks(t_compendium *all)
 				i = i->next;
 		}
 		all->max[s] = p;
-		all->base[s] = mean(all, s);
 /*		all->max[s] = all->max_val;*/
 	}
 }
