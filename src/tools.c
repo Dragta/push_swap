@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/06/20 21:27:07 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/07/05 11:46:06 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -81,7 +81,7 @@ int	mod(int g, int max)
 
 int	sense(int a, int b, int max)
 {
-	if ((b > a && b - a < max / 2) || (b < a && a - b > max / 2))
+	if ((b > a && 2 * (b - a) < max) || (b < a && 2 * (a - b) > max))
 		return (1);
 	return (-1);
 }
@@ -112,10 +112,12 @@ int	mean(t_compendium *all, int stk)
 		else
 			return ((m + max / 2) % max);
 	}
-	if (!stk && sense(all->top[stk]->target, m, max) == -1)
+/*	if (!stk && sense(all->top[stk]->target, m, max) == -1)
 		m += max / 2;
 	if (stk && sense(all->top[stk]->target, m, max) == 1)
-		m -= max / 2;
+		m -= max / 2;*/
+	if (sense(all->top[stk]->target, m, max) == 1 - 2 * stk)
+		m = (m + max / 2) % max;
 	return (m);
 }
 
@@ -331,10 +333,7 @@ void	process(t_compendium *all)
 			}
 			way = closest(all, *top_[stk], toler);
 			while (!where_to_push(all, *top_[stk], toler))
-			{
-/*				printf("EH! stk %i\n", stk);*/
 				move(all, _RA + stk + way);
-			}
 			way = where_to_push(all, *top_[stk], toler);
 			while (way)
 			{
