@@ -49,6 +49,7 @@ typedef struct s_data
 	int				id;
 	int				val;
 	int				target;
+	int				golden;
 	struct s_data	*prev;
 	struct s_data	*next;
 }			t_data;
@@ -56,6 +57,7 @@ typedef struct s_data
 typedef struct s_compendium
 {
 	int		max_val;
+	int		max_golden;
 	t_data	**top;
 	int	(*ops[12])(struct s_compendium *);
 	char	*revert;
@@ -111,7 +113,7 @@ int		undo(t_compendium *all, int n);
 int		sense(int a, int b, int max);
 void	start(t_compendium *all);
 void	try_moves(t_compendium *all);
-void	process(t_compendium *all);
+void	process(t_compendium *all, int stk, int ct, int bit);
 t_data	**mem_stack(int n);
 int		main(int narg, char **args);
 /*___Bonus part___*/

@@ -38,6 +38,31 @@ int	ft_atoi(char *str, int *err)
 	return (sign * ret);
 }
 
+int	phi(int i)
+{
+	int	n2;
+	int	n1;
+	int	res;
+	int	bit;
+
+	bit = 12;
+	n2 = 610;
+	n1 = 377;
+	res = 0;
+	while (bit >= 0)
+	{
+		if (i > n1)
+		{
+			res += 1 << bit;
+			i -= n1;
+		}
+		n1 = n2 - n1;
+		n2 = n2 - n1;
+		bit--;
+	}
+	return (res);
+}
+
 void	index(t_compendium *all)
 {
 	t_data	*tmp;
@@ -50,6 +75,7 @@ void	index(t_compendium *all)
 	while(tmp != all->top[0])
 	{
 		tmp->target = i++;
+		tmp->golden = phi(i);
 		tmp = tmp->next;
 	}
 	all->s[0].prev = &(all->s[i - 1]);
@@ -119,6 +145,7 @@ int	main(int narg, char **args)
 	if (!stack)
 		err = -1;
 	all.max_val = narg - 1;
+	all.max_golden = phi(all.max_val);
 	all.top = top;
 	all.s = stack;
 	top[0] = all.s;

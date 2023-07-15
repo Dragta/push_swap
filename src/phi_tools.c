@@ -94,37 +94,51 @@ t_data	*find_last (t_compendium *all, int bit)
 	return (ret);
 }
 
-void	process(t_compendium *all, int stk, int ct, int bit)
+void	process(t_compendium *all)
 {
-	t_data	**this;
-	int		tmp;
-	int		ct2;
-	int		digit;
+	t_data	**top_[2];
+	int		bit;
+/*	int		ct;*/
+	t_data	*last;
 
-	this = &(all->top[stk]);
+	index(all);
+	top_[0] = &(all->top[0]);
+	top_[1] = &(all->top[1]);
 /*	show_all(all);*/
-	tmp = ct;
-	ct2 = 0;
-/*	printf("\n-----------\nstk %i, ct %i, bit %i\n\n", stk, ct, bit);*/
-/*	last = this->prev; /find_last(all, bit);*/
-	if (1 << bit >= all->max_golden)
-		return ;
-	while (tmp--)
+	bit = 0;
+	while (1 << bit < all->max_golden)
 	{
-/*		printf("val (golden): %i (%i)\n", (*this)->target, (*this)->golden);*/
-		digit = ((*this)->golden & (1 << bit)) / (1 << bit);
-		move(all, _PB + 2 * stk + digit - 4 * stk * digit);
-		ct2 += digit ^ stk ^ 1;
-/*		printf("count: %i; move: %i\n\n", ct2, _PB + 2 * stk + digit - 4 * stk * digit);*/
+		last = (*top_[0])->prev; /*find_last(all, bit);*/
+		while (last)
+		{
+			if (*top_[0] == last)
+				last = NULL;
+			if ((*top_[0])->golden & 1 << (bit + 1))
+				move(all, _RA);
+			else
+				move(all, _PB);
+		}
+/*		ct = all->max[1];
+		while (ct--)
+		{*/
+		last = (*top_[1])->prev;
+		while (last)
+		{
+			if (*top_[1] == last)
+				last = NULL;
+			if ((*top_[1])->golden & 1 << bit)
+				move(all, _PA);
+			else
+				move(all, _RB);
+		}
+		while (*top_[1])
+			move(all, _PA);
+		bit += 2;
 	}
-/*	printf("*\n");*/
-	process(all, stk, ct - ct2, bit + 2);
-	process(all, 1 - stk, ct2, bit + 1);
-	while (ct2--)
-		move(all, _PA + stk);
-/*	while (all->max[1])
+	
+	while (all->max[1])
 		move(all, _PA);
-/	print_steps(all->steps, NEW_LINE);*/
+/*	print_steps(all->steps, NEW_LINE);*/
 }
 
 /*uso:
@@ -157,8 +171,7 @@ void	start(t_compendium *all)
 	all->done[0] = 0;
 	all->cut[0] = 0;
 	all->tolerance = TOLERANCE;
-	index(all);
-	process(all, 0, all->max_val, 0);
+	process(all);
 }
 
 void	count_stacks(t_compendium *all)
