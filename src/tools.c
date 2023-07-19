@@ -94,39 +94,125 @@ t_data	*find_last (t_compendium *all, int bit)
 	return (ret);
 }
 
+void	order_2_plus(t_compendium *all, int stk)
+{
+	t_data	**this;
+
+	if (stk)
+	{
+		move(all, _PA);
+		move(all, _PA);
+	}
+	this = &(all->top[0]);
+	if ((*this)->golden > (*this)->next->golden)
+		move(all, _SA);
+}
+
+void	order_2_minus(t_compendium *all, int stk)
+{
+	t_data	**this;
+
+	this = &(all->top[stk]);
+	move(all, _RRA + stk);
+	if ((*this)->golden < (*this)->prev->golden && stk)
+	{
+		move(all, _RRB);
+		move(all, _PA);
+		move(all, _PA);
+	}
+	else if (stk)
+	{
+		move(all, _PA);
+		move(all, _RRB);
+		move(all, _PA);
+	}
+	else
+		move(all, _RRA);
+	this = &(all->top[0]);
+	if ((*this)->golden > (*this)->next->golden)
+		move(all, _SA);
+}
+
 void	process(t_compendium *all, int stk, int ct, int bit)
 {
 	t_data	**this;
 	int		tmp;
-	int		ct2;
+	int		ct1;
 	int		digit;
+	int		sgn;
 
+	if (!ct)
+		return ;
 	this = &(all->top[stk]);
 /*	show_all(all);*/
-	tmp = ct;
-	ct2 = 0;
+	sgn = 1;
+	if (ct < 0)
+		sgn = -1;
+	tmp = sgn * ct;
+	if (1 == tmp && sgn < 0)
+		move(all, _RRA + stk);
+	if (1 == tmp && stk)
+		move(all, _PA);
+	if (1 == tmp)
+		return ;
+	if (2 == tmp)
+	{
+		if (ct > 0)
+			order_2_plus(all, stk);
+		else
+			order_2_minus(all, stk);
+		return ;
+	}
+	if (bit < 0)
+		return ;
+	ct1 = 0;
 /*	printf("\n-----------\nstk %i, ct %i, bit %i\n\n", stk, ct, bit);*/
 /*	last = this->prev; /find_last(all, bit);*/
-	if (1 << bit >= all->max_golden)
-		return ;
 	while (tmp--)
 	{
-/*		printf("val (golden): %i (%i)\n", (*this)->target, (*this)->golden);*/
+		if (sgn < 0)
+			move(all, _RRA + stk);
 		digit = ((*this)->golden & (1 << bit)) / (1 << bit);
-		move(all, _PB + 2 * stk + digit - 4 * stk * digit);
-		ct2 += digit ^ stk ^ 1;
-/*		printf("count: %i; move: %i\n\n", ct2, _PB + 2 * stk + digit - 4 * stk * digit);*/
+		if (stk == digit || 1 == sgn)
+			move(all, _PB + 2 * stk + digit - 4 * stk * digit);
+		ct1 += digit;
 	}
 /*	printf("*\n");*/
-	process(all, stk, ct - ct2, bit + 2);
-	process(all, 1 - stk, ct2, bit + 1);
-	while (ct2--)
-		move(all, _PA + stk);
+	tmp = sgn * ct;
+	if (stk || ct1 == all->max[0] || sgn < 0)
+		process(all, 0, ct1, bit - 2);
+	else
+		process(all, 0, -ct1, bit - 2);
+	if (!stk || tmp - ct1 == all->max[1] || sgn < 0)
+		process(all, 1, tmp - ct1, bit - 1);
+	else
+		process(all, 1, -(tmp - ct1), bit - 1);
 /*	while (all->max[1])
 		move(all, _PA);
 /	print_steps(all->steps, NEW_LINE);*/
 }
 
+void	del_steps(t_compendium *all, int from, int ct)
+{
+	while(all->steps[from + ct - 1])
+	{
+		all->steps[from] = all->steps[from + ct];
+		from++;
+	}
+}
+
+void	clean_result(t_compendium *all)
+{
+	int	i;
+	int	nums_in[2];
+	int	ct;
+	int	stk;
+
+	i = 0;
+	nums_in[0] = all->max_val;
+	nums_in[1] = 0;
+
+}
 /*uso:
  *				(*ops[x])(stk)
  */
@@ -137,6 +223,7 @@ void	start(t_compendium *all)
 		2688, 3136, 3584, 1344, 896, 448};
 	const int	h_m[] = {0, 3470, 2894, 14, 0, 0,
 		3972, 3906, 3584, 3460, 3394, 448};
+	int		bit;
 
 	all->revert = (char *)rev;
 	all->cut_mask = (int *)c_m;
@@ -158,7 +245,12 @@ void	start(t_compendium *all)
 	all->cut[0] = 0;
 	all->tolerance = TOLERANCE;
 	index(all);
-	process(all, 0, all->max_val, 0);
+	bit = 2;
+	while (1 << (bit + 1) < all->max_golden)
+		bit++;
+	process(all, 0, all->max_val, bit);
+	clean_result(all);
+	print_steps(all->steps, NEW_LINE);
 }
 
 void	count_stacks(t_compendium *all)
