@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/07/20 17:57:51 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/07/20 22:27:16 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,7 +190,7 @@ void	process(t_compendium *all, int stk, int ct, int bit)
 
 void	del_steps(t_compendium *all, int from, int ct)
 {
-	printf("del from %i, %i steps\n", from, ct);
+/*	printf("del from %i, %i steps\n", from, ct);*/
 	if (ct < 1)
 		return ;
 	while(all->steps[from + ct - 1])
@@ -199,7 +199,7 @@ void	del_steps(t_compendium *all, int from, int ct)
 		from++;
 	}
 	all->n_st -= ct;
-	print_steps(all->steps, NEW_LINE);
+/*	print_steps(all->steps, NEW_LINE);*/
 }
 
 void	clean_result(t_compendium *all)
@@ -217,7 +217,6 @@ void	clean_result(t_compendium *all)
 	step1 = all->steps[i + 1];
 	while (step)
 	{
-		printf("i: %i\n", i);
 /*		print_1_step(step);
 		if (step < 9)
 			printf(" ");
@@ -231,14 +230,13 @@ void	clean_result(t_compendium *all)
 				(CLEAN_2A & (1 << step1))) ||
 				((2 == _in[1]) && (CLEAN_2B & (1 << step)) &&
 				(CLEAN_2B & (1 << step1))) ||
-				(((1 << step) & (1 << step1)) == 
-				((1 << _PA) & (1 << _PB))) ||
-				(((1 << step) & (1 << step1)) == 
-				((1 << _RA) & (1 << _RRA))) ||
-				(((1 << step) & (1 << step1)) == 
-				((1 << _RB) & (1 << _RRB))))
+				(((1 << step) | (1 << step1)) == 
+				((1 << _PA) | (1 << _PB))) ||
+				(((1 << step) | (1 << step1)) == 
+				((1 << _RA) | (1 << _RRA))) ||
+				(((1 << step) | (1 << step1)) == 
+				((1 << _RB) | (1 << _RRB))))
 		{
-			printf("step: %i; step1: %i\n", step, step1);
 			del_steps(all, i, 2);
 			if (i)
 			{
@@ -309,7 +307,6 @@ void	start(t_compendium *all)
 	while (1 << (bit + 1) <= all->max_golden)
 		bit++;
 	process(all, 0, all->max_val, bit);
-	print_steps(all->steps, NEW_LINE);
 	clean_result(all);
 	print_steps(all->steps, NEW_LINE);
 }
