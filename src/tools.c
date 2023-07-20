@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/07/05 11:46:06 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/07/20 01:59:16 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,9 +79,8 @@ void	move(t_compendium *all, int op)
 	(*(all->ops[op]))(all);
 	all->steps[all->n_st] = op;
 	init_next_st(all);
-	print_1_step(op);
-	printf("\n");
-/*	printf("%i op %i, a: %i b: %i\n", all->n_st - 1, op, all->max[0], all->max[1]);*/
+/*	print_1_step(op);
+	printf("\n");*/
 }
 
 t_data	*find_last (t_compendium *all, int bit)
@@ -133,6 +132,19 @@ void	order_2_minus(t_compendium *all, int stk)
 		move(all, _SA);
 }
 
+void	order_last(t_compendium *all, int stk, int tmp, int sgn)
+{
+	if (1 == tmp && sgn < 0)
+		move(all, _RRA + stk);
+	if (1 == tmp && stk)
+		move(all, _PA);
+	if (2 == tmp && sgn > 0)
+		order_2_plus(all, stk);
+	if (2 == tmp && sgn < 0)
+		order_2_minus(all, stk);
+}
+
+
 void	process(t_compendium *all, int stk, int ct, int bit)
 {
 	t_data	**this;
@@ -144,30 +156,18 @@ void	process(t_compendium *all, int stk, int ct, int bit)
 	if (!ct)
 		return ;
 	this = &(all->top[stk]);
-/*	show_all(all);*/
 	sgn = 1;
 	if (ct < 0)
 		sgn = -1;
 	tmp = sgn * ct;
-	if (1 == tmp && sgn < 0)
-		move(all, _RRA + stk);
-	if (1 == tmp && stk)
-		move(all, _PA);
-	if (1 == tmp)
-		return ;
-	if (2 == tmp)
-	{
-		if (ct > 0)
-			order_2_plus(all, stk);
-		else
-			order_2_minus(all, stk);
-		return ;
-	}
-	if (bit < 0)
+	if (tmp < 3)
+		order_last(all, stk, tmp, sgn);
+	if (tmp < 3 || bit < 0)
 		return ;
 	ct1 = 0;
-/*	printf("\n-----------\nstk %i, ct %i, bit %i\n\n", stk, ct, bit);*/
-/*	last = this->prev; /find_last(all, bit);*/
+/*	if ((!stk && (*this)->golden > (*this)->next->golden) ||
+			(stk && (*this)->golden < (*this)->next->golden))
+		move(all, _SA + stk);*/
 	while (tmp--)
 	{
 		if (sgn < 0)
@@ -177,7 +177,6 @@ void	process(t_compendium *all, int stk, int ct, int bit)
 			move(all, _PB + 2 * stk + digit - 4 * stk * digit);
 		ct1 += digit;
 	}
-/*	printf("*\n");*/
 	tmp = sgn * ct;
 	if (stk || ct1 == all->max[0] || sgn < 0)
 		process(all, 0, ct1, bit - 2);
@@ -187,31 +186,104 @@ void	process(t_compendium *all, int stk, int ct, int bit)
 		process(all, 1, tmp - ct1, bit - 1);
 	else
 		process(all, 1, -(tmp - ct1), bit - 1);
-/*	while (all->max[1])
-		move(all, _PA);
-/	print_steps(all->steps, NEW_LINE);*/
 }
 
 void	del_steps(t_compendium *all, int from, int ct)
 {
+/*	printf("del from %i, %i steps\n", from, ct);*/
+	if (ct < 1)
+		return ;
 	while(all->steps[from + ct - 1])
 	{
 		all->steps[from] = all->steps[from + ct];
 		from++;
 	}
+	all->n_st -= ct;
 }
 
 void	clean_result(t_compendium *all)
 {
 	int	i;
-	int	nums_in[2];
-	int	ct;
-	int	stk;
+	int	_in[2];
+	int	step;
+	int	step1;
 
 	i = 0;
-	nums_in[0] = all->max_val;
-	nums_in[1] = 0;
-
+	_in[0] = all->max_val;
+	_in[1] = 0;
+/*	printf("in0: %i; in1: %i.\n", _in[0], _in[1]);*/
+	step = all->steps[i];
+	step1 = all->steps[i + 1];
+	while (step)
+	{
+/*		print_1_step(step);
+		if (step < 9)
+			printf(" ");
+		printf(" in0: %i; in1: %i.\n", _in[0], _in[1]);*/
+		if (((_in[0] < 2) && (CLEAN_1A & (1 << step))) ||
+				(!_in[0] && (_PB == step)) ||
+				((_in[1] < 2) && (CLEAN_1B & (1 << step))) ||
+				(!_in[1] && (_PA == step)))
+			del_steps(all, i, 1);
+		else if (((2 == _in[0]) && (CLEAN_2A & (1 << step)) &&
+				(CLEAN_2A & (1 << step1))) ||
+				((2 == _in[1]) && (CLEAN_2B & (1 << step)) &&
+				(CLEAN_2B & (1 << step1))))
+		{
+			del_steps(all, i, 2);
+			if (i)
+			{
+				i--;
+				if (_PB == all->steps[i])
+				{
+					_in[0]++;
+					_in[1]--;
+				}
+				if (_PA == all->steps[i])
+				{
+					_in[0]--;
+					_in[1]++;
+				}
+			}
+		}
+		else if (_PB == step)
+		{
+			_in[0]--;
+			_in[1]++;
+			i++;
+		}
+		else if (_PA == step)
+		{
+			_in[0]++;
+			_in[1]--;
+			i++;
+		}
+		else if (((_RA == step) && (_RRA == step1)) ||
+				((_RRA == step) && (_RA == step1)) ||
+				((_RB == step) && (_RRB == step1)) ||
+				((_RRB == step) && (_RB == step1)))
+		{
+			del_steps(all, i, 2);
+			if (i)
+			{
+				i--;
+				if (_PB == all->steps[i])
+				{
+					_in[0]++;
+					_in[1]--;
+				}
+				if (_PA == all->steps[i])
+				{
+					_in[0]--;
+					_in[1]++;
+				}
+			}
+		}
+		else
+			i++;
+		step = all->steps[i];
+		step1 = all->steps[i + 1];
+	}
 }
 /*uso:
  *				(*ops[x])(stk)
@@ -246,7 +318,7 @@ void	start(t_compendium *all)
 	all->tolerance = TOLERANCE;
 	index(all);
 	bit = 2;
-	while (1 << (bit + 1) < all->max_golden)
+	while (1 << (bit + 1) <= all->max_golden)
 		bit++;
 	process(all, 0, all->max_val, bit);
 	clean_result(all);

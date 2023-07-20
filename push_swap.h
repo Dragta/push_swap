@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/06/19 20:48:46 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/07/20 00:52:29 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,10 @@
 # define NOT_0B 0b000000010000
 # define NOT_1A 0b101101001010
 # define NOT_1B 0b110110001100
+# define CLEAN_1A 0b001001000010
+# define CLEAN_1B 0b010010000100
+# define CLEAN_2A 0b001001000010
+# define CLEAN_2B 0b010010000100
 # define NOT_2A 0b001001000000
 # define NOT_2B 0b010010000000
 # define OPS_A 0b001001010010
