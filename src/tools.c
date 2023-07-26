@@ -14,24 +14,15 @@
 
 void	print_1_step(int op)
 {
+	char	*ops;
+
 	if (op < 1 || op > 11)
 		return ;
-	if (op ==  3)
-		write(1, "s", 1);
-	if (op < 4)
-		write(1, "s", 1);
-	else if (op < 6)
-		write(1, "p", 1);
+	ops = "xx  sa  sb  ss  pa  pb  ra  rb  rr  rra rrb rrr";
+	if (op < 8)
+		write(1, ops + 4 * op, 2);
 	else
-		write(1, "r", 1);
-	if (op > 7)
-		write(1, "r", 1);
-	if (OPS_A & (1 << op))
-		write(1, "a", 1);
-	if (OPS_B & (1 << op))
-		write(1, "b", 1);
-	if (op ==  11)
-		write(1, "r", 1);
+		write(1, ops + 4 * op, 3);
 }
 
 void	print_steps(char *ops, int nl)
@@ -63,22 +54,24 @@ void	quick_st(t_compendium *all)
 	}
 }
 
-void	init_next_st(t_compendium *all)
-{
-	all->steps[all->n_st + 1] = 0;
-/*	all->done[all->n_st + 1] = 0;
-	all->cut[all->n_st + 1] = all->cut[all->n_st];
-	all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
-	all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];*/
-	all->n_st++;
-	count_stacks(all);
-}
-
 void	move(t_compendium *all, int op)
 {
-	(*(all->ops[op]))(all);
+	int	op_done;
+
+	op_done = (*(all->ops[op]))(all);
+	if (_PB == op_done)
+	{
+		all->count[0]--;
+		all->count[1]++;
+	}
+	if (_PA == op_done)
+	{
+		all->count[0]++;
+		all->count[1]--;
+	}
 	all->steps[all->n_st] = op;
-	init_next_st(all);
+	all->n_st++;
+	all->steps[all->n_st] = 0;
 /*	print_1_step(op);
 	printf("\n");*/
 }
@@ -113,22 +106,23 @@ void	order_2_minus(t_compendium *all, int stk)
 
 	this = &(all->top[stk]);
 	move(all, _RRA + stk);
-	if ((*this)->golden < (*this)->prev->golden && stk)
+	if (stk)
 	{
-		move(all, _RRB);
-		move(all, _PA);
-		move(all, _PA);
-	}
-	else if (stk)
-	{
-		move(all, _PA);
-		move(all, _RRB);
+		if ((*this)->golden < (*this)->prev->golden)
+		{
+			move(all, _RRB);
+			move(all, _PA);
+		}
+		else
+		{
+			move(all, _PA);
+			move(all, _RRB);
+		}
 		move(all, _PA);
 	}
 	else
 		move(all, _RRA);
-	this = &(all->top[0]);
-	if ((*this)->golden > (*this)->next->golden)
+	if (!stk && (*this)->golden > (*this)->next->golden)
 		move(all, _SA);
 }
 
@@ -144,18 +138,33 @@ void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 		order_2_minus(all, stk);
 }
 
+int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
+{
+	int	digit;
+	int	ret;
+
+	ret = 0;
+	while (tmp--)
+	{
+		if (sgn < 0)
+			move(all, _RRA + stk);
+		digit = (all->top[stk]->golden & (1 << bit)) / (1 << bit);
+		if (stk == digit || 1 == sgn)
+			move(all, _PB + 2 * stk + digit - 4 * stk * digit);
+		ret += digit;
+	}
+	return (ret);
+}
+
 
 void	process(t_compendium *all, int stk, int ct, int bit)
 {
-	t_data	**this;
 	int		tmp;
 	int		ct1;
-	int		digit;
 	int		sgn;
 
 	if (!ct)
 		return ;
-	this = &(all->top[stk]);
 	sgn = 1;
 	if (ct < 0)
 		sgn = -1;
@@ -164,42 +173,97 @@ void	process(t_compendium *all, int stk, int ct, int bit)
 		order_last(all, stk, tmp, sgn);
 	if (tmp < 3 || bit < 0)
 		return ;
-	ct1 = 0;
-/*	if ((!stk && (*this)->golden > (*this)->next->golden) ||
-			(stk && (*this)->golden < (*this)->next->golden))
-		move(all, _SA + stk);*/
-	while (tmp--)
-	{
-		if (sgn < 0)
-			move(all, _RRA + stk);
-		digit = ((*this)->golden & (1 << bit)) / (1 << bit);
-		if (stk == digit || 1 == sgn)
-			move(all, _PB + 2 * stk + digit - 4 * stk * digit);
-		ct1 += digit;
-	}
+	ct1 = separate(all, stk, tmp, sgn, bit);
 	tmp = sgn * ct;
-	if (stk || ct1 == all->max[0] || sgn < 0)
+	if (stk || ct1 == all->count[0] || sgn < 0)
 		process(all, 0, ct1, bit - 2);
 	else
 		process(all, 0, -ct1, bit - 2);
-	if (!stk || tmp - ct1 == all->max[1] || sgn < 0)
+	if (!stk || tmp - ct1 == all->count[1] || sgn < 0)
 		process(all, 1, tmp - ct1, bit - 1);
 	else
 		process(all, 1, -(tmp - ct1), bit - 1);
 }
 
-void	del_steps(t_compendium *all, int from, int ct)
+void	del_steps(t_crawler *bot, int ct)
 {
-/*	printf("del from %i, %i steps\n", from, ct);*/
+	int	from;
+
 	if (ct < 1)
 		return ;
-	while(all->steps[from + ct - 1])
+	from = bot->n;
+	if (ct > 2)
+		from = bot->n - bot->times;
+/*	printf("del from %i, %i steps\n", from, ct);*/
+	while(bot->steps[from + ct - 1])
 	{
 		all->steps[from] = all->steps[from + ct];
 		from++;
 	}
 	all->n_st -= ct;
 /*	print_steps(all->steps, NEW_LINE);*/
+}
+
+int	step_fwd(t_crawler *bot)
+{
+	int	step;
+
+	step = bot->steps[n];
+	bot->n++;
+	if (CHECK_TURNAROUND & (1 << step) && !bot->repeated_op)
+	{
+		bot->repeated_op = step;
+		bot->times = 1;
+	}
+	else if (step == bot->repeated_op)
+		bot->times++;
+	else
+	{
+		bot->repeated_op = 0;
+		bot->times = 0;
+	}
+	if (_PB == step)
+		bot->in_stack_A--;
+	if (_PA == step)
+		bot->in_stack_A++;
+	return (step);
+}
+
+int	useless_step(t_crawler *bot)
+{
+
+}
+
+int	opposite_steps(t_crawler *bot)
+{
+
+}
+
+int	turnaround(t_crawler *bot)
+{
+
+}
+
+int	clean_steps(char *steps, int total)
+{
+	t_crawler	bot;
+
+	bot.steps = steps;
+	bot.total = total;
+	bot.n = 0;
+	bot.repeated_op = 0;
+	bot.times = 0;
+	bot.in_stack_A = total;
+	while (step_fwd(&bot))
+	{
+		if (useless_step(&bot))
+			del_steps(&bot, 1);
+		if (opposite_steps(&bot))
+			del_steps(&bot, 2);
+		if (turnaround(&bot))
+			del_steps(&bot, bot.times);
+	}
+	return (bot.total);
 }
 
 void	clean_result(t_compendium *all)
@@ -210,7 +274,7 @@ void	clean_result(t_compendium *all)
 	int	step1;
 
 	i = 0;
-	_in[0] = all->max_val;
+	_in[0] = all->count_val;
 	_in[1] = 0;
 /*	printf("in0: %i; in1: %i.\n", _in[0], _in[1]);*/
 	step = all->steps[i];
@@ -276,16 +340,8 @@ void	clean_result(t_compendium *all)
  */
 void	start(t_compendium *all)
 {
-	const char	rev[] = {0, 1, 2, 3, 5, 4, 9, 10, 11, 6, 7, 8};
-	const int	c_m[] = {0, 14, 14, 14, 32, 16,
-		2688, 3136, 3584, 1344, 896, 448};
-	const int	h_m[] = {0, 3470, 2894, 14, 0, 0,
-		3972, 3906, 3584, 3460, 3394, 448};
 	int		bit;
 
-	all->revert = (char *)rev;
-	all->cut_mask = (int *)c_m;
-	all->heir_mask = (int *)h_m;
 	all->ops[1] = &move_sa;
 	all->ops[2] = &move_sb;
 	all->ops[3] = &move_ss;
@@ -299,49 +355,14 @@ void	start(t_compendium *all)
 	all->ops[11] = &move_rrr;
 	all->n_st = 0;
 	all->steps[0] = 0;
-	all->done[0] = 0;
-	all->cut[0] = 0;
-	all->tolerance = TOLERANCE;
 	index(all);
 	bit = 2;
-	while (1 << (bit + 1) <= all->max_golden)
+	while (1 << (bit + 1) <= all->count_golden)
 		bit++;
-	process(all, 0, all->max_val, bit);
-	clean_result(all);
+	process(all, 0, all->count_val, bit);
+/*	clean_result(all);*/
+	all->n_st = clean_steps(all->steps, all->n_st);
 	print_steps(all->steps, NEW_LINE);
-}
-
-void	count_stacks(t_compendium *all)
-{
-	t_data	*i;
-	int		p;
-	int		s;
-
-	s = -1;
-	while (++s < 2)
-	{
-		i = all->top[s];
-		all->max[s] = 0;
-		if (!i)
-			continue ;
-		p = 0;
-		i->pos = p++;
-		if (s)
-			i = i->prev;
-		else
-			i = i->next;
-		while (i != all->top[s])
-		{
-			i->pos = p++;
-			if (s)
-				i = i->prev;
-			else
-				i = i->next;
-		}
-		all->max[s] = p;
-/*		all->base[s] = mean(all, s);
-		all->max[s] = all->max_val;*/
-	}
 }
 
 void	show_tgts(t_compendium *all)
@@ -372,7 +393,7 @@ void	show_tgts(t_compendium *all)
 	}
 	write(1, "\n", 1);
 }
-
+/*
 void	show_all(t_compendium *all)
 {
 	t_data	*i;
@@ -386,4 +407,4 @@ void	show_all(t_compendium *all)
 		printf("%4i|%4i|%4i|%4i|%4lu|%4lu\n", i->pos, i->id, i->val, i->target, (i->prev - &(all->s[0])), (i->next - &(all->s[0])));
 		i = i->next;
 	}
-}
+}*/

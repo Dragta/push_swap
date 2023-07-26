@@ -17,7 +17,6 @@ int	move_ra(t_compendium *all)
 	if (!all->top[0] || all->top[0] == all->top[0]->next)
 		return (-1);
 	all->top[0] = all->top[0]->next;
-	count_stacks(all);
 	return (_RA);
 }
 
@@ -26,7 +25,6 @@ int	move_rb(t_compendium *all)
 	if (!all->top[1] || all->top[1] == all->top[1]->next)
 		return (-1);
 	all->top[1] = all->top[1]->next;
-	count_stacks(all);
 	return (_RB);
 }
 

@@ -78,6 +78,7 @@ void	index(t_compendium *all)
 		tmp->golden = phi(i);
 		tmp = tmp->next;
 	}
+	all->count[0] = i;
 	all->s[0].prev = &(all->s[i - 1]);
 	all->s[i - 1].next = &(all->s[0]);
 	while (--i)
@@ -86,7 +87,6 @@ void	index(t_compendium *all)
 		all->s[i - 1].next = &(all->s[i]);
 	}
 	all->top[0] = &(all->s[0]);
-	count_stacks(all);
 }
 
 void	add_data(t_compendium *all, int position , t_data *on)
@@ -103,9 +103,9 @@ void	add_data(t_compendium *all, int position , t_data *on)
 	else
 	{
 		mv->prev = on->prev;
+		mv->prev->next = mv;
 		mv->next = on;
 		on->prev = mv;
-		mv->prev->next = mv;
 	}
 	if (mv->val < all->top[0]->val)
 		all->top[0] = mv;
@@ -144,8 +144,8 @@ int	main(int narg, char **args)
 	stack = malloc((narg - 1) * sizeof(t_data));
 	if (!stack)
 		err = -1;
-	all.max_val = narg - 1;
-	all.max_golden = phi(all.max_val);
+	all.count_val = narg - 1;
+	all.count_golden = phi(all.count_val);
 	all.top = top;
 	all.s = stack;
 	top[0] = all.s;
@@ -154,16 +154,13 @@ int	main(int narg, char **args)
 	while (!err && ++i < narg)
 		init(&all, i - 1, ft_atoi(args[i], &err), &err);
 	if (narg != i)
-	{
 		write(1, "Error\n", 6);
-		printf("arg %i\n", i);
-	}
 /*	if (narg == 3)
 	{
-		all.max[0] = 500;
+		all.count[0] = 500;
 		printf("mean: %i\n", mean(&all, 0));
 	}*/
-	if (narg == i && narg > 1)
+	if (narg == i && narg > 2)
 		start(&all);
 	free(stack);
 	return (0);

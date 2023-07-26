@@ -38,7 +38,6 @@ int	data_atop(t_compendium *all, t_data *mv, int stack)
 		mv->prev->next = mv;
 	}
 	all->top[stack] = mv;
-	count_stacks(all);
 	return (0);
 }
 

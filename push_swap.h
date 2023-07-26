@@ -27,12 +27,9 @@
 # define _RRA 9
 # define _RRB 10
 # define _RRR 11
-# define LIMIT 300
-# define TOLERANCE 30
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 7
-# define NOT_REP 0b011011000000
+# define CHECK_TURNAROUND 0b011011000000
 # define NOT_0A 0b000000100000
 # define NOT_0B 0b000000010000
 # define NOT_1A 0b101101001010
@@ -43,13 +40,21 @@
 # define CLEAN_2B 0b010010000100
 # define NOT_2A 0b001001000000
 # define NOT_2B 0b010010000000
-# define OPS_A 0b001001010010
-# define OPS_B 0b010010100100
 # define ALL_OPS 0b111111111110
+
+typedef struct s_crawler
+{
+	char	*steps;
+	int	total;
+	int	n;
+	int	repeated_op;
+	int	times;
+	int	in_stack_A;
+	int	ordered;
+}			t_crawler;
 
 typedef struct s_data
 {
-	int				pos;
 	int				id;
 	int				val;
 	int				target;
@@ -60,23 +65,13 @@ typedef struct s_data
 
 typedef struct s_compendium
 {
-	int		max_val;
-	int		max_golden;
+	int		count_val;
+	int		count_golden;
 	t_data	**top;
 	int	(*ops[12])(struct s_compendium *);
-	char	*revert;
 	char	steps[15000];
-	int		done[15000];
-	int		cut[15000];
-	int		*cut_mask;
-	int		*heir_mask;
 	int		n_st;
-	int		max[2];
-	int		base[2];
-	int		tns[12];
-	int		tolerance;
-	char	sol_part[300];
-	int		sol_tns;
+	int		count[2];
 	t_data	*s;
 }			t_compendium;
 
@@ -84,7 +79,6 @@ int		ft_atoi(char *str, int *err);
 void	index(t_compendium *all);
 void	quick_st(t_compendium *all);
 int		data_atop(t_compendium *all, t_data *mv, int stack);
-void	count_stacks(t_compendium *all);
 int		move_sa(t_compendium *all);
 int		move_sb(t_compendium *all);
 int		move_ss(t_compendium *all);
