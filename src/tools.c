@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/07/20 22:27:16 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/07/27 17:54:47 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,8 +208,8 @@ int	step_fwd(t_crawler *bot)
 {
 	int	step;
 
-	step = bot->steps[n];
 	bot->n++;
+	step = bot->steps[bot->n];
 	if (CHECK_TURNAROUND & (1 << step) && !bot->repeated_op)
 	{
 		bot->repeated_op = step;
@@ -231,16 +231,54 @@ int	step_fwd(t_crawler *bot)
 
 int	useless_step(t_crawler *bot)
 {
+	int	step;
+	int	ret;
 
+	ret = 0;
+	step = bot->steps[bot->n];
+	if (-1 == bot->in_stack_A ||
+			bot->total == bot->in_stack_A ||
+			((bot->in_stack_A < 2) && (CLEAN_1A & (1 << step))) ||
+			((bot->total - bot->in_stack_A < 2) && (CLEAN_1B & (1 << step))))
+		ret = 1;
+	return (ret);
 }
 
 int	opposite_steps(t_crawler *bot)
 {
+	int	step;
+	int	step1;
+	int	ret;
 
+	ret = 0;
+	step = bot->steps[bot->n];
+	step1 = bot->steps[bot->n + 1];
+	if (((2 == bot->in_stack_A) && (CLEAN_2A & (1 << step)) &&
+			(CLEAN_2A & (1 << step1))) ||
+			((2 == bot->total - bot->in_stack_A) && (CLEAN_2B & (1 << step)) &&
+			(CLEAN_2B & (1 << step1))) ||
+			(((1 << step) | (1 << step1)) == 
+			((1 << _PA) | (1 << _PB))) ||
+			(((1 << step) | (1 << step1)) == 
+			((1 << _RA) | (1 << _RRA))) ||
+			(((1 << step) | (1 << step1)) == 
+			((1 << _RB) | (1 << _RRB))))
+		ret = 2;
+	return (ret);
 }
 
 int	turnaround(t_crawler *bot)
 {
+	int	dif;
+	int	ret;
+
+	if (!bot->times)
+		ret = 0;
+	else if (_RA == bot->repeated_op || _RRA == bot->repeated_op)
+		dif = bot->in_stack_A - bot.times;
+	else
+		dif = bot->total - bot->in_stack_A - bot.times;
+	if (bot->times > dif)
 
 }
 
@@ -250,7 +288,7 @@ int	clean_steps(char *steps, int total)
 
 	bot.steps = steps;
 	bot.total = total;
-	bot.n = 0;
+	bot.n = -1;
 	bot.repeated_op = 0;
 	bot.times = 0;
 	bot.in_stack_A = total;
