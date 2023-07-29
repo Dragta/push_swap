@@ -45,7 +45,7 @@
 typedef struct s_crawler
 {
 	char	*steps;
-	int	total;
+	int	vals;
 	int	n;
 	int	repeated_op;
 	int	times;

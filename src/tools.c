@@ -192,40 +192,46 @@ void	del_steps(t_crawler *bot, int ct)
 	if (ct < 1)
 		return ;
 	from = bot->n;
-	if (ct > 2)
-		from = bot->n - bot->times;
-/*	printf("del from %i, %i steps\n", from, ct);*/
+/*	printf("\n________________\ndel from %i, %i steps\n", from, ct);*/
 	while(bot->steps[from + ct - 1])
 	{
-		all->steps[from] = all->steps[from + ct];
+		bot->steps[from] = bot->steps[from + ct];
 		from++;
 	}
-	all->n_st -= ct;
-/*	print_steps(all->steps, NEW_LINE);*/
+/*	print_steps(bot->steps, NEW_LINE);*/
 }
 
-int	step_fwd(t_crawler *bot)
+int	refresh(t_crawler *bot)
 {
 	int	step;
+	int 	i;
 
-	bot->n++;
-	step = bot->steps[bot->n];
-	if (CHECK_TURNAROUND & (1 << step) && !bot->repeated_op)
+	i = 0;
+	bot->repeated_op = 0;
+	bot->times = 0;
+	bot->in_stack_A = bot->vals;
+	step = bot->steps[i];
+	while (step && i <= bot->n)
 	{
-		bot->repeated_op = step;
-		bot->times = 1;
+		if (CHECK_TURNAROUND & (1 << step) && step != bot->repeated_op)
+		{
+			bot->repeated_op = step;
+			bot->times = 1;
+		}
+		else if (step == bot->repeated_op)
+			bot->times++;
+		else
+		{
+			bot->repeated_op = 0;
+			bot->times = 0;
+		}
+		if (_PB == step)
+			bot->in_stack_A--;
+		if (_PA == step)
+			bot->in_stack_A++;
+		i++;
+		step = bot->steps[i];
 	}
-	else if (step == bot->repeated_op)
-		bot->times++;
-	else
-	{
-		bot->repeated_op = 0;
-		bot->times = 0;
-	}
-	if (_PB == step)
-		bot->in_stack_A--;
-	if (_PA == step)
-		bot->in_stack_A++;
 	return (step);
 }
 
@@ -237,10 +243,12 @@ int	useless_step(t_crawler *bot)
 	ret = 0;
 	step = bot->steps[bot->n];
 	if (-1 == bot->in_stack_A ||
-			bot->total == bot->in_stack_A ||
+			bot->vals + 1 == bot->in_stack_A ||
 			((bot->in_stack_A < 2) && (CLEAN_1A & (1 << step))) ||
-			((bot->total - bot->in_stack_A < 2) && (CLEAN_1B & (1 << step))))
+			((bot->vals - bot->in_stack_A < 2) &&
+			(CLEAN_1B & (1 << step))))
 		ret = 1;
+/*	printf("useless: %i; ", ret);*/
 	return (ret);
 }
 
@@ -255,7 +263,7 @@ int	opposite_steps(t_crawler *bot)
 	step1 = bot->steps[bot->n + 1];
 	if (((2 == bot->in_stack_A) && (CLEAN_2A & (1 << step)) &&
 			(CLEAN_2A & (1 << step1))) ||
-			((2 == bot->total - bot->in_stack_A) && (CLEAN_2B & (1 << step)) &&
+			((2 == bot->vals - bot->in_stack_A) && (CLEAN_2B & (1 << step)) &&
 			(CLEAN_2B & (1 << step1))) ||
 			(((1 << step) | (1 << step1)) == 
 			((1 << _PA) | (1 << _PB))) ||
@@ -264,7 +272,21 @@ int	opposite_steps(t_crawler *bot)
 			(((1 << step) | (1 << step1)) == 
 			((1 << _RB) | (1 << _RRB))))
 		ret = 2;
+/*	printf("opposite: %i; ", ret);*/
 	return (ret);
+}
+
+void	invert(t_crawler *bot)
+{
+	bot->n--;
+	while (bot->n >= 0 && bot->steps[bot->n] == bot->repeated_op)
+	{
+		if (bot->steps[bot->n] < _RR)
+			bot->steps[bot->n] += 3;
+		else
+			bot->steps[bot->n] -= 3;
+		bot->n--;
+	}
 }
 
 int	turnaround(t_crawler *bot)
@@ -272,38 +294,57 @@ int	turnaround(t_crawler *bot)
 	int	dif;
 	int	ret;
 
-	if (!bot->times)
-		ret = 0;
-	else if (_RA == bot->repeated_op || _RRA == bot->repeated_op)
-		dif = bot->in_stack_A - bot.times;
-	else
-		dif = bot->total - bot->in_stack_A - bot.times;
-	if (bot->times > dif)
+	ret = 0;
+	dif = 0;
+/*	if (bot->repeated_op && (bot->repeated_op != bot->steps[bot->n + 1] ||
+		(bot->repeated_op % 3 == 0 && bot->times == bot->in_stack_A) ||
+		(bot->repeated_op % 3 == 1 && bot->times == (bot->vals - bot->in_stack_A))))
 
+	{
+		printf("tot %i, A%i, times %i\n", bot->vals, bot->in_stack_A, bot->times);*/
+	if (_RA == bot->repeated_op || _RRA == bot->repeated_op)
+		dif = bot->in_stack_A - bot->times;
+	if (_RB == bot->repeated_op || _RRB == bot->repeated_op)
+		dif = bot->vals - bot->in_stack_A - bot->times;
+	if (bot->times > dif &&
+		(bot->repeated_op != bot->steps[bot->n + 1] || !dif))
+		ret = bot->times - dif;
+/*	printf("turnaround: (dif %i) %i\n", dif, ret);*/
+	return (ret);
 }
 
-int	clean_steps(char *steps, int total)
+int	clean_steps(char *steps, int vals)
 {
 	t_crawler	bot;
+	int		excess;
 
 	bot.steps = steps;
-	bot.total = total;
-	bot.n = -1;
-	bot.repeated_op = 0;
-	bot.times = 0;
-	bot.in_stack_A = total;
-	while (step_fwd(&bot))
+	bot.vals = vals;
+	bot.n = 0;
+	while (refresh(&bot))
 	{
+/*		printf("n: %i: ", bot.n);*/
 		if (useless_step(&bot))
 			del_steps(&bot, 1);
-		if (opposite_steps(&bot))
+		else if (opposite_steps(&bot))
 			del_steps(&bot, 2);
-		if (turnaround(&bot))
-			del_steps(&bot, bot.times);
+		else if(turnaround(&bot))
+		{
+			excess = turnaround(&bot);
+			bot.n -= excess - 1;
+			del_steps(&bot, excess);
+			invert(&bot);
+		}
+		else
+		{
+			bot.n++;
+			continue ;
+		}
+		bot.n = 0;
 	}
-	return (bot.total);
+	return (bot.n);
 }
-
+/*
 void	clean_result(t_compendium *all)
 {
 	int	i;
@@ -314,15 +355,15 @@ void	clean_result(t_compendium *all)
 	i = 0;
 	_in[0] = all->count_val;
 	_in[1] = 0;
-/*	printf("in0: %i; in1: %i.\n", _in[0], _in[1]);*/
+*	printf("in0: %i; in1: %i.\n", _in[0], _in[1]);*
 	step = all->steps[i];
 	step1 = all->steps[i + 1];
 	while (step)
 	{
-/*		print_1_step(step);
+*		print_1_step(step);
 		if (step < 9)
 			printf(" ");
-		printf(" in0: %i; in1: %i.\n", _in[0], _in[1]);*/
+		printf(" in0: %i; in1: %i.\n", _in[0], _in[1]);*
 		if (((_in[0] < 2) && (CLEAN_1A & (1 << step))) ||
 				(!_in[0] && (_PB == step)) ||
 				((_in[1] < 2) && (CLEAN_1B & (1 << step))) ||
@@ -372,7 +413,9 @@ void	clean_result(t_compendium *all)
 		step = all->steps[i];
 		step1 = all->steps[i + 1];
 	}
-}
+}*/
+
+
 /*uso:
  *				(*ops[x])(stk)
  */
@@ -398,8 +441,9 @@ void	start(t_compendium *all)
 	while (1 << (bit + 1) <= all->count_golden)
 		bit++;
 	process(all, 0, all->count_val, bit);
-/*	clean_result(all);*/
-	all->n_st = clean_steps(all->steps, all->n_st);
+/*	clean_steps(all);
+	print_steps(all->steps, NEW_LINE);*/
+	all->n_st = clean_steps(all->steps, all->count_val);
 	print_steps(all->steps, NEW_LINE);
 }
 
