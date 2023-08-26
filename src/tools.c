@@ -186,8 +186,6 @@ int	min_target(t_compendium *all, int stk, int tmp, int sgn)
 	t_data	*i;
 	int	ret;
 
-	if (tmp < 0)
-		tmp *= -1;
 	i = all->top[stk];
 	if (sgn < 0)
 		i = i->prev;
@@ -206,6 +204,9 @@ int	min_target(t_compendium *all, int stk, int tmp, int sgn)
 
 void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 {
+	int	t;
+
+	t = tmp;
 	all->count_blocked[1 - stk] = all->count[1 - stk];
 	all->block_top[1 - stk] = all->top[1 - stk];
 	if (all->top[1 - stk])
@@ -220,9 +221,9 @@ void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 	{
 		all->block_top[stk] = all->top[stk];
 		all->block_btm[stk] = all->top[stk]->prev;
-		while (sgn < 0 && tmp--)
+		while (sgn < 0 && t--)
 			all->block_btm[stk] = all->block_btm[stk]->prev;
-		while (sgn > 0 && tmp--)
+		while (sgn > 0 && t--)
 			all->block_top[stk] = all->block_top[stk]->next;
 /*		printf("stk %i, blktop=%i, blkbtm=%i\n", stk, all->block_top[stk]->target, all->block_btm[stk]->target);*/
 	}
@@ -232,12 +233,14 @@ void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 		all->block_btm[stk] = NULL;
 	}
 	all->min_target = min_target(all, stk, tmp, sgn);
+	printf("min: %i\n", all->min_target);
+	count_stacks(all);
 }
 
 void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 {
-/*	printf("order_last: stk %i, tmp %i, sgn %i\n", stk, tmp, sgn);
-	printf(" IN: n=%i\n", all->n_st);*/
+	printf("order_last: stk %i, tmp %i, sgn %i\n", stk, tmp, sgn);
+/*	printf(" IN: n=%i\n", all->n_st);*/
 	set_blocks(all, stk, tmp, sgn);
 	backtrack(all);
 /*	printf("OUT: n=%i\n", all->n_st);*/
@@ -283,7 +286,7 @@ int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
 	int	digit;
 	int	ret;
 
-/*	printf("separate: stk %i, tmp %i, sgn %i, bit %i\n", stk, tmp, sgn, bit);*/
+	printf("separate: stk %i, tmp %i, sgn %i, bit %i\n", stk, tmp, sgn, bit);
 	ret = 0;
 	while (tmp--)
 	{
@@ -372,8 +375,8 @@ void	start(t_compendium *all)
 		bit++;
 	process(all, 0, all->count_val, bit);
 /*	clean_steps(all);
-	print_steps(all->steps, NEW_LINE);*/
-	all->n_st = clean_steps(all->steps, all->count_val);
+	print_steps(all->steps, NEW_LINE);
+	all->n_st = clean_steps(all->steps, all->count_val);*/
 	print_steps(all->steps, NEW_LINE);
 }
 
@@ -381,7 +384,7 @@ void	show_pos(t_compendium *all)
 {
 	t_data	*i;
 	int		s;
-	char	tmp;
+/*	char	tmp;*/
 
 	s = -1;
 	while (++s < 2)
@@ -393,14 +396,16 @@ void	show_pos(t_compendium *all)
 		i = all->top[s];
 		if (!i)
 			continue ;
-		tmp = '0' + i->pos;
-		write(1, &tmp, 1);
+/*		tmp = '0' + i->pos;
+		write(1, &tmp, 1);*/
+		printf("%i", i->pos);
 		while (i->next != all->top[s])
 		{
 			i = i->next;
-			tmp = '0' + i->pos;
+/*			tmp = '0' + i->pos;
 			write(1, " ", 1);
-			write(1, &tmp, 1);
+			write(1, &tmp, 1);*/
+			printf(" %i", i->pos);
 		}
 	}
 	write(1, " (pos)\n", 7);
@@ -411,7 +416,7 @@ void	show_tgts(t_compendium *all)
 {
 	t_data	*i;
 	int		s;
-	char	tmp;
+/*	char	tmp;*/
 
 	s = -1;
 	while (++s < 2)
@@ -423,14 +428,16 @@ void	show_tgts(t_compendium *all)
 		i = all->top[s];
 		if (!i)
 			continue ;
-		tmp = '0' + i->target;
-		write(1, &tmp, 1);
+/*		tmp = '0' + i->target;
+		write(1, &tmp, 1);*/
+		printf("%i", i->target);
 		while (i->next != all->top[s])
 		{
 			i = i->next;
-			tmp = '0' + i->target;
+/*			tmp = '0' + i->target;
 			write(1, " ", 1);
-			write(1, &tmp, 1);
+			write(1, &tmp, 1);*/
+			printf(" %i", i->target);
 		}
 	}
 	show_pos(all);

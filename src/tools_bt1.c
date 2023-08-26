@@ -58,6 +58,11 @@ void	backtrack(t_compendium *all)
 	all->part_tns = all->tns[0];
 	search_depth = all->n_st + BACKTRACK_DEPTH;
 /*	while (all->tns[0] && all->n_st < LIMIT && (all->n_st || (all->done[0] != ALL_OPS)))*/
+		write(1, "\n", 1);
+		show_tgts(all);
+		printf("\n min=%i, mejor tns: %i (%i steps) ", all->min_target, all->part_tns, all->n_st);
+		quick_st(all);
+		write(1, "\n-_-\n", 5);
 	fan(all, search_depth);
 	all->tns[0] = tot_tension(all);
 	settle(all);

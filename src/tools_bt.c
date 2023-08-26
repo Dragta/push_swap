@@ -44,7 +44,7 @@ int	apply_min(t_compendium *all)
 		all->tns[do_op] = -1;
 		all->positions++;
 		move(all, do_op);
-	/*	printf("\r");
+/*		printf("\n%i: ", all->positions);
 		quick_st(all);*/
 	}
 	return (ret_tns);
@@ -217,13 +217,13 @@ void	save_part(t_compendium *all, int bt_z)
 /*	printf("\nsave_part:\ntns[0]: %i tot_tns: %i\n---\n", all->tns[0], tot_tension(all));*/
 	all->part_tns = all->tns[0];
 /*	if (!all->part_tns)
-	{
+	{*/
 		write(1, "\n", 1);
 		show_tgts(all);
-	}
-	printf("\n mejor tns: %i (%i steps) ", all->part_tns, all->n_st);
+/*	}*/
+	printf("\n min=%i, mejor tns: %i (%i steps) ", all->min_target, all->part_tns, all->n_st);
 	quick_st(all);
-	write(1, "\n---\n", 5);*/
+	write(1, "\n---\n", 5);
 	i = all->n_st;
 	all->part[i] = 0;
 	while (--i >= bt_z)
@@ -259,19 +259,20 @@ void	fan(t_compendium *all, int search_depth)
 	}
 	min_tns = all->tns[0];
 	bt_z = all->n_st;
-	while (all->n_st < search_depth && (bt_z < all->n_st || all->done[bt_z] != ALL_OPS))
+	while (all->n_st < search_depth && (bt_z < all->n_st || all->tns[0] > -1))
 	{
 		eval_moves(all);
 		all->tns[0] = apply_min(all);
 /*		if (5)* == all->n_st - bt_z)*
 		{
+			printf("\r(tns %i) ", all->tns[0]);
 			quick_st(all);
-			write(1, "\n", 1);
 			show_tgts(all);
 			write(1, "\n", 1);
 		}*/
 		if (all->tns[0] > -1 && all->tns[0] <= min_tns + 1)
 		{
+/*			printf("n=%i (tns %i) ", all->n_st, all->tns[0]);*/
 			if (all->tns[0] < min_tns)
 				min_tns = all->tns[0];
 			if (!all->tns[0] && all->n_st < search_depth)
@@ -281,6 +282,8 @@ void	fan(t_compendium *all, int search_depth)
 			if (all->part_tns > 0 && all->n_st > search_depth - 2)
 				fan(all, all->n_st + BACKTRACK_DEPTH);
 		}
+/*		if (all->positions > 40)
+			printf("\nn=%i bt_z=%i srchDPTH=%i tns0=%i\n", all->n_st, bt_z, search_depth, all->tns[0]);*/
 		while (all->n_st > bt_z &&
 			(all->n_st >= search_depth || all->tns[0] < 0))
 			undo(all, 1);
