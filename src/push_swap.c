@@ -44,12 +44,17 @@ int	phi(int i)
 	int	n1;
 	int	res;
 	int	bit;
+	int	sgn;
 
-	bit = 12;
+	sgn = 1;
+	if (i < 0)
+		sgn = -1;
+	i *= sgn;
+	bit = 13;
 	n2 = 610;
 	n1 = 377;
 	res = 0;
-	while (bit >= 0)
+	while (--bit >= 0)
 	{
 		if (i > n1)
 		{
@@ -58,9 +63,8 @@ int	phi(int i)
 		}
 		n1 = n2 - n1;
 		n2 = n2 - n1;
-		bit--;
 	}
-	return (res);
+	return (sgn * res);
 }
 
 void	index(t_compendium *all)
@@ -69,12 +73,12 @@ void	index(t_compendium *all)
 	int		i;
 
 	tmp = all->top[0];
-	tmp->target = 0;
+	tmp->target = - all->target_B;
 	tmp = tmp->next;
 	i = 1;
 	while(tmp != all->top[0])
 	{
-		tmp->target = i++;
+		tmp->target = i++ - all->target_B;
 		tmp->golden = phi(i);
 		tmp = tmp->next;
 	}
@@ -86,7 +90,8 @@ void	index(t_compendium *all)
 		all->s[i].prev = &(all->s[i - 1]);
 		all->s[i - 1].next = &(all->s[i]);
 	}
-	all->top[0] = &(all->s[0]);
+	all->top[0] = all->s;
+	count_stacks(all);
 }
 
 void	add_data(t_compendium *all, int position , t_data *on)
@@ -136,20 +141,20 @@ int	main(int narg, char **args)
 	int	err;
 	int	i;
 	t_compendium	all;
-	t_data			*stack;
+/*	t_data			*stack;*/
 	t_data			*top[2];
 
 	setvbuf(stdout, NULL, _IONBF, 0);
 	err = 0;
-	stack = malloc((narg - 1) * sizeof(t_data));
-	if (!stack)
+	all.s = malloc((narg - 1) * sizeof(t_data));
+	if (!all.s)
 		err = -1;
 	all.count_val = narg - 1;
 	all.count_golden = phi(all.count_val);
 	all.top = top;
-	all.s = stack;
-	top[0] = all.s;
-	top[1] = NULL;
+	all.top[0] = all.s;
+	all.top[1] = NULL;
+	all.ops[1] = NULL;
 	i = 0;
 	while (!err && ++i < narg)
 		init(&all, i - 1, ft_atoi(args[i], &err), &err);
@@ -162,6 +167,6 @@ int	main(int narg, char **args)
 	}*/
 	if (narg == i && narg > 2)
 		start(&all);
-	free(stack);
+	free(all.s);
 	return (0);
 }

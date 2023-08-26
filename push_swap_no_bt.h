@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 00:28:59 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/07/20 00:52:29 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,32 +28,19 @@
 # define _RRB 10
 # define _RRR 11
 # define MAX_BACKTRACK 5
-# define BLOCK 999999
-# define LIMIT 25
-# define TOLERANCE 50
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 5
 # define CHECK_TURNAROUND 0b011011000000
-# define NOT_REP 0b011011000000
-# define NOT_0A 0b101101101010
-# define NOT_0B 0b110110011100
+# define NOT_0A 0b000000100000
+# define NOT_0B 0b000000010000
 # define NOT_1A 0b101101001010
 # define NOT_1B 0b110110001100
-# define NOT_2A 0b001001000000
-# define NOT_2B 0b010010000000
-# define NOT_0TOP_A 0b000101101010
-# define NOT_0TOP_B 0b000110011100
-# define NOT_1TOP_A 0b000000001010
-# define NOT_1TOP_B 0b000000001100
-# define NOT_0BTM_A 0b101000000000
-# define NOT_0BTM_B 0b110000000000
 # define CLEAN_1A 0b001001000010
 # define CLEAN_1B 0b010010000100
 # define CLEAN_2A 0b001001000010
 # define CLEAN_2B 0b010010000100
-# define OPS_A 0b001001010010
-# define OPS_B 0b010010100100
+# define NOT_2A 0b001001000000
+# define NOT_2B 0b010010000000
 # define ALL_OPS 0b111111111110
 
 typedef struct s_crawler
@@ -69,7 +56,6 @@ typedef struct s_crawler
 
 typedef struct s_data
 {
-	int				pos;
 	int				id;
 	int				val;
 	int				target;
@@ -80,30 +66,13 @@ typedef struct s_data
 
 typedef struct s_compendium
 {
-	int		positions;
-	int		target_B;
 	int		count_val;
 	int		count_golden;
 	t_data	**top;
 	int	(*ops[12])(struct s_compendium *);
-	char	*revert;
 	char	steps[15000];
-	int		done[15000];
-	int		cut[15000];
-	int		*cut_mask;
-	int		*heir_mask;
 	int		n_st;
 	int		count[2];
-	t_data	*block_top[2];
-	t_data	*block_btm[2];
-	int		count_blocked[2];
-	int		min_target;
-	int		tns[12];
-	int		tolerance;
-	char	part[300];
-	char	sol[15000];
-	int		part_tns;
-	int		sol_st;
 	t_data	*s;
 }			t_compendium;
 
@@ -111,7 +80,6 @@ int		ft_atoi(char *str, int *err);
 void	index(t_compendium *all);
 void	quick_st(t_compendium *all);
 int		data_atop(t_compendium *all, t_data *mv, int stack);
-void	count_stacks(t_compendium *all);
 int		move_sa(t_compendium *all);
 int		move_sb(t_compendium *all);
 int		move_ss(t_compendium *all);
@@ -127,37 +95,29 @@ void	add_data(t_compendium *all, int position, t_data *on);
 void	init(t_compendium *all, int position, int val, int *err);
 void	show_tgts(t_compendium *all);
 void	show_all(t_compendium *all);
-void	backtrack(t_compendium *all);
 /*void	show_a(t_data **stk);
 void	show_b(t_data **stk);
 int		dist(t_data *t);
 int		trend(t_data *t);*/
 void	print_1_step(int op);
 void	print_steps(char *ops, int nl);
-void	move(t_compendium *all, int op);
-void	init_next_st(t_compendium *all);
-int		gap(int g, int max);
+int		gap(t_compendium *all, t_data *i);
 int		longest(t_compendium *all);
+int		mean(t_compendium *all, int stk);
 int		inter_tension(t_compendium *all);
 int		intra_tension(t_compendium *all);
 int		tot_tension(t_compendium *all);
-int		tot_tension1(t_compendium *all);
 int		apply_min(t_compendium *all);
 int		undo(t_compendium *all, int n);
-void	fan(t_compendium *all, int search_depth);
-int		sense(t_data *tx, t_data *ty, t_data *tz);
-void	initialise(t_compendium *all);
+int		sense(int a, int b, int max);
+int		clean_steps(char *steps, int vals);
 void	start(t_compendium *all);
-void	start_bt(t_compendium *all);
 void	try_moves(t_compendium *all);
 void	process(t_compendium *all, int stk, int ct, int bit);
+int		turnaround(t_crawler *bot);
+int		opposite_steps(t_crawler *bot);
+int		useless_step(t_crawler *bot);
 t_data	**mem_stack(int n);
-
-int	useless_step(t_crawler *bot);
-int	opposite_steps(t_crawler *bot);
-int	turnaround(t_crawler *bot);
-int	clean_steps(char *steps, int vals);
-
 int		main(int narg, char **args);
 /*___Bonus part___*/
 #endif
