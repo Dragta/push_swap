@@ -46,25 +46,55 @@ void	settle(t_compendium *all)
 	while (all->sol[all->n_st])
 		move(all, all->sol[all->n_st]);
 }
+
+int	settle_part(t_compendium *all)
+{
+	int	i;
+
+	i = 0;
+	while (all->part[i])
+		move(all, all->part[i++]);
+	return (i);
+}
+
 void	backtrack(t_compendium *all)
 {
 	int		search_depth;
+/*	int		und;*/
 
 /*	show_all(all);*/
+	all->tolerance = TOLERANCE;
 	all->part[0] = 0;
 	all->sol[0] = 0;
 	all->sol_st = all->n_st + LIMIT;
 	all->tns[0] = tot_tension(all);
 	all->part_tns = all->tns[0];
 	search_depth = all->n_st + BACKTRACK_DEPTH;
-/*	while (all->tns[0] && all->n_st < LIMIT && (all->n_st || (all->done[0] != ALL_OPS)))*/
+/*	while (all->tns[0] && all->n_st < LIMIT && (all->n_st || (all->done[0] != ALL_OPS)))*
 		write(1, "\n", 1);
 		show_tgts(all);
 		printf("\n min=%i, mejor tns: %i (%i steps) ", all->min_target, all->part_tns, all->n_st);
 		quick_st(all);
 		write(1, "\n-_-\n", 5);
-	fan(all, search_depth);
-	all->tns[0] = tot_tension(all);
+	printf("(tns0 %i)", all->tns[0]);
+	show_tgts(all);*/
+	if (!all->tns[0])
+		return ;
+	while (!all->sol[0] && all->tolerance < 10000)
+	{
+		all->tolerance *= 2;
+		all->done[all->n_st] = 0;
+		all->cut[all->n_st] = 0;
+/*		printf("part_tns %i, tol %i\n", all->part_tns, all->tolerance);*/
+		fan(all, search_depth);
+		all->tns[0] = tot_tension(all);
+	}
+/*	if (!all->sol[0])
+	{
+		und = settle_part(all);
+		printf("part %i\n", und);
+		show_tgts(all);
+	}*/
 	settle(all);
 /*	if (all->part[0])
 		all->part[0] = 0;

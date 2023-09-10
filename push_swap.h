@@ -30,10 +30,10 @@
 # define MAX_BACKTRACK 5
 # define BLOCK 999999
 # define LIMIT 16
-# define TOLERANCE 50
+# define TOLERANCE 100
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 5
+# define BACKTRACK_DEPTH 8
 # define CHECK_TURNAROUND 0b011011000000
 # define NOT_REP 0b011011000000
 # define NOT_0A 0b101101101010
@@ -125,6 +125,7 @@ int		move_rrb(t_compendium *all);
 int		move_rrr(t_compendium *all);
 void	add_data(t_compendium *all, int position, t_data *on);
 void	init(t_compendium *all, int position, int val, int *err);
+void	show_pos(t_compendium *all);
 void	show_tgts(t_compendium *all);
 void	show_all(t_compendium *all);
 void	backtrack(t_compendium *all);

@@ -1,0 +1,225 @@
+./push_swap 30 12 7 4 27 24 22 13 3 18 15 32 31 21 10 16 8 23 20 9 28 2 33 17 11 0 25 19 5 14 1 6 29 26
+
+separate: stk 0, tmp 34, sgn 1, bit 6
+
+_____ IN: n=0, ct0 34, ct1 0
+_____OUT: n=34
+
+separate: stk 0, tmp 13, sgn 1, bit 4
+
+_____ IN: n=34, ct0 13, ct1 21
+_____OUT: n=47
+
+order_last: stk 0, tmp 5, sgn 1
+_____ IN: n=47, ct0 5, ct1 29
+_____OUT: n=51
+
+separate: stk 1, tmp 8, sgn 1, bit 3
+
+_____ IN: n=51, ct0 5, ct1 29
+_____OUT: n=59
+
+order_last: stk 0, tmp 3, sgn 1
+_____ IN: n=59, ct0 8, ct1 26
+_____OUT: n=63
+
+order_last: stk 1, tmp 5, sgn -1
+_____ IN: n=63, ct0 8, ct1 26
+_____OUT: n=63
+
+separate: stk 1, tmp 21, sgn 1, bit 5
+
+_____ IN: n=63, ct0 8, ct1 26
+_____OUT: n=84
+
+separate: stk 0, tmp 8, sgn 1, bit 3
+
+_____ IN: n=84, ct0 16, ct1 18
+_____OUT: n=92
+
+order_last: stk 0, tmp 3, sgn -1
+_____ IN: n=92, ct0 11, ct1 23
+_____OUT: n=96
+
+order_last: stk 1, tmp 5, sgn 1
+_____ IN: n=96, ct0 11, ct1 23
+_____OUT: n=104
+
+separate: stk 1, tmp 13, sgn -1, bit 4
+
+_____ IN: n=104, ct0 16, ct1 18
+_____OUT: n=122
+
+order_last: stk 0, tmp 5, sgn 1
+_____ IN: n=122, ct0 21, ct1 13
+_____OUT: n=130
+
+separate: stk 1, tmp 8, sgn 1, bit 3
+
+_____ IN: n=130, ct0 21, ct1 13
+_____OUT: n=138
+
+order_last: stk 0, tmp 3, sgn 1
+_____ IN: n=138, ct0 24, ct1 10
+_____OUT: n=142
+
+order_last: stk 1, tmp 5, sgn -1
+_____ IN: n=142, ct0 24, ct1 10
+_____OUT: n=156
+
+ra
+pb
+pb
+pb
+ra
+ra
+ra
+pb
+pb
+pb
+pb
+ra
+ra
+ra
+pb
+pb
+pb
+ra
+pb
+pb
+ra
+pb
+ra
+pb
+pb
+pb
+ra
+pb
+pb
+pb
+pb
+pb
+ra
+ra
+ra
+pb
+pb
+pb
+ra
+ra
+pb
+pb
+pb
+ra
+pb
+ra
+pb
+ra
+sa
+rra
+rra
+pa
+rb
+pa
+rb
+rb
+rb
+rb
+pa
+ra
+sa
+rra
+sa
+rb
+rb
+pa
+rb
+pa
+rb
+rb
+pa
+rb
+rb
+pa
+rb
+pa
+rb
+pa
+pa
+rb
+pa
+rb
+rb
+rb
+pb
+ra
+pb
+pb
+ra
+pb
+ra
+pb
+rra
+rra
+sa
+rra
+sb
+pa
+sb
+pa
+pa
+pa
+sa
+pa
+rrb
+pa
+rrb
+rrb
+rrb
+rrb
+pa
+rrb
+pa
+rrb
+pa
+rrb
+rrb
+pa
+rrb
+rrb
+rrb
+rrb
+sa
+ra
+sa
+ra
+sa
+rra
+rra
+sa
+pa
+rb
+pa
+rb
+rb
+rb
+rb
+pa
+sa
+ra
+sa
+rra
+rrb
+pa
+rrb
+pa
+rrb
+pa
+ra
+pb
+rrb
+sb
+pa
+rrr
+pa
+pa

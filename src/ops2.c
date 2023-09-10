@@ -14,7 +14,7 @@
 
 int	data_atop(t_compendium *all, t_data *mv, int stack)
 {
-	if (all->top[stack] == mv || (mv->id != stack && all->top[mv->id] != mv))
+	if (!mv || all->top[stack] == mv || (mv->id != stack && all->top[mv->id] != mv))
 		return (-1);
 	mv->prev->next = mv->next;
 	mv->next->prev = mv->prev;

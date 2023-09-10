@@ -52,8 +52,8 @@ int	apply_min(t_compendium *all)
 
 void	exclude_reps(t_compendium *all)
 {
-	int	id;
 	int	op;
+	int	id;
 	int	i;
 
 	op = all->steps[all->n_st - 1];
@@ -79,7 +79,22 @@ int	exclude(t_compendium *all)
 {
 	int	ret;
 
-	exclude_reps(all);
+/*	if (all->n_st > 80)
+	{
+		printf("ct0 %i, ctBL0 %i\n", all->count[0], all->count_blocked[0]);
+		printf("ct1 %i, ctBL1 %i\n", all->count[1], all->count_blocked[1]);
+		if (all->top[0])
+			printf("pre_top0 %p, ", all->top[0]->prev);
+		else
+			printf("pre_top0 (NA), ");
+		printf("top0 %p, topBL0 %p\n", all->top[0], all->block_top[0]);
+		if (all->top[1])
+			printf("pre_top1 %p, ", all->top[1]->prev);
+		else
+			printf("pre_top1 (NA), ");
+		printf("top1 %p, topBL1 %p\n", all->top[1], all->block_top[1]);
+	}*/
+/*	exclude_reps(all);*/
 	ret = 0;
 	if (!(all->count[0] - all->count_blocked[0]))
 		ret |= NOT_0A;
@@ -141,21 +156,28 @@ int	undo(t_compendium *all, int n)
 void	eval_moves(t_compendium *all)
 {
 	int	op;
+	int	exc;
 
 /*	quick_st(all);
-	printf("w(%i/%i), done[%i]=%i", all->tns[0], all->sol_tns, all->n_st, all->done[all->n_st]);*/
+	printf("w(%i/%i), done[%i]=%i", all->tns[0], all->part_tns, all->n_st, all->done[all->n_st]);*/
 	op = 12;
+	exc = exclude(all);
+	if (all->n_st > 300 && (all->n_st < 316))
+		printf("exclude: %i\n", exc);
 	while (--op)
 	{
 		all->tns[op] = -1;
-		if (exclude(all) & (1 << op))
+		if (exc & (1 << op))
 		{
 			all->done[all->n_st] |= 1 << op;
 			continue ;
 		}
 		move(all, op);
+/*		if (all->count_blocked[0] == 8)
+			printf("step: %i\n", all->steps[all->n_st - 1]);*/
 		if (all->steps[all->n_st - 1] <= 0)
 		{
+			all->tns[op] = -1;
 			all->n_st--;
 			all->done[all->n_st] |= 1 << op;
 			count_stacks(all);
@@ -163,11 +185,16 @@ void	eval_moves(t_compendium *all)
 		else
 		{
 			all->tns[op] = tot_tension(all);
-/*			printf("_\ntns(%i)=%i, ", op, all->tns[0]);
-			quick_st(all);
-			write(1, "\n---\n", 5);*/
+		if (all->n_st > 300 && (all->n_st < 316))
+			{
+				printf("_\ntns(%i)=%i (tol %i), ", op, all->tns[op], all->tolerance);
+				quick_st(all);
+				write(1, "\n---\n", 5);
+			}
 			if (all->tns[op] > all->tns[0] + all->tolerance)
 			{
+/*				if (all->count_blocked[0] == 8)
+					printf("HItns\n");*/
 				all->tns[op] = -1;
 				all->done[all->n_st] |= 1 << op;
 			}
@@ -216,14 +243,14 @@ void	save_part(t_compendium *all, int bt_z)
 
 /*	printf("\nsave_part:\ntns[0]: %i tot_tns: %i\n---\n", all->tns[0], tot_tension(all));*/
 	all->part_tns = all->tns[0];
-/*	if (!all->part_tns)
-	{*/
+/*	if (all->n_st > 80)
+	{
 		write(1, "\n", 1);
 		show_tgts(all);
-/*	}*/
-	printf("\n min=%i, mejor tns: %i (%i steps) ", all->min_target, all->part_tns, all->n_st);
-	quick_st(all);
-	write(1, "\n---\n", 5);
+		printf("\n min=%i, mejor tns: %i (%i steps) ", all->min_target, all->part_tns, all->n_st);
+		quick_st(all);
+		write(1, "\n---\n", 5);
+	}*/
 	i = all->n_st;
 	all->part[i] = 0;
 	while (--i >= bt_z)
@@ -259,14 +286,18 @@ void	fan(t_compendium *all, int search_depth)
 	}
 	min_tns = all->tns[0];
 	bt_z = all->n_st;
+/*	printf("***n %i, search_dth %i, tns0 %i\n", all->n_st, search_depth, all->tns[0]);*/
 	while (all->n_st < search_depth && (bt_z < all->n_st || all->tns[0] > -1))
 	{
+		if (all->n_st > 300)
+			printf("n %i, search_dth %i, tns0 %i\n", all->n_st, search_depth, all->tns[0]);
 		eval_moves(all);
 		all->tns[0] = apply_min(all);
-/*		if (5)* == all->n_st - bt_z)*
+/*		if (0 < all->n_st)
 		{
-			printf("\r(tns %i) ", all->tns[0]);
+			printf("(tns %i) ", all->tns[0]);
 			quick_st(all);
+			write(1, "\n", 1);
 			show_tgts(all);
 			write(1, "\n", 1);
 		}*/
@@ -286,8 +317,10 @@ void	fan(t_compendium *all, int search_depth)
 			printf("\nn=%i bt_z=%i srchDPTH=%i tns0=%i\n", all->n_st, bt_z, search_depth, all->tns[0]);*/
 		while (all->n_st > bt_z &&
 			(all->n_st >= search_depth || all->tns[0] < 0))
+		{
 			undo(all, 1);
 /*			printf("n_st %i; done %i\n", all->n_st, all->done[all->n_st]);*/
+		}
 	}
 /*    printf("fin fan lvl %i\n", lvl);*/
 }

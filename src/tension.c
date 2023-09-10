@@ -174,12 +174,17 @@ void	count_stacks(t_compendium *all)
 			p = 0;
 			while (i != all->block_btm[s])
 			{
-				i->pos = all->top[0]->pos - s - (s + 1) * ++p;
+				i->pos = all->top[s]->pos - (s + 1) * ++p;
 				i = i->prev;
 			}
 			all->count[s] += p + all->count_blocked[s];
 		}
 	}
+/*	if (all->n_st > 80)
+	{
+		printf("ct: (n %i, explorados %i)\n", all->n_st, all->positions);
+		show_pos(all);
+	}*/
 }
 
 /*void	index(t_compendium *all)

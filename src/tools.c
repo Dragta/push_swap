@@ -233,19 +233,21 @@ void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 		all->block_btm[stk] = NULL;
 	}
 	all->min_target = min_target(all, stk, tmp, sgn);
-	printf("min: %i\n", all->min_target);
+/*	printf("min: %i\n", all->min_target);*/
 	count_stacks(all);
 }
 
 void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 {
 	printf("order_last: stk %i, tmp %i, sgn %i\n", stk, tmp, sgn);
-/*	printf(" IN: n=%i\n", all->n_st);*/
+	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);
 	set_blocks(all, stk, tmp, sgn);
 	backtrack(all);
-/*	printf("OUT: n=%i\n", all->n_st);*/
+	printf("_____OUT: n=%i\n\n", all->n_st);
 	all->count_blocked[0] = 0;
 	all->count_blocked[1] = 0;
+	all->block_top[0] = NULL;
+	all->block_top[1] = NULL;
 }
 
 /*order_last alternativa{
@@ -286,7 +288,8 @@ int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
 	int	digit;
 	int	ret;
 
-	printf("separate: stk %i, tmp %i, sgn %i, bit %i\n", stk, tmp, sgn, bit);
+/*	printf("separate: stk %i, tmp %i, sgn %i, bit %i\n\n", stk, tmp, sgn, bit);
+	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
 	ret = 0;
 	while (tmp--)
 	{
@@ -300,7 +303,8 @@ int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
 		}
 		ret += digit;
 	}
-/*	printf("\n\n");*/
+/*	printf("_____OUT: n=%i\n\n", all->n_st);
+	printf("\n\n");*/
 	return (ret);
 }
 
@@ -374,9 +378,7 @@ void	start(t_compendium *all)
 	while (1 << (bit + 1) <= all->count_golden)
 		bit++;
 	process(all, 0, all->count_val, bit);
-/*	clean_steps(all);
-	print_steps(all->steps, NEW_LINE);
-	all->n_st = clean_steps(all->steps, all->count_val);*/
+/*	all->n_st = clean_steps(all->steps, all->count_val);*/
 	print_steps(all->steps, NEW_LINE);
 }
 
