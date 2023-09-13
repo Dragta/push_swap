@@ -239,11 +239,11 @@ void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 
 void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 {
-	printf("order_last: stk %i, tmp %i, sgn %i\n", stk, tmp, sgn);
-	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);
+/*	printf("order_last: stk %i, tmp %i, sgn %i\n", stk, tmp, sgn);
+	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
 	set_blocks(all, stk, tmp, sgn);
 	backtrack(all);
-	printf("_____OUT: n=%i\n\n", all->n_st);
+/*	printf("_____OUT: n=%i\n\n", all->n_st);*/
 	all->count_blocked[0] = 0;
 	all->count_blocked[1] = 0;
 	all->block_top[0] = NULL;
