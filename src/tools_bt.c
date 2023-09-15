@@ -162,8 +162,6 @@ void	eval_moves(t_compendium *all)
 	printf("w(%i/%i), done[%i]=%i", all->tns[0], all->part_tns, all->n_st, all->done[all->n_st]);*/
 	op = 12;
 	exc = exclude(all);
-/*	if (all->n_st > 300 && (all->n_st < 316))
-		printf("exclude: %i\n", exc);*/
 	while (--op)
 	{
 		all->tns[op] = -1;
@@ -177,6 +175,7 @@ void	eval_moves(t_compendium *all)
 			printf("step: %i\n", all->steps[all->n_st - 1]);*/
 		if (all->steps[all->n_st - 1] <= 0)
 		{
+			printf("XXXXXXXXXXXXXXXXXX%i", op);
 			all->tns[op] = -1;
 			all->n_st--;
 			all->done[all->n_st] |= 1 << op;
@@ -185,16 +184,8 @@ void	eval_moves(t_compendium *all)
 		else
 		{
 			all->tns[op] = tot_tension(all);
-/*			if (all->n_st > 300 && (all->n_st < 316))
-			{
-				printf("_\ntns(%i)=%i (tol %i), ", op, all->tns[op], all->tolerance);
-				quick_st(all);
-				write(1, "\n---\n", 5);
-			}*/
 			if (all->tns[op] > all->tns[0] + all->tolerance)
 			{
-/*				if (all->count_blocked[0] == 8)
-					printf("HItns\n");*/
 				all->tns[op] = -1;
 				all->done[all->n_st - 1] |= 1 << op;
 			}
@@ -257,7 +248,7 @@ void	save_part(t_compendium *all, int bt_z)
 		all->part[i] = all->steps[i];
 	if (!all->part_tns)
 	{
-		write(1, "0", 1);
+/*		write(1, "0", 1);*/
 		i = all->n_st + 1;
 		while (--i >= 0)
 			all->sol[i] = all->steps[i];
@@ -281,44 +272,16 @@ void	fan(t_compendium *all, int search_depth)
 	int	pr_st;
 
 	if (search_depth >= all->sol_st)
-	{
-/*       write(1, "max search depth\n", 17);*/
 		search_depth = all->sol_st - 1;
-	}
 	pr_st = 0;
 	min_tns = all->tns[0];
 	bt_z = all->n_st;
-/*	printf("***n %i, search_dth %i, tns0 %i\n", all->n_st, search_depth, all->tns[0]);*/
 	while (all->n_st < search_depth && (bt_z < all->n_st || all->tns[0] > -1))
 	{
-/*		if (all->n_st > 300)
-			printf("n %i, search_dth %i, tns0 %i\n", all->n_st, search_depth, all->tns[0]);*/
 		eval_moves(all);
 		all->tns[0] = apply_min(all);
-		if (all->n_st == search_depth)
-		{
-			if (!pr_st)
-			{
-				write(1, "\n", 1);
-				quick_st(all);
-				write(1, "\n", 1);
-				pr_st = 1;
-			}
-			printf("(%i:%i)", all->steps[all->n_st - 1], all->tns[0]);
-		}
-		else
-			pr_st = 0;
-/*		if (0 < all->n_st)
-		{
-			printf("(tns %i) ", all->tns[0]);
-			quick_st(all);
-			write(1, "\n", 1);
-			show_tgts(all);
-			write(1, "\n", 1);
-		}*/
 		if (all->tns[0] > -1 && all->tns[0] <= min_tns + 1)
 		{
-/*			printf("n=%i (tns %i) ", all->n_st, all->tns[0]);*/
 			if (all->tns[0] < min_tns)
 				min_tns = all->tns[0];
 			if (!all->tns[0])
@@ -328,14 +291,8 @@ void	fan(t_compendium *all, int search_depth)
 			if (all->part_tns > 0 && all->n_st > search_depth - 2)
 				fan(all, all->n_st + BACKTRACK_DEPTH);
 		}
-/*		if (all->positions > 40)
-			printf("\nn=%i bt_z=%i srchDPTH=%i tns0=%i\n", all->n_st, bt_z, search_depth, all->tns[0]);*/
 		while (all->n_st > bt_z &&
 			(all->n_st >= search_depth || all->tns[0] < 0))
-		{
 			undo(all, 1);
-/*			printf("n_st %i; done %i\n", all->n_st, all->done[all->n_st]);*/
-		}
 	}
-/*    printf("fin fan lvl %i\n", lvl);*/
 }

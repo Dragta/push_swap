@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/07/30 20:32:18 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/15 10:51:44 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,7 +243,7 @@ void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
 	set_blocks(all, stk, tmp, sgn);
 	backtrack(all);
-/*	printf("_____OUT: n=%i\n\n", all->n_st);*/
+/*	printf("_____OUT: n=%i\n", all->n_st);*/
 	all->count_blocked[0] = 0;
 	all->count_blocked[1] = 0;
 	all->block_top[0] = NULL;
@@ -283,13 +283,45 @@ void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 		start(&part);
 }*/
 
+int	fuse(t_compendium *all, int stk, int tmp, int sgn)
+{
+	t_data	*d;
+	int		or;
+	int		and;
+	int		ret;
+
+	d = all->top[stk];
+	if (sgn < 0)
+		d = d->prev;
+	or = d->golden;
+	and = d->golden;
+	if (sgn > 0)
+		d = d->next;
+	while (--tmp)
+	{
+		if (sgn < 0)
+			d = d->prev;
+		or |= d->golden;
+		and &= d->golden;
+		if (sgn > 0)
+			d = d->next;
+	}
+	or ^= 0xFFFF;
+	ret = and | or;
+	return (ret);
+}
+
 int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
 {
 	int	digit;
 	int	ret;
+	int	fused_val;
 
-/*	printf("separate: stk %i, tmp %i, sgn %i, bit %i\n\n", stk, tmp, sgn, bit);
-	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
+	fused_val = fuse(all, stk, tmp, sgn);
+/*	printf("separate: stk %i, tmp %i, sgn %i, bit %i", stk, tmp, sgn, bit);*/
+	while (bit > 0 && (fused_val & (1 << bit)))
+		bit--;
+/*	printf("\n\n_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
 	ret = 0;
 	while (tmp--)
 	{
@@ -321,9 +353,9 @@ void	process(t_compendium *all, int stk, int ct, int bit)
 	if (ct < 0)
 		sgn = -1;
 	tmp = sgn * ct;
-	if (tmp <= MAX_BACKTRACK) /*<5 => backtracking*/
+	if (tmp <= all->max_bt) /*<5 => backtracking*/
 		order_last(all, stk, tmp, sgn);
-	if (tmp <= MAX_BACKTRACK || bit < 0)
+	if (tmp <= all->max_bt || bit < 0)
 		return ;
 	ct1 = separate(all, stk, tmp, sgn, bit);
 	if (stk || ct1 == all->count[0] || sgn < 0)
@@ -369,7 +401,9 @@ void	start(t_compendium *all)
 	all->revert = (char *)rev;
 	all->cut_mask = (int *)c_m;
 	all->heir_mask = (int *)h_m;
-	all->target_B = 0;
+	all->max_bt = MAX_BACKTRACK;
+	if (all->count_val < 101)
+		all->max_bt = 5;
 	index(all);
 	if (!all->ops[1])
 		initialise(all);
@@ -378,7 +412,7 @@ void	start(t_compendium *all)
 	while (1 << (bit + 1) <= all->count_golden)
 		bit++;
 	process(all, 0, all->count_val, bit);
-/*	all->n_st = clean_steps(all->steps, all->count_val);*/
+	all->n_st = clean_steps(all->steps, all->count_val);
 	print_steps(all->steps, NEW_LINE);
 }
 

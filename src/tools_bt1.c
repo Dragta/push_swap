@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 01:41:29 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/13 13:49:00 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ void	backtrack(t_compendium *all)
 /*	show_all(all);*/
 	all->tolerance = TOLERANCE;
 	all->part[0] = 0;
-	all->sol[0] = 0;
+	all->sol[all->n_st] = 0;
 	all->sol_st = all->n_st + LIMIT;
 	all->tns[0] = tot_tension(all);
 	all->part_tns = all->tns[0];
@@ -80,12 +80,11 @@ void	backtrack(t_compendium *all)
 	show_tgts(all);*/
 	if (!all->tns[0])
 		return ;
-	while (!all->sol[0] && all->tolerance < 10000)
+	while (!all->sol[all->n_st] && all->tolerance < 10000)
 	{
 		all->tolerance *= 2;
 		all->done[all->n_st] = 0;
 		all->cut[all->n_st] = 0;
-/*		printf("part_tns %i, tol %i\n", all->part_tns, all->tolerance);*/
 		fan(all, search_depth);
 		all->tns[0] = tot_tension(all);
 	}

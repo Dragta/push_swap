@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 00:28:59 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/14 10:29:40 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,15 +33,15 @@
 # define TOLERANCE 100
 # define ONE_LINE 0
 # define NEW_LINE 1
-# define BACKTRACK_DEPTH 8
+# define BACKTRACK_DEPTH 12
 # define CHECK_TURNAROUND 0b011011000000
 # define NOT_REP 0b011011000000
 # define NOT_0A 0b101101101010
 # define NOT_0B 0b110110011100
 # define NOT_1A 0b101101001010
 # define NOT_1B 0b110110001100
-# define NOT_2A 0b001001000000
-# define NOT_2B 0b010010000000
+# define NOT_2A 0b000001000000
+# define NOT_2B 0b000010000000
 # define NOT_0TOP_A 0b000101101010
 # define NOT_0TOP_B 0b000110011100
 # define NOT_1TOP_A 0b000000001010
@@ -85,13 +85,14 @@ typedef struct s_compendium
 	int		count_val;
 	int		count_golden;
 	t_data	**top;
-	int	(*ops[12])(struct s_compendium *);
+	int		(*ops[12])(struct s_compendium *);
 	char	*revert;
 	char	steps[15000];
 	int		done[15000];
 	int		cut[15000];
 	int		*cut_mask;
 	int		*heir_mask;
+	int		max_bt;
 	int		n_st;
 	int		count[2];
 	t_data	*block_top[2];

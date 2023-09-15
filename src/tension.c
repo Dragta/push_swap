@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/05/04 01:41:29 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/13 19:44:43 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,11 @@ t_data *after(t_compendium *all, t_data *i)
 	else if (i == all->top[1]->prev)
 		ret = NULL;
 	else
+	{
 		ret = i->next;
+		if (ret == all->block_top[1])
+			ret = after(all, all->block_btm[1]);
+	}
 	return (ret);
 }
 
