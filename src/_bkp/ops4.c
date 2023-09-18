@@ -1,19 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ops4.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2022/06/27 08:55:54 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/11 20:16:03 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../push_swap.h"
 
-void	ft_lstadd_front(t_list **lst, t_list *new)
+int	move_rra(t_compendium *all)
 {
-	new->next = *lst;
-	*lst = new;
+	if (!all->top[0] || all->top[0] == all->top[0]->prev)
+		return (-1);
+	all->top[0] = all->top[0]->prev;
+	return (_RRA);
+}
+
+int	move_rrb(t_compendium *all)
+{
+	if (!all->top[1] || all->top[1] == all->top[1]->prev)
+		return (-1);
+	all->top[1] = all->top[1]->prev;
+	return (_RRB);
+}
+
+int	move_rrr(t_compendium *all)
+{
+	int	mrra;
+	int	mrrb;
+
+	mrra = move_rra(all);
+	mrrb = move_rrb(all);
+	if (-1 == mrra || -1 == mrrb)
+	{
+		if (-1 == mrra)
+			return (mrrb);
+		return (mrra);
+	}
+	return (_RRR);
 }

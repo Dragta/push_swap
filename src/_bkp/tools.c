@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/15 10:51:44 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/18 13:08:02 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -234,7 +234,6 @@ void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 	}
 	all->min_target = min_target(all, stk, tmp, sgn);
 /*	printf("min: %i\n", all->min_target);*/
-	count_stacks(all);
 }
 
 void	order_last(t_compendium *all, int stk, int tmp, int sgn)
@@ -242,7 +241,8 @@ void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 /*	printf("order_last: stk %i, tmp %i, sgn %i\n", stk, tmp, sgn);
 	printf("_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
 	set_blocks(all, stk, tmp, sgn);
-	backtrack(all);
+	start_bt(all);
+/*	backtrack(all);*/
 /*	printf("_____OUT: n=%i\n", all->n_st);*/
 	all->count_blocked[0] = 0;
 	all->count_blocked[1] = 0;
@@ -321,7 +321,7 @@ int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
 /*	printf("separate: stk %i, tmp %i, sgn %i, bit %i", stk, tmp, sgn, bit);*/
 	while (bit > 0 && (fused_val & (1 << bit)))
 		bit--;
-/*	printf("\n\n_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
+/*	printf("\n_____ IN: n=%i, ct0 %i, ct1 %i\n", all->n_st, all->count[0], all->count[1]);*/
 	ret = 0;
 	while (tmp--)
 	{
@@ -398,16 +398,14 @@ void	start(t_compendium *all)
 	const int	h_m[] = {0, 3470, 2894, 14, 0, 0,
 		3972, 3906, 3584, 3460, 3394, 448};
 
+	index(all);
+	initialise(all);
 	all->revert = (char *)rev;
 	all->cut_mask = (int *)c_m;
 	all->heir_mask = (int *)h_m;
 	all->max_bt = MAX_BACKTRACK;
 	if (all->count_val < 101)
 		all->max_bt = 5;
-	index(all);
-	if (!all->ops[1])
-		initialise(all);
-	start_bt(all);
 	bit = 2;
 	while (1 << (bit + 1) <= all->count_golden)
 		bit++;

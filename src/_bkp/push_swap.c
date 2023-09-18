@@ -6,11 +6,37 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/18 18:09:39 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/18 12:21:29 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
+
+int	ft_atoi(char *str, int *err)
+{
+	unsigned int	ret;
+	unsigned int	max;
+	int	sign;
+
+	max = (1 << (8 * sizeof(ret) - 1)) - 1U;
+	while (' ' == *str)
+		str++;
+	sign = 1;
+	if ('-' == *str)
+		sign = -1;
+	if ('-' == *str || '+' == *str)
+		str++;
+	ret = 0;
+	while (!(*err) && *str >= '0' && *str <= '9')
+	{
+		ret = ret * 10 + (*(str++) - '0');
+		if (ret > max + (1 - sign) / 2)
+			*err = -1;
+	}
+	if (*str || '+' == *(str - 1) || '-' == *(str - 1))
+		*err = -1;
+	return (sign * ret);
+}
 
 int	phi(int i)
 {
@@ -39,6 +65,33 @@ int	phi(int i)
 		n2 = n2 - n1;
 	}
 	return (sgn * res);
+}
+
+void	index(t_compendium *all)
+{
+	t_data	*tmp;
+	int		i;
+
+	tmp = all->top[0];
+	tmp->target = 0;
+	tmp = tmp->next;
+	i = 1;
+	while(tmp != all->top[0])
+	{
+		tmp->target = i++;
+		tmp->golden = phi(i);
+		tmp = tmp->next;
+	}
+	all->count[0] = i;
+	all->s[0].prev = &(all->s[i - 1]);
+	all->s[i - 1].next = &(all->s[0]);
+	while (--i)
+	{
+		all->s[i].prev = &(all->s[i - 1]);
+		all->s[i - 1].next = &(all->s[i]);
+	}
+	all->top[0] = all->s;
+	count_stacks(all);
 }
 
 void	add_data(t_compendium *all, int position , t_data *on)
@@ -83,32 +136,6 @@ void	init(t_compendium *all, int position, int val, int *err)
 	add_data(all, position, i);
 }
 
-int	ft_atoi(char *str, int *err)
-{
-	unsigned int	ret;
-	unsigned int	max;
-	int	sign;
-
-	max = (1 << (8 * sizeof(ret) - 1)) - 1U;
-	while (' ' == *str)
-		str++;
-	sign = 1;
-	if ('-' == *str)
-		sign = -1;
-	if ('-' == *str || '+' == *str)
-		str++;
-	ret = 0;
-	while (!(*err) && *str >= '0' && *str <= '9')
-	{
-		ret = ret * 10 + (*(str++) - '0');
-		if (ret > max + (1 - sign) / 2)
-			*err = -1;
-	}
-	if (*str || '+' == *(str - 1) || '-' == *(str - 1))
-		*err = -1;
-	return (sign * ret);
-}
-
 int	main(int narg, char **args)
 {
 	int	err;
@@ -132,7 +159,7 @@ int	main(int narg, char **args)
 	while (!err && ++i < narg)
 		init(&all, i - 1, ft_atoi(args[i], &err), &err);
 	if (narg != i)
-		write(2, "Error\n", 6);
+		write(1, "Error\n", 6);
 /*	if (narg == 3)
 	{
 		all.count[0] = 500;

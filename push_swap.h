@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/14 10:29:40 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/18 12:21:58 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 # define _RRB 10
 # define _RRR 11
 # define MAX_BACKTRACK 3
-# define BLOCK 999999
 # define LIMIT 16
 # define TOLERANCE 100
 # define ONE_LINE 0
@@ -59,12 +58,12 @@
 typedef struct s_crawler
 {
 	char	*steps;
-	int	vals;
-	int	n;
-	int	repeated_op;
-	int	times;
-	int	in_stack_A;
-	int	ordered;
+	int		vals;
+	int		n;
+	int		repeated_op;
+	int		times;
+	int		in_stack_A;
+	int		ordered;
 }			t_crawler;
 
 typedef struct s_data
@@ -80,8 +79,7 @@ typedef struct s_data
 
 typedef struct s_compendium
 {
-	int		positions;
-	int		target_B;
+/*	int		positions;*/
 	int		count_val;
 	int		count_golden;
 	t_data	**top;
@@ -108,11 +106,7 @@ typedef struct s_compendium
 	t_data	*s;
 }			t_compendium;
 
-int		ft_atoi(char *str, int *err);
-void	index(t_compendium *all);
-void	quick_st(t_compendium *all);
 int		data_atop(t_compendium *all, t_data *mv, int stack);
-void	count_stacks(t_compendium *all);
 int		move_sa(t_compendium *all);
 int		move_sb(t_compendium *all);
 int		move_ss(t_compendium *all);
@@ -124,42 +118,53 @@ int		move_rr(t_compendium *all);
 int		move_rra(t_compendium *all);
 int		move_rrb(t_compendium *all);
 int		move_rrr(t_compendium *all);
-void	add_data(t_compendium *all, int position, t_data *on);
-void	init(t_compendium *all, int position, int val, int *err);
-void	show_pos(t_compendium *all);
-void	show_tgts(t_compendium *all);
-void	show_all(t_compendium *all);
+
+void	move(t_compendium *all, int op);
+void	count_stacks(t_compendium *all);
+int		undo(t_compendium *all, int n);
+
+int		min_step(t_compendium *all, int *op);
+int		apply_min(t_compendium *all);
+void	save_part(t_compendium *all, int bt_z);
+int		exclude(t_compendium *all);
+void	eval_moves(t_compendium *all);
+
+int		abs(int g);
+int		gap(int g, int max);
+t_data	*after(t_compendium *all, t_data *i);
+int		tot_tension(t_compendium *all);
+
+int		min_target(t_compendium *all, int stk, int tmp, int sgn);
+void	set_blocks(t_compendium *all, int stk, int tmp, int sgn);
+void	settle(t_compendium *all);
+void	fan(t_compendium *all, int search_depth);
 void	backtrack(t_compendium *all);
-/*void	show_a(t_data **stk);
-void	show_b(t_data **stk);
-int		dist(t_data *t);
-int		trend(t_data *t);*/
+
+void	order_last(t_compendium *all, int stk, int tmp, int sgn);
+int		fuse(t_compendium *all, int stk, int tmp, int sgn);
+int		separate(t_compendium *all, int stk, int tmp, int sgn, int bit);
+void	process(t_compendium *all, int stk, int ct, int bit);
+void	start_bt(t_compendium *all);
+
+int		useless_step(t_crawler *bot);
+int		opposite_steps(t_crawler *bot);
+int		turnaround(t_crawler *bot);
+
+void	del_steps(t_crawler *bot, int ct);
+int		refresh(t_crawler *bot);
+void	invert(t_crawler *bot);
+int		clean_steps(char *steps, int vals);
+
 void	print_1_step(int op);
 void	print_steps(char *ops, int nl);
-void	move(t_compendium *all, int op);
-void	init_next_st(t_compendium *all);
-int		gap(int g, int max);
-int		longest(t_compendium *all);
-int		inter_tension(t_compendium *all);
-int		intra_tension(t_compendium *all);
-int		tot_tension(t_compendium *all);
-int		tot_tension1(t_compendium *all);
-int		apply_min(t_compendium *all);
-int		undo(t_compendium *all, int n);
-void	fan(t_compendium *all, int search_depth);
-int		sense(t_data *tx, t_data *ty, t_data *tz);
 void	initialise(t_compendium *all);
+void	index(t_compendium *all);
 void	start(t_compendium *all);
-void	start_bt(t_compendium *all);
-void	try_moves(t_compendium *all);
-void	process(t_compendium *all, int stk, int ct, int bit);
-t_data	**mem_stack(int n);
 
-int	useless_step(t_crawler *bot);
-int	opposite_steps(t_crawler *bot);
-int	turnaround(t_crawler *bot);
-int	clean_steps(char *steps, int vals);
-
+int		phi(int i);
+void	add_data(t_compendium *all, int position , t_data *on);
+void	init(t_compendium *all, int position, int val, int *err);
+int		ft_atoi(char *str, int *err);
 int		main(int narg, char **args);
 /*___Bonus part___*/
 #endif

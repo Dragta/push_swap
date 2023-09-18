@@ -5,7 +5,8 @@ CFLAGS = -Wall -Werror -Wextra -std=c89 #-g3 -fsanitize=address
 INCLUDES = include
 
 DIR_PUSH_SWAP = src/
-FILES_PUSH_SWAP = push_swap tools tools_bt tools_bt1 tension ops1 ops2 ops3 ops4 clean1 clean2
+FILES_PUSH_SWAP = push_swap start process backtrack tension1 tension2 actions \
+				ops1 ops2 ops3 ops4 clean1 clean2
 
 FILES_SRC += $(addprefix $(DIR_PUSH_SWAP), $(FILES_PUSH_SWAP))
 

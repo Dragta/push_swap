@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tension2.c                                         :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
+/*   Updated: 2023/09/18 13:06:20 by fsusanna         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "../push_swap.h"
 
 int	min_step(t_compendium *all, int *op)
@@ -30,12 +42,28 @@ int	apply_min(t_compendium *all)
 	{
 		all->done[all->n_st] |= 1 << do_op;
 		all->tns[do_op] = -1;
-		all->positions++;
+/*		all->positions++;*/
 		move(all, do_op);
-/*		printf("\n%i: ", all->positions);
-		quick_st(all);*/
 	}
 	return (ret_tns);
+}
+
+void	save_part(t_compendium *all, int bt_z)
+{
+	int	i;
+
+	all->part_tns = all->tns[0];
+	i = all->n_st;
+	all->part[i] = 0;
+	while (--i >= bt_z)
+		all->part[i] = all->steps[i];
+	if (!all->part_tns)
+	{
+		i = all->n_st + 1;
+		while (--i >= 0)
+			all->sol[i] = all->steps[i];
+		all->sol_st = all->n_st;
+	}
 }
 
 int	exclude(t_compendium *all)
@@ -72,29 +100,6 @@ int	exclude(t_compendium *all)
 	return (ret);
 }
 
-int	undo(t_compendium *all, int n)
-{
-	int	op;
-
-	n++;
-	while (--n)
-	{
-		if (!all->n_st)
-		{
-			n = -1;
-			break ;
-		}
-		op = all->revert[(int)all->steps[all->n_st - 1]];
-		all->steps[all->n_st - 1] = 0;
-		all->n_st--;
-	}
-	count_stacks(all);
-	all->tns[0] = tot_tension(all);
-	if (exclude(all) == ALL_OPS)
-		all->tns[0] = -1;
-	return (n);
-}
-
 void	eval_moves(t_compendium *all)
 {
 	int	op;
@@ -118,55 +123,5 @@ void	eval_moves(t_compendium *all)
 			all->done[all->n_st - 1] |= 1 << op;
 		}
 		undo(all, 1);
-	}
-}
-
-void	save_part(t_compendium *all, int bt_z)
-{
-	int	i;
-
-	all->part_tns = all->tns[0];
-	i = all->n_st;
-	all->part[i] = 0;
-	while (--i >= bt_z)
-		all->part[i] = all->steps[i];
-	if (!all->part_tns)
-	{
-		i = all->n_st + 1;
-		while (--i >= 0)
-			all->sol[i] = all->steps[i];
-		all->sol_st = all->n_st;
-	}
-}
-
-void	fan(t_compendium *all, int search_depth)
-{
-	int min_tns;
-	int bt_z;
-	int	pr_st;
-
-	if (search_depth >= all->sol_st)
-		search_depth = all->sol_st - 1;
-	pr_st = 0;
-	min_tns = all->tns[0];
-	bt_z = all->n_st;
-	while (all->n_st < search_depth && (bt_z < all->n_st || all->tns[0] > -1))
-	{
-		eval_moves(all);
-		all->tns[0] = apply_min(all);
-		if (all->tns[0] > -1 && all->tns[0] <= min_tns + 1)
-		{
-			if (all->tns[0] < min_tns)
-				min_tns = all->tns[0];
-			if (!all->tns[0])
-				search_depth = all->n_st - 1;
-			if (!all->tns[0] || all->tns[0] < all->part_tns)
-				save_part(all, bt_z);
-			if (all->part_tns > 0 && all->n_st > search_depth - 2)
-				fan(all, all->n_st + BACKTRACK_DEPTH);
-		}
-		while (all->n_st > bt_z &&
-			(all->n_st >= search_depth || all->tns[0] < 0))
-			undo(all, 1);
 	}
 }

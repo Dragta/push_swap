@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/13 19:44:43 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/18 12:19:24 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,7 +96,7 @@ int	tot_tension(t_compendium *all)
 	}
 	pos_tns += gap(i->target - i->pos, all->count_val);
 /*	printf("tns, pos_tns: %i, %i\n", tns, pos_tns);*/
-	tns += 2 * abs(all->count[1] - all->count_blocked[1] - all->target_B) + 
+	tns += 2 * abs(all->count[1] - all->count_blocked[1]) + 
 		pos_tns / (all->count_val - all->count_blocked[0] - all->count_blocked[1]);
 	return (tns);
 }

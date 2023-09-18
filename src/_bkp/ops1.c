@@ -1,38 +1,45 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_lstnew.c                                        :+:      :+:    :+:   */
+/*   ops1.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2022/07/16 04:13:19 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/04/10 18:54:53 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "../push_swap.h"
 
-t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *))
+int	move_sa(t_compendium *all)
 {
-	t_list	*fcopy;
-	t_list	*new;
+	if (!all->top[0] || all->top[0]->next == all->top[0])
+		return (-1);
+	data_atop(all, all->top[0]->next, 0);
+	return (_SA);
+}
 
-	fcopy = NULL;
-	if (lst && f)
+int	move_sb(t_compendium *all)
+{
+	if (!all->top[1] || all->top[1]->next == all->top[1])
+		return (-1);
+	data_atop(all, all->top[1]->next, 1);
+	return (_SB);
+}
+
+int	move_ss(t_compendium *all)
+{
+	int	msa;
+	int	msb;
+
+	msa = move_sa(all);
+	msb = move_sb(all);
+	if (-1 == msa || -1 == msb)
 	{
-		fcopy = ft_lstnew((*f)((*lst).content));
-		lst = (*lst).next;
-		while (lst && fcopy)
-		{
-			new = ft_lstnew((*f)((*lst).content));
-			if (!new)
-			{
-				ft_lstclear(&fcopy, del);
-				return (NULL);
-			}
-			ft_lstadd_back(&fcopy, new);
-			lst = (*lst).next;
-		}
+		if (-1 == msa)
+			return (msb);
+		return (msa);
 	}
-	return (fcopy);
+	return (_SS);
 }
