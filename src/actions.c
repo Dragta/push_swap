@@ -16,18 +16,39 @@ void	move(t_compendium *all, int op)
 {
 	int	op_done;
 
-	printf("___op %i\n", op);
 	op_done = (*(all->ops[op]))(all);
-	if (op_done != op)
-		printf("uyuyuy op %i (done %i)\n", op, op_done);
-	all->steps[all->n_st] = op_done;
-	all->steps[all->n_st + 1] = 0;
-	all->done[all->n_st + 1] = 0;
-	all->cut[all->n_st + 1] = all->cut[all->n_st];
-	all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
-	all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];
-	all->n_st++;
-	count_stacks(all);
+	if (op_done > 0)
+	{
+		all->steps[all->n_st] = op_done;
+		all->steps[all->n_st + 1] = 0;
+		all->done[all->n_st + 1] = 0;
+		all->cut[all->n_st + 1] = all->cut[all->n_st];
+		all->cut[all->n_st + 1] &= all->heir_mask[(int)all->steps[all->n_st]];
+		all->cut[all->n_st + 1] |= all->cut_mask[(int)all->steps[all->n_st]];
+		all->n_st++;
+		count_stacks(all);
+	}
+}
+
+void	settle(t_compendium *all)
+{
+	while (all->sol[all->n_st])
+		move(all, all->sol[all->n_st]);
+}
+
+void	count_blk(t_compendium *all, int s)
+{
+	t_data	*i;
+	int		p;
+
+	i = all->top[s]->prev;
+	p = 0;
+	while (i != all->block_btm[s])
+	{
+		i->pos = all->top[s]->pos - (s + 1) * ++p;
+		i = i->prev;
+	}
+	all->count[s] += p + all->count_blocked[s];
 }
 
 void	count_stacks(t_compendium *all)
@@ -54,16 +75,7 @@ void	count_stacks(t_compendium *all)
 		}
 		all->count[s] = p;
 		if (all->count_blocked[s])
-		{
-			i = all->top[s]->prev;
-			p = 0;
-			while (i != all->block_btm[s])
-			{
-				i->pos = all->top[s]->pos - (s + 1) * ++p;
-				i = i->prev;
-			}
-			all->count[s] += p + all->count_blocked[s];
-		}
+			count_blk(all, s);
 	}
 }
 
@@ -72,16 +84,17 @@ int	undo(t_compendium *all, int n)
 	int	op;
 
 	n++;
-	while (--n)
+	while (--n > 0)
 	{
 		if (!all->n_st)
-		{
 			n = -1;
-			break ;
+		else
+		{
+			op = all->revert[(int)all->steps[all->n_st - 1]];
+			op = (*(all->ops[op]))(all);
+			all->steps[all->n_st - 1] = 0;
+			all->n_st--;
 		}
-		op = all->revert[(int)all->steps[all->n_st - 1]];
-		all->steps[all->n_st - 1] = 0;
-		all->n_st--;
 	}
 	count_stacks(all);
 	all->tns[0] = tot_tension(all);

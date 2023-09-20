@@ -27,15 +27,15 @@ turnaround
 process
 separate
 fuse
+find_last
 order_last
-start_bt
 
 *backtrack
 set_blocks
 min_target
 backtrack
 fan
-settle
+start_bt
 
 *tension1
 tot_tension
@@ -54,6 +54,7 @@ save_part
 count_stacks
 move
 undo
+settle
 
 *________
 ops...

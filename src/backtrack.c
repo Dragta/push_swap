@@ -15,7 +15,7 @@
 int	min_target(t_compendium *all, int stk, int tmp, int sgn)
 {
 	t_data	*i;
-	int	ret;
+	int		ret;
 
 	i = all->top[stk];
 	if (sgn < 0)
@@ -56,32 +56,22 @@ void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
 		while (sgn > 0 && t--)
 			all->block_top[stk] = all->block_top[stk]->next;
 	}
-	else
-	{
-		all->block_top[stk] = NULL;
-		all->block_btm[stk] = NULL;
-	}
-	all->min_target = min_target(all, stk, tmp, sgn);
 }
 
-void	settle(t_compendium *all)
+void	settle_part(t_compendium *all)
 {
-	while (all->sol[all->n_st])
-	{
-		printf("op %i\n", all->sol[all->n_st]);
-		move(all, all->sol[all->n_st]);
-	}
+	while (all->part[all->n_st])
+		move(all, all->part[all->n_st]);
+	all->tns[0] = tot_tension(all);
 }
 
 void	fan(t_compendium *all, int search_depth)
 {
-	int min_tns;
-	int bt_z;
-	int	pr_st;
+	int	min_tns;
+	int	bt_z;
 
 	if (search_depth >= all->sol_st)
 		search_depth = all->sol_st - 1;
-	pr_st = 0;
 	min_tns = all->tns[0];
 	bt_z = all->n_st;
 	while (all->n_st < search_depth && (bt_z < all->n_st || all->tns[0] > -1))
@@ -96,12 +86,16 @@ void	fan(t_compendium *all, int search_depth)
 				search_depth = all->n_st - 1;
 			if (!all->tns[0] || all->tns[0] < all->part_tns)
 				save_part(all, bt_z);
-			if (all->part_tns > 0 && all->n_st > search_depth - 2)
-				fan(all, all->n_st + BACKTRACK_DEPTH);
 		}
-		while (all->n_st > bt_z &&
-			(all->n_st >= search_depth || all->tns[0] < 0))
+		while (all->n_st > bt_z
+			&& (all->n_st >= search_depth || all->tns[0] < 0))
 			undo(all, 1);
+	}
+	if (all->part_tns > 0)
+	{
+		settle_part(all);
+/*		printf("	tns %i n_st %i (sol_st %i)\n", all->part_tns, all->part_tns, all->sol_st);*/
+		fan(all, all->n_st + BACKTRACK_DEPTH);
 	}
 }
 
@@ -119,6 +113,8 @@ void	backtrack(t_compendium *all)
 		return ;
 	while (!all->sol[all->n_st] && all->tolerance < 10000)
 	{
+		if (all->tolerance > TOLERANCE)
+			printf("tol*2 %i\n", all->tolerance * 2);
 		all->tolerance *= 2;
 		all->done[all->n_st] = 0;
 		all->cut[all->n_st] = 0;
@@ -126,5 +122,13 @@ void	backtrack(t_compendium *all)
 		all->tns[0] = tot_tension(all);
 	}
 	settle(all);
-	printf("b\n");
+}
+
+void	start_bt(t_compendium *all)
+{
+	all->done[0] = 0;
+	all->cut[0] = 0;
+	all->tolerance = TOLERANCE;
+	count_stacks(all);
+	backtrack(all);
 }

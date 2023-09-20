@@ -100,6 +100,19 @@ int	exclude(t_compendium *all)
 	return (ret);
 }
 
+void	quick_st(t_compendium *all)
+{
+	int i;
+	int	tmp;
+
+	i = 0;
+	while (i < all->n_st)
+	{
+		tmp = all->steps[i++] + '0';
+		write(1, &tmp, 1);
+	}
+}
+
 void	eval_moves(t_compendium *all)
 {
 	int	op;
