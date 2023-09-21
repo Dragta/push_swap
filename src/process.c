@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.c                                            :+:      :+:    :+:   */
+/*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,11 +12,10 @@
 
 #include "../push_swap.h"
 
-void	order_last(t_compendium *all, int stk, int tmp, int sgn)
+void	order_last(t_compendium *all, t_group gr)
 {
-/*	printf("order_last stk %i tmp %i sgn %i\n", stk, tmp, sgn);*/
-	set_blocks(all, stk, tmp, sgn);
-	all->min_target = min_target(all, stk, tmp, sgn);
+	set_blocks(all, gr);
+	all->min_target = min_target(all, gr);
 	start_bt(all);
 	all->count_blocked[0] = 0;
 	all->count_blocked[1] = 0;
@@ -26,27 +25,27 @@ void	order_last(t_compendium *all, int stk, int tmp, int sgn)
 	all->block_btm[1] = NULL;
 }
 
-int	fuse(t_compendium *all, int stk, int tmp, int sgn)
+int	fuse(t_compendium *all, t_group gr)
 {
 	t_data	*d;
 	int		or;
 	int		and;
 	int		ret;
 
-	d = all->top[stk];
-	if (sgn < 0)
+	d = all->top[gr.stk];
+	if (gr.sgn < 0)
 		d = d->prev;
 	or = d->golden;
 	and = d->golden;
-	if (sgn > 0)
+	if (gr.sgn > 0)
 		d = d->next;
-	while (--tmp)
+	while (--gr.tmp)
 	{
-		if (sgn < 0)
+		if (gr.sgn < 0)
 			d = d->prev;
 		or |= d->golden;
 		and &= d->golden;
-		if (sgn > 0)
+		if (gr.sgn > 0)
 			d = d->next;
 	}
 	or ^= 0xFFFF;
@@ -54,7 +53,7 @@ int	fuse(t_compendium *all, int stk, int tmp, int sgn)
 	return (ret);
 }
 
-int	find_last (t_compendium *all, int stk, int bit)
+int	find_last(t_compendium *all, int stk, int bit)
 {
 	t_data	*last;
 	int		ret;
@@ -69,57 +68,57 @@ int	find_last (t_compendium *all, int stk, int bit)
 	return (ret);
 }
 
-int	separate(t_compendium *all, int stk, int tmp, int sgn, int bit)
+int	separate(t_compendium *all, t_group gr)
 {
 	int		digit;
 	int		ret;
 	int		fused_val;
 
-/*	printf("separate stk %i tmp %i sgn %i bit %i\n", stk, tmp, sgn, bit);*/
-	fused_val = fuse(all, stk, tmp, sgn);
-	while (bit > 0 && (fused_val & (1 << bit)))
-		bit--;
+	fused_val = fuse(all, gr);
+	while (gr.bit > 0 && (fused_val & (1 << gr.bit)))
+		gr.bit--;
 	ret = 0;
-	if (tmp == all->count[stk])
-		ret = find_last(all, stk, bit);
-	tmp -= ret;
-	if (stk)
+	if (gr.tmp == all->count[gr.stk])
+		ret = find_last(all, gr.stk, gr.bit);
+	gr.tmp -= ret;
+	if (gr.stk)
 		ret = 0;
-	while (tmp--)
+	while (gr.tmp--)
 	{
-		if (sgn < 0)
-			move(all, _RRA + stk);
-		digit = (all->top[stk]->golden & (1 << bit)) / (1 << bit);
-		if (stk == digit || sgn > 0)
-			move(all, _PB + 2 * stk + digit - 4 * stk * digit);
+		if (gr.sgn < 0)
+			move(all, _RRA + gr.stk);
+		digit = (all->top[gr.stk]->golden & (1 << gr.bit)) / (1 << gr.bit);
+		if (gr.stk == digit || gr.sgn > 0)
+			move(all, _PB + 2 * gr.stk + digit - 4 * gr.stk * digit);
 		ret += digit;
 	}
 	return (ret);
 }
 
-void	process(t_compendium *all, int stk, int ct, int bit)
+void	process(t_compendium *all, t_group gr)
 {
-	int		tmp;
-	int		ct1;
-	int		sgn;
+	t_group	gr1;
 
-	if (!ct)
+	if (!gr.tmp)
 		return ;
-	sgn = 1;
-	if (ct < 0)
-		sgn = -1;
-	tmp = sgn * ct;
-	if (tmp <= all->max_bt) /*<5 => backtracking*/
-		order_last(all, stk, tmp, sgn);
-	if (tmp <= all->max_bt || bit < 0)
+	if (gr.tmp <= all->max_bt)
+		order_last(all, gr);
+	if (gr.tmp <= all->max_bt || gr.bit < 0)
 		return ;
-	ct1 = separate(all, stk, tmp, sgn, bit);
-	if (stk || ct1 == all->count[0] || sgn < 0)
-		process(all, 0, ct1, bit - 2);
+	gr1.stk = 0;
+	gr1.tmp = separate(all, gr);
+	gr1.bit = gr.bit - 2;
+	if (gr.stk || gr1.tmp == all->count[0] || gr.sgn < 0)
+		gr1.sgn = 1;
 	else
-		process(all, 0, -ct1, bit - 2);
-	if (!stk || tmp - ct1 == all->count[1] || sgn < 0)
-		process(all, 1, tmp - ct1, bit - 1);
+		gr1.sgn = -1;
+	process(all, gr1);
+	gr1.stk = 1;
+	gr1.tmp = gr.tmp - gr1.tmp;
+	gr1.bit = gr.bit - 1;
+	if (!gr.stk || gr1.tmp == all->count[1] || gr.sgn < 0)
+		gr1.sgn = 1;
 	else
-		process(all, 1, -(tmp - ct1), bit - 1);
+		gr1.sgn = -1;
+	process(all, gr1);
 }

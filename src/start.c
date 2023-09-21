@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.c                                            :+:      :+:    :+:   */
+/*   start.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -32,7 +32,6 @@ void	print_steps(char *ops, int nl)
 	sep = ' ';
 	if (nl)
 		sep = '\n';
-
 	while (*ops)
 	{
 		print_1_step(*ops);
@@ -69,7 +68,7 @@ void	index(t_compendium *all)
 	tmp->target = 0;
 	tmp = tmp->next;
 	i = 1;
-	while(tmp != all->top[0])
+	while (tmp != all->top[0])
 	{
 		tmp->target = i++;
 		tmp->golden = phi(i);
@@ -89,9 +88,10 @@ void	index(t_compendium *all)
 
 void	start(t_compendium *all)
 {
-	int		bit;
+	t_group		group;
 	const char	rev[] = {0, 1, 2, 3, 5, 4, 9, 10, 11, 6, 7, 8};
-	const int	c_m[] = {0, 14, 14, 14, 32, 16, 2688, 3136, 3584, 1344, 896, 448};
+	const int	c_m[] = {0, 14, 14, 14, 32, 16,
+		2688, 3136, 3584, 1344, 896, 448};
 	const int	h_m[] = {0, 3470, 2894, 14, 0, 0,
 		3972, 3906, 3584, 3460, 3394, 448};
 
@@ -103,10 +103,13 @@ void	start(t_compendium *all)
 	all->max_bt = MAX_BACKTRACK;
 	if (all->count_val < 101)
 		all->max_bt = 5;
-	bit = 2;
-	while (1 << (bit + 1) <= all->count_golden)
-		bit++;
-	process(all, 0, all->count_val, bit);
+	group.bit = 2;
+	while (1 << (group.bit + 1) <= all->count_golden)
+		group.bit++;
+	group.stk = 0;
+	group.tmp = all->count_val;
+	group.sgn = 1;
+	process(all, group);
 	all->n_st = clean_steps(all->steps, all->count_val);
 	print_steps(all->steps, NEW_LINE);
 }

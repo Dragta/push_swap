@@ -35,6 +35,7 @@ int	apply_min(t_compendium *all)
 	int	do_op;
 	int	ret_tns;
 
+	eval_moves(all);
 	ret_tns = -1;
 	do_op = 0;
 	ret_tns = min_step(all, &do_op);
@@ -42,7 +43,6 @@ int	apply_min(t_compendium *all)
 	{
 		all->done[all->n_st] |= 1 << do_op;
 		all->tns[do_op] = -1;
-/*		all->positions++;*/
 		move(all, do_op);
 	}
 	return (ret_tns);
@@ -52,6 +52,8 @@ void	save_part(t_compendium *all, int bt_z)
 {
 	int	i;
 
+	if (all->tns[0] && all->tns[0] > all->part_tns)
+		return ;
 	all->part_tns = all->tns[0];
 	i = all->n_st;
 	all->part[i] = 0;
@@ -98,19 +100,6 @@ int	exclude(t_compendium *all)
 	ret |= all->done[all->n_st];
 	ret |= all->cut[all->n_st];
 	return (ret);
-}
-
-void	quick_st(t_compendium *all)
-{
-	int i;
-	int	tmp;
-
-	i = 0;
-	while (i < all->n_st)
-	{
-		tmp = all->steps[i++] + '0';
-		write(1, &tmp, 1);
-	}
 }
 
 void	eval_moves(t_compendium *all)

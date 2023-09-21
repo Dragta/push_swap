@@ -16,12 +16,14 @@ start
 clean_steps
 del_steps
 invert
-refresh
+reduce
 
 *clean2
 useless_step
 opposite_steps
 turnaround
+refresh
+refresh2
 
 *process
 process

@@ -41,7 +41,7 @@ int	phi(int i)
 	return (sgn * res);
 }
 
-void	add_data(t_compendium *all, int position , t_data *on)
+void	add_data(t_compendium *all, int position, t_data *on)
 {
 	t_data	*mv;
 
@@ -87,7 +87,7 @@ int	ft_atoi(char *str, int *err)
 {
 	unsigned int	ret;
 	unsigned int	max;
-	int	sign;
+	int				sign;
 
 	max = (1 << (8 * sizeof(ret) - 1)) - 1U;
 	while (' ' == *str)
@@ -111,10 +111,9 @@ int	ft_atoi(char *str, int *err)
 
 int	main(int narg, char **args)
 {
-	int	err;
-	int	i;
+	int				err;
+	int				i;
 	t_compendium	all;
-/*	t_data			*stack;*/
 	t_data			*top[2];
 
 	setvbuf(stdout, NULL, _IONBF, 0);
@@ -133,11 +132,6 @@ int	main(int narg, char **args)
 		init(&all, i - 1, ft_atoi(args[i], &err), &err);
 	if (narg != i)
 		write(2, "Error\n", 6);
-/*	if (narg == 3)
-	{
-		all.count[0] = 500;
-		printf("mean: %i\n", mean(&all, 0));
-	}*/
 	if (narg == i && narg > 2)
 		start(&all);
 	free(all.s);

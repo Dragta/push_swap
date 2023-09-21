@@ -1,7 +1,7 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tools.c                                            :+:      :+:    :+:   */
+/*   backtrack.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
@@ -12,18 +12,18 @@
 
 #include "../push_swap.h"
 
-int	min_target(t_compendium *all, int stk, int tmp, int sgn)
+int	min_target(t_compendium *all, t_group gr)
 {
 	t_data	*i;
 	int		ret;
 
-	i = all->top[stk];
-	if (sgn < 0)
+	i = all->top[gr.stk];
+	if (gr.sgn < 0)
 		i = i->prev;
 	ret = i->target;
-	while (--tmp)
+	while (--gr.tmp)
 	{
-		if (sgn < 0)
+		if (gr.sgn < 0)
 			i = i->prev;
 		else
 			i = i->next;
@@ -33,36 +33,29 @@ int	min_target(t_compendium *all, int stk, int tmp, int sgn)
 	return (ret);
 }
 
-void	set_blocks(t_compendium *all, int stk, int tmp, int sgn)
+void	set_blocks(t_compendium *all, t_group gr)
 {
 	int	t;
 
-	t = tmp;
-	all->count_blocked[1 - stk] = all->count[1 - stk];
-	all->block_top[1 - stk] = all->top[1 - stk];
-	if (all->top[1 - stk])
+	t = gr.tmp;
+	all->count_blocked[1 - gr.stk] = all->count[1 - gr.stk];
+	all->block_top[1 - gr.stk] = all->top[1 - gr.stk];
+	if (all->top[1 - gr.stk])
 	{
-		all->block_btm[1 - stk] = all->top[1 - stk]->prev;
+		all->block_btm[1 - gr.stk] = all->top[1 - gr.stk]->prev;
 	}
 	else
-		all->block_btm[1 - stk] = NULL;
-	all->count_blocked[stk] = all->count[stk] - tmp;
-	if (all->count_blocked[stk])
+		all->block_btm[1 - gr.stk] = NULL;
+	all->count_blocked[gr.stk] = all->count[gr.stk] - gr.tmp;
+	if (all->count_blocked[gr.stk])
 	{
-		all->block_top[stk] = all->top[stk];
-		all->block_btm[stk] = all->top[stk]->prev;
-		while (sgn < 0 && t--)
-			all->block_btm[stk] = all->block_btm[stk]->prev;
-		while (sgn > 0 && t--)
-			all->block_top[stk] = all->block_top[stk]->next;
+		all->block_top[gr.stk] = all->top[gr.stk];
+		all->block_btm[gr.stk] = all->top[gr.stk]->prev;
+		while (gr.sgn < 0 && t--)
+			all->block_btm[gr.stk] = all->block_btm[gr.stk]->prev;
+		while (gr.sgn > 0 && t--)
+			all->block_top[gr.stk] = all->block_top[gr.stk]->next;
 	}
-}
-
-void	settle_part(t_compendium *all)
-{
-	while (all->part[all->n_st])
-		move(all, all->part[all->n_st]);
-	all->tns[0] = tot_tension(all);
 }
 
 void	fan(t_compendium *all, int search_depth)
@@ -76,7 +69,6 @@ void	fan(t_compendium *all, int search_depth)
 	bt_z = all->n_st;
 	while (all->n_st < search_depth && (bt_z < all->n_st || all->tns[0] > -1))
 	{
-		eval_moves(all);
 		all->tns[0] = apply_min(all);
 		if (all->tns[0] > -1 && all->tns[0] <= min_tns + 1)
 		{
@@ -84,8 +76,7 @@ void	fan(t_compendium *all, int search_depth)
 				min_tns = all->tns[0];
 			if (!all->tns[0])
 				search_depth = all->n_st - 1;
-			if (!all->tns[0] || all->tns[0] < all->part_tns)
-				save_part(all, bt_z);
+			save_part(all, bt_z);
 			if (all->part_tns > 0 && all->n_st > search_depth - 2)
 				fan(all, all->n_st + BACKTRACK_DEPTH);
 		}
@@ -93,12 +84,6 @@ void	fan(t_compendium *all, int search_depth)
 			&& (all->n_st >= search_depth || all->tns[0] < 0))
 			undo(all, 1);
 	}
-/*	if (all->part_tns > 0)
-	{
-		settle_part(all);
-*		printf("	tns %i n_st %i (sol_st %i)\n", all->part_tns, all->part_tns, all->sol_st);*
-		fan(all, all->n_st + BACKTRACK_DEPTH);
-	}*/
 }
 
 void	backtrack(t_compendium *all)

@@ -62,7 +62,7 @@ typedef struct s_crawler
 	int		n;
 	int		repeated_op;
 	int		times;
-	int		in_stack_A;
+	int		in_stack_a;
 	int		ordered;
 }			t_crawler;
 
@@ -77,9 +77,16 @@ typedef struct s_data
 	struct s_data	*next;
 }			t_data;
 
+typedef struct s_group
+{
+	int				stk;
+	int				tmp;
+	int				sgn;
+	int				bit;
+}			t_group;
+
 typedef struct s_compendium
 {
-/*	int		positions;*/
 	int		count_val;
 	int		count_golden;
 	t_data	**top;
@@ -134,16 +141,16 @@ int		gap(int g, int max);
 t_data	*after(t_compendium *all, t_data *i);
 int		tot_tension(t_compendium *all);
 
-int		min_target(t_compendium *all, int stk, int tmp, int sgn);
-void	set_blocks(t_compendium *all, int stk, int tmp, int sgn);
+int		min_target(t_compendium *all, t_group gr);
+void	set_blocks(t_compendium *all, t_group gr);
 void	settle(t_compendium *all);
 void	fan(t_compendium *all, int search_depth);
 void	backtrack(t_compendium *all);
 
-void	order_last(t_compendium *all, int stk, int tmp, int sgn);
-int		fuse(t_compendium *all, int stk, int tmp, int sgn);
-int		separate(t_compendium *all, int stk, int tmp, int sgn, int bit);
-void	process(t_compendium *all, int stk, int ct, int bit);
+void	order_last(t_compendium *all, t_group gr);
+int		fuse(t_compendium *all, t_group gr);
+int		separate(t_compendium *all, t_group gr);
+void	process(t_compendium *all, t_group gr);
 void	start_bt(t_compendium *all);
 
 int		useless_step(t_crawler *bot);
@@ -162,7 +169,7 @@ void	index(t_compendium *all);
 void	start(t_compendium *all);
 
 int		phi(int i);
-void	add_data(t_compendium *all, int position , t_data *on);
+void	add_data(t_compendium *all, int position, t_data *on);
 void	init(t_compendium *all, int position, int val, int *err);
 int		ft_atoi(char *str, int *err);
 int		main(int narg, char **args);
