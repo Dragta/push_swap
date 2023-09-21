@@ -86,17 +86,19 @@ void	fan(t_compendium *all, int search_depth)
 				search_depth = all->n_st - 1;
 			if (!all->tns[0] || all->tns[0] < all->part_tns)
 				save_part(all, bt_z);
+			if (all->part_tns > 0 && all->n_st > search_depth - 2)
+				fan(all, all->n_st + BACKTRACK_DEPTH);
 		}
 		while (all->n_st > bt_z
 			&& (all->n_st >= search_depth || all->tns[0] < 0))
 			undo(all, 1);
 	}
-	if (all->part_tns > 0)
+/*	if (all->part_tns > 0)
 	{
 		settle_part(all);
-/*		printf("	tns %i n_st %i (sol_st %i)\n", all->part_tns, all->part_tns, all->sol_st);*/
+*		printf("	tns %i n_st %i (sol_st %i)\n", all->part_tns, all->part_tns, all->sol_st);*
 		fan(all, all->n_st + BACKTRACK_DEPTH);
-	}
+	}*/
 }
 
 void	backtrack(t_compendium *all)

@@ -1,51 +1,3 @@
-separate stk 0 tmp 100 sgn 1 bit 9
-separate stk 0 tmp 11 sgn 1 bit 7
-order_last stk 0 tmp 3 sgn 1
-separate stk 1 tmp 8 sgn 1 bit 6
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn -1
-separate stk 1 tmp 89 sgn 1 bit 8
-separate stk 0 tmp 34 sgn 1 bit 6
-separate stk 0 tmp 13 sgn -1 bit 4
-order_last stk 0 tmp 5 sgn 1
-separate stk 1 tmp 8 sgn 1 bit 3
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn -1
-	tns 2 n_st 2 (sol_st 320)
-separate stk 1 tmp 21 sgn 1 bit 5
-separate stk 0 tmp 8 sgn 1 bit 3
-order_last stk 0 tmp 3 sgn -1
-order_last stk 1 tmp 5 sgn 1
-separate stk 1 tmp 13 sgn -1 bit 4
-order_last stk 0 tmp 5 sgn 1
-separate stk 1 tmp 8 sgn 1 bit 3
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn -1
-separate stk 1 tmp 55 sgn 1 bit 7
-separate stk 0 tmp 21 sgn 1 bit 5
-separate stk 0 tmp 8 sgn -1 bit 3
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn 1
-separate stk 1 tmp 13 sgn 1 bit 4
-order_last stk 0 tmp 5 sgn 1
-separate stk 1 tmp 8 sgn -1 bit 3
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn 1
-separate stk 1 tmp 34 sgn 1 bit 6
-separate stk 0 tmp 13 sgn 1 bit 4
-order_last stk 0 tmp 5 sgn -1
-separate stk 1 tmp 8 sgn 1 bit 3
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn -1
-separate stk 1 tmp 21 sgn 1 bit 5
-separate stk 0 tmp 8 sgn 1 bit 3
-order_last stk 0 tmp 3 sgn -1
-order_last stk 1 tmp 5 sgn 1
-separate stk 1 tmp 13 sgn 1 bit 4
-order_last stk 0 tmp 5 sgn 1
-separate stk 1 tmp 8 sgn 1 bit 3
-order_last stk 0 tmp 3 sgn 1
-order_last stk 1 tmp 5 sgn 1
 pb
 pb
 pb
@@ -342,20 +294,19 @@ pa
 rrb
 pa
 rrb
-rrb
-pa
 ra
 pa
-sa
-pb
-pb
-sb
-pb
 rra
 sa
+ra
+ra
+pb
+rrb
 pa
+sa
 pa
-pa
+rra
+rra
 rb
 rb
 rb
