@@ -102,3 +102,23 @@ int	undo(t_compendium *all, int n)
 		all->tns[0] = -1;
 	return (n);
 }
+
+void	save_part(t_compendium *all, int bt_z)
+{
+	int	i;
+
+	if (all->tns[0] && all->tns[0] > all->part_tns)
+		return ;
+	all->part_tns = all->tns[0];
+	i = all->n_st;
+	all->part[i] = 0;
+	while (--i >= bt_z)
+		all->part[i] = all->steps[i];
+	if (!all->part_tns)
+	{
+		i = all->n_st + 1;
+		while (--i >= 0)
+			all->sol[i] = all->steps[i];
+		all->sol_st = all->n_st;
+	}
+}

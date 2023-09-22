@@ -48,51 +48,39 @@ int	apply_min(t_compendium *all)
 	return (ret_tns);
 }
 
-void	save_part(t_compendium *all, int bt_z)
-{
-	int	i;
-
-	if (all->tns[0] && all->tns[0] > all->part_tns)
-		return ;
-	all->part_tns = all->tns[0];
-	i = all->n_st;
-	all->part[i] = 0;
-	while (--i >= bt_z)
-		all->part[i] = all->steps[i];
-	if (!all->part_tns)
-	{
-		i = all->n_st + 1;
-		while (--i >= 0)
-			all->sol[i] = all->steps[i];
-		all->sol_st = all->n_st;
-	}
-}
-
-int	exclude(t_compendium *all)
+int	exclude2(t_compendium *all)
 {
 	int	ret;
 
 	ret = 0;
 	if (!(all->count[0] - all->count_blocked[0]))
 		ret |= NOT_0A;
-	if (all->top[0] == all->block_top[0])
-		ret |= NOT_0TOP_A;
 	if (!(all->count[1] - all->count_blocked[1]))
 		ret |= NOT_0B;
-	if (all->top[1] == all->block_top[1])
-		ret |= NOT_0TOP_B;
 	if ((all->count[0] - all->count_blocked[0]) < 2)
 		ret |= NOT_1A;
-	if (all->top[0] && all->top[0]->next == all->block_top[0])
-		ret |= NOT_1TOP_A;
 	if ((all->count[1] - all->count_blocked[1]) < 2)
 		ret |= NOT_1B;
-	if (all->top[1] && all->top[1]->next == all->block_top[1])
-		ret |= NOT_1TOP_B;
 	if ((all->count[0] - all->count_blocked[0]) < 3)
 		ret |= NOT_2A;
 	if ((all->count[1] - all->count_blocked[1]) < 3)
 		ret |= NOT_2B;
+	return (ret);
+}
+
+int	exclude(t_compendium *all)
+{
+	int	ret;
+
+	ret = exclude2(all);
+	if (all->top[0] == all->block_top[0])
+		ret |= NOT_0TOP_A;
+	if (all->top[1] == all->block_top[1])
+		ret |= NOT_0TOP_B;
+	if (all->top[0] && all->top[0]->next == all->block_top[0])
+		ret |= NOT_1TOP_A;
+	if (all->top[1] && all->top[1]->next == all->block_top[1])
+		ret |= NOT_1TOP_B;
 	if (all->top[0] && all->top[0]->prev == all->block_btm[0])
 		ret |= NOT_0BTM_A;
 	if (all->top[1] && all->top[1]->prev == all->block_btm[1])

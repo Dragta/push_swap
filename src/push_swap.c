@@ -116,7 +116,6 @@ int	main(int narg, char **args)
 	t_compendium	all;
 	t_data			*top[2];
 
-	setvbuf(stdout, NULL, _IONBF, 0);
 	err = 0;
 	all.s = malloc((narg - 1) * sizeof(t_data));
 	if (!all.s)

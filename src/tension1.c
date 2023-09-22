@@ -27,20 +27,26 @@ int	gap(int g, int max)
 	return (g);
 }
 
+t_data	*after2(t_compendium *all)
+{
+	t_data	*ret;
+
+	ret = all->top[1];
+	if (ret && ret == all->block_top[1])
+	{
+		ret = all->block_btm[1]->next;
+		if (ret == all->top[1])
+			ret = NULL;
+	}
+	return (ret);
+}
+
 t_data	*after(t_compendium *all, t_data *i)
 {
 	t_data	*ret;
 
 	if (i == all->top[0])
-	{
-		ret = all->top[1];
-		if (ret && ret == all->block_top[1])
-		{
-			ret = all->block_btm[1]->next;
-			if (ret == all->top[1])
-				ret = NULL;
-		}
-	}
+		ret = after2(all);
 	else if (!i->id)
 	{
 		ret = i->prev;

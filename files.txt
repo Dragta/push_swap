@@ -41,22 +41,26 @@ start_bt
 
 *tension1
 tot_tension
+first
 after
+after2
 gap
 abs
 
 *tension2
 eval_moves
 exclude
+exclude2
 apply_min
 min_step
-save_part
 
 *actions
 count_stacks
+count_blk
 move
 undo
 settle
+save_part
 
 *________
 ops...
