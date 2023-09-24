@@ -6,26 +6,11 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/18 20:43:29 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/25 00:08:07 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
-
-int	abs(int g)
-{
-	if (g < 0)
-		return (-g);
-	return (g);
-}
-
-int	gap(int g, int max)
-{
-	g = abs(g);
-	if (g > max / 2)
-		g = max - g;
-	return (g);
-}
 
 t_data	*after2(t_compendium *all)
 {

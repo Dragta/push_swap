@@ -44,8 +44,6 @@ tot_tension
 first
 after
 after2
-gap
-abs
 
 *tension2
 eval_moves
@@ -55,12 +53,16 @@ apply_min
 min_step
 
 *actions
-count_stacks
-count_blk
 move
 undo
 settle
 save_part
+
+*calc
+gap
+abs
+count_stacks
+count_blk
 
 *________
 ops...

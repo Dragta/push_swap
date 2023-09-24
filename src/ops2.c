@@ -6,38 +6,38 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/04/10 20:03:21 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/25 00:13:26 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../push_swap.h"
 
-int	data_atop(t_compendium *all, t_data *mv, int stack)
+int	data_atop(t_compendium *all, t_data *mv, int stk)
 {
-	if (!mv || all->top[stack] == mv || (mv->id != stack && all->top[mv->id] != mv))
+	if (!mv || all->top[stk] == mv || (mv->id != stk && all->top[mv->id] != mv))
 		return (-1);
 	mv->prev->next = mv->next;
 	mv->next->prev = mv->prev;
-	if (mv->id != stack)
+	if (mv->id != stk)
 	{
 		all->top[mv->id] = NULL;
 		if (mv->next != mv)
 			all->top[mv->id] = mv->next;
 	}
-	mv->id = stack;
-	if (!all->top[stack])
+	mv->id = stk;
+	if (!all->top[stk])
 	{
 		mv->prev = mv;
 		mv->next = mv;
 	}
 	else
 	{
-		mv->prev = all->top[stack]->prev;
-		mv->next = all->top[stack];
-		all->top[stack]->prev = mv;
+		mv->prev = all->top[stk]->prev;
+		mv->next = all->top[stk];
+		all->top[stk]->prev = mv;
 		mv->prev->next = mv;
 	}
-	all->top[stack] = mv;
+	all->top[stk] = mv;
 	return (0);
 }
 

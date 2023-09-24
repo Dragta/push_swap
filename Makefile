@@ -6,7 +6,7 @@ INCLUDES = include
 
 DIR_PUSH_SWAP = src/
 FILES_PUSH_SWAP = push_swap start process backtrack tension1 tension2 actions \
-				ops1 ops2 ops3 ops4 clean1 clean2
+				ops1 ops2 ops3 ops4 clean1 clean2 calcs
 
 FILES_SRC += $(addprefix $(DIR_PUSH_SWAP), $(FILES_PUSH_SWAP))
 
