@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/18 18:09:39 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/27 00:02:41 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,26 +109,53 @@ int	ft_atoi(char *str, int *err)
 	return (sign * ret);
 }
 
+int	count_n(int narg, char **args)
+{
+	int	i;
+	int	j;
+	int	num;
+	int	ret;
+
+	ret = 0;
+	i = 1;
+	while (i < narg)
+	{
+		j = 0;
+		num = 0;
+		while (args[i][j] == ' ')
+			j++;
+		if (args[i][j])
+			num++;
+		while (args[i][j] && args[i][j] != ' ')
+			j++;
+		if (!args[i][j])
+			ret += num;
+		if (!args[i][j])
+			i++;
+	}
+	return (ret);
+}
+
 int	main(int narg, char **args)
 {
+	int				num;
 	int				err;
 	int				i;
 	t_compendium	all;
 	t_data			*top[2];
 
-	err = 0;
-	all.s = malloc((narg - 1) * sizeof(t_data));
+	num = count_n(narg, args);
+	all.s = malloc((num) * sizeof(t_data));
 	if (!all.s)
 		err = -1;
-	all.count_val = narg - 1;
-	all.count_golden = phi(all.count_val);
+	all.count_val = 0;
 	all.top = top;
 	all.top[0] = all.s;
 	all.top[1] = NULL;
-	all.ops[1] = NULL;
 	i = 0;
 	while (!err && ++i < narg)
 		init(&all, i - 1, ft_atoi(args[i], &err), &err);
+	all.count_golden = phi(all.count_val);
 	if (narg != i)
 		write(2, "Error\n", 6);
 	if (narg == i && narg > 2)
