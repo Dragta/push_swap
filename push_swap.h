@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/24 15:29:40 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/18 12:21:58 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/27 16:51:51 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -170,8 +170,10 @@ void	start(t_compendium *all);
 
 int		phi(int i);
 void	add_data(t_compendium *all, int position, t_data *on);
-void	init(t_compendium *all, int position, int val, int *err);
+void	init(t_compendium *all, char *arg, int *err);
 int		ft_atoi(char *str, int *err);
+int		count_vals(int narg, char **args);
+
 int		main(int narg, char **args);
 /*___Bonus part___*/
 #endif

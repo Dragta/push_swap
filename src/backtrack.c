@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/18 20:34:11 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/27 18:04:11 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,8 +100,6 @@ void	backtrack(t_compendium *all)
 		return ;
 	while (!all->sol[all->n_st] && all->tolerance < 10000)
 	{
-		if (all->tolerance > TOLERANCE)
-			printf("tol*2 %i\n", all->tolerance * 2);
 		all->tolerance *= 2;
 		all->done[all->n_st] = 0;
 		all->cut[all->n_st] = 0;
