@@ -6,7 +6,7 @@
 /*   By: fsusanna <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/06/16 12:50:59 by fsusanna          #+#    #+#             */
-/*   Updated: 2023/09/27 18:45:39 by fsusanna         ###   ########.fr       */
+/*   Updated: 2023/09/28 09:43:09 by fsusanna         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ int	main(int narg, char **args)
 	all.count_golden = phi(all.count_val);
 	if (all.count_val != num || err)
 		write(2, "Error\n", 6);
-	if (!err && all.count_val == num && num > 2)
+	if (!err && all.count_val == num && num > 1)
 		start(&all);
 	free(all.s);
 	return (0);
